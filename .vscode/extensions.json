@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "gruntfuggly.todo-tree",
+    "vue.volar",
+    "bradlc.vscode-tailwindcss",
+    "streetsidesoftware.code-spell-checker-german",
+    "streetsidesoftware.code-spell-checker",
+    "csstools.postcss",
+    "cpylua.language-postcss"
+  ]
+}

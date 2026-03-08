@@ -1,0 +1,6 @@
+[*]
+end_of_line = lf
+indent_style = space
+
+[*.{html,json,yaml,yml,js,ts,vue}]
+indent_size = 2
