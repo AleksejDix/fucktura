@@ -5,5 +5,19 @@
   "city": "Männedorf",
   "email": "invoice@dix.consulting",
   "website": "www.dix.consulting",
-  "uid": "CHE-397.600.688"
+  "uid": "CHE-397.600.688",
+  "contact": "Lidia Dix",
+  "contactEmail": "lidia@dix.consulting",
+  "accounts": [
+    {
+      "iban": "CH58 0070 0114 8057 5961 3",
+      "bank": "Zürcher Kantonalbank",
+      "bic": "ZKBKCHZZ80A"
+    },
+    {
+      "iban": "DE73 1001 1001 2624 0069 98",
+      "bank": "N26 Bank",
+      "bic": "NTSBDEB1XXX"
+    }
+  ]
 }
