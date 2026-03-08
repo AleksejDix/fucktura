@@ -30,7 +30,7 @@
 
       <div class="pt-[12mm]">
         <div class="flex justify-between items-baseline">
-          <h2 class="text-[14pt] font-bold">{{ mahnungStufe }}. {{ $t('Reminder') }}</h2>
+          <h2 class="text-[14pt] font-bold">{{ mahnungStufe }}. {{ t('Reminder') }}</h2>
           <span class="text-[14pt] font-bold">{{ invoiceNumber }}</span>
         </div>
         <p class="font-bold text-[9pt]">{{ invoiceSubtitle }}</p>
@@ -38,69 +38,69 @@
 
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ $t('Date') }}:</span>
+          <span class="text-gray-600">{{ t('Date') }}:</span>
           <span class="font-mono">{{ meta.datum }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ $t('Invoice date') }}:</span>
+          <span class="text-gray-600">{{ t('Invoice date') }}:</span>
           <span class="font-mono">{{ meta.rechnungsDatum }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ $t('Overdue since') }}:</span>
+          <span class="text-gray-600">{{ t('Overdue since') }}:</span>
           <span class="font-mono">{{ meta.faelligSeit }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ $t('Customer number') }}:</span>
+          <span class="text-gray-600">{{ t('Customer number') }}:</span>
           <span class="font-mono">{{ meta.kundennummer }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ $t('Due date') }}:</span>
+          <span class="text-gray-600">{{ t('Due date') }}:</span>
           <span class="font-mono">{{ meta.zahlbarBis }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ $t('Your contact') }}:</span>
+          <span class="text-gray-600">{{ t('Your contact') }}:</span>
           <span>{{ meta.ansprechpartner }}</span>
         </div>
       </div>
 
       <div class="text-[9pt] leading-relaxed mt-3">
-        <p>{{ $t('Greeting', { name: recipient.name }) }}</p>
-        <p class="mt-2">{{ $t('Reminder intro') }}</p>
+        <p>{{ t('Greeting', { name: recipient.name }) }}</p>
+        <p class="mt-2">{{ t('Reminder intro') }}</p>
       </div>
 
       <table class="w-full text-[9pt] mt-3">
         <thead>
           <tr class="border-b border-gray-400 text-left">
-            <th class="py-1.5 font-bold">{{ $t('Description') }}</th>
-            <th class="py-1.5 text-right font-bold">{{ $t('Price in CHF') }}</th>
+            <th class="py-1.5 font-bold">{{ t('Description') }}</th>
+            <th class="py-1.5 text-right font-bold">{{ t('Price in CHF') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr class="border-b border-gray-200">
-            <td class="py-1.5">{{ $t('Outstanding amount') }} ({{ $t('reminder to invoice') }} <span class="font-mono">{{ invoiceNumber }}</span>)</td>
-            <td class="py-1.5 text-right font-mono">{{ formatChf(offenerBetrag) }}</td>
+            <td class="py-1.5">{{ t('Outstanding amount') }} ({{ t('reminder to invoice') }} <span class="font-mono">{{ invoiceNumber }}</span>)</td>
+            <td class="py-1.5 text-right font-mono">{{ formatChfFromNumber(offenerBetrag) }}</td>
           </tr>
           <tr v-if="mahngebuehr > 0" class="border-b border-gray-200">
-            <td class="py-1.5">{{ $t('Reminder fee') }}</td>
-            <td class="py-1.5 text-right font-mono">{{ formatChf(mahngebuehr) }}</td>
+            <td class="py-1.5">{{ t('Reminder fee') }}</td>
+            <td class="py-1.5 text-right font-mono">{{ formatChfFromNumber(mahngebuehr) }}</td>
           </tr>
           <tr v-if="verzugszins > 0" class="border-b border-gray-200">
-            <td class="py-1.5">{{ $t('Default interest') }}</td>
-            <td class="py-1.5 text-right font-mono">{{ formatChf(verzugszins) }}</td>
+            <td class="py-1.5">{{ t('Default interest') }}</td>
+            <td class="py-1.5 text-right font-mono">{{ formatChfFromNumber(verzugszins) }}</td>
           </tr>
         </tbody>
         <tfoot>
           <tr class="border-t border-gray-400">
-            <td class="py-1.5 font-bold">{{ $t('Total amount due') }}</td>
+            <td class="py-1.5 font-bold">{{ t('Total amount due') }}</td>
             <td class="py-1.5 text-right font-bold font-mono">{{ formatChf(total) }}</td>
           </tr>
         </tfoot>
       </table>
 
       <div class="text-[9pt] leading-relaxed mt-4">
-        <p>{{ $t('Reminder crossing note') }}</p>
-        <p class="mt-2">{{ $t('Questions note') }}</p>
-        <p class="mt-3">{{ $t('Kind regards') }}</p>
+        <p>{{ t('Reminder crossing note') }}</p>
+        <p class="mt-2">{{ t('Questions note') }}</p>
+        <p class="mt-3">{{ t('Kind regards') }}</p>
         <p>{{ meta.ansprechpartner }}</p>
       </div>
     </section>
@@ -109,19 +109,30 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { Document, Sender } from '@/db';
+import { useMoney } from '@/composables/useMoney';
 import PageTemplate from '../PageTemplate.vue';
-import sender from '@/data/sender.json';
-import doc from '@/data/documents/MH-00001.json';
 
-defineProps({ pageIndex: { type: Number, default: 0 } });
+const { t } = useI18n({ useScope: 'local' });
+const { sumAmounts, formatChf, formatChfFromNumber } = useMoney();
 
-const { number: invoiceNumber, subtitle: invoiceSubtitle, stufe: mahnungStufe, recipient, meta, offenerBetrag, mahngebuehr, verzugszins } = doc;
+const props = defineProps<{
+  pageIndex?: number;
+  doc: Document;
+  sender: Sender;
+}>();
 
-const total = computed(() => offenerBetrag + mahngebuehr + verzugszins);
+const recipient = computed(() => props.doc.recipient);
+const meta = computed(() => props.doc.meta);
+const invoiceNumber = computed(() => props.doc.number);
+const invoiceSubtitle = computed(() => props.doc.subtitle);
+const mahnungStufe = computed(() => props.doc.stufe ?? 1);
+const offenerBetrag = computed(() => props.doc.offenerBetrag ?? 0);
+const mahngebuehr = computed(() => props.doc.mahngebuehr ?? 0);
+const verzugszins = computed(() => props.doc.verzugszins ?? 0);
 
-function formatChf(n: number): string {
-  return n.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, verzugszins.value));
 </script>
 
 <i18n lang="json">
