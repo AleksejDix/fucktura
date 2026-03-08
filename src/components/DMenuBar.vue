@@ -23,7 +23,7 @@
           <div v-if="item.separator" class="border-t border-gray-200 my-1" />
           <button
             v-else-if="!item.hidden"
-            @click="runAction(item)"
+            @click.stop="runAction(item)"
             :disabled="item.disabled"
             class="w-full flex items-center justify-between px-3 py-1.5 text-left text-[13px] transition-colors"
             :class="item.disabled ? 'text-gray-300 cursor-default' : item.destructive ? 'text-red-500 hover:bg-gray-100' : 'text-gray-800 hover:bg-black hover:text-white'"
@@ -65,7 +65,7 @@ import { useLetterNormStore } from '@/stores/letterNorm';
 interface MenuItem {
   label?: string;
   shortcut?: string;
-  action?: () => void;
+  action?: () => void | Promise<void>;
   disabled?: boolean;
   hidden?: boolean;
   destructive?: boolean;
@@ -93,10 +93,10 @@ function toggleMenu(label: string) {
   openMenu.value = openMenu.value === label ? null : label;
 }
 
-function runAction(item: MenuItem) {
+async function runAction(item: MenuItem) {
   if (item.disabled || !item.action) return;
-  item.action();
   openMenu.value = null;
+  await item.action();
 }
 
 function closeMenus(e: MouseEvent) {
@@ -154,6 +154,7 @@ const menus = computed<Menu[]>(() => [
       { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.id!), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
       { separator: true, hidden: !hasActiveDoc.value },
       { label: t('Clients'), action: () => router.push('/clients') },
+      { label: t('Positions'), action: () => router.push('/positions') },
       { separator: true },
       { label: t('Print / PDF'), shortcut: '⌘P', action: () => emit('generate-pdf') },
     ],

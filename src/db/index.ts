@@ -20,10 +20,17 @@ export interface Sender {
   accounts: Account[];
 }
 
-export interface ClientPosition {
+export interface Position {
+  id?: number;
   description: string;
   code: string;
-  unitPrice: number;
+  unit: string;
+  defaultPrice: number;
+}
+
+export interface ClientPosition {
+  positionId: number;
+  price: number;
 }
 
 export interface Client {
@@ -43,6 +50,7 @@ export interface LineItem {
   description: string;
   code: string;
   quantity: number;
+  unit: string;
   unitPrice: number;
 }
 
@@ -94,6 +102,7 @@ export interface Document {
 
 const db = new Dexie('Fucktura') as Dexie & {
   senders: EntityTable<Sender, 'id'>;
+  positions: EntityTable<Position, 'id'>;
   clients: EntityTable<Client, 'id'>;
   documents: EntityTable<Document, 'id'>;
 };
@@ -134,6 +143,13 @@ db.version(4).stores({
       doc.status = 'draft';
     }
   });
+});
+
+db.version(5).stores({
+  senders: '++id, name',
+  positions: '++id, description, code',
+  clients: '++id, company, zip',
+  documents: '++id, type, status, number, clientId, createdAt',
 });
 
 export { db };
