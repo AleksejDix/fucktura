@@ -30,25 +30,27 @@
         <slot />
       </div>
 
-      <footer class="absolute bottom-0 left-0 right-0 w-full pl-[26mm] pr-[15mm] pb-[10mm]">
-        <div class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4">
-          <div>
-            <div class="font-bold text-gray-600">Acme Consulting</div>
-            <div>Bahnhofstrasse 1</div>
-            <div>8001 Zürich</div>
+      <slot name="footer">
+        <footer class="absolute bottom-0 left-0 right-0 w-full pl-[26mm] pr-[15mm] pb-[10mm]">
+          <div class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4">
+            <div>
+              <div class="font-bold text-gray-600">Acme Consulting</div>
+              <div>Bahnhofstrasse 1</div>
+              <div>8001 Zürich</div>
+            </div>
+            <div>
+              <div class="font-bold text-gray-600">Alex Example</div>
+              <div>alex@acme.example</div>
+              <div>www.acme.example</div>
+            </div>
+            <div>
+              <div class="font-bold text-gray-600 font-mono">CH00 0000 0000 0000 0000 0</div>
+              <div>Demo Bank</div>
+              <div class="font-mono">DEMOCHZZXXX</div>
+            </div>
           </div>
-          <div>
-            <div class="font-bold text-gray-600">Alex Example</div>
-            <div>alex@acme.example</div>
-            <div>www.acme.example</div>
-          </div>
-          <div>
-            <div class="font-bold text-gray-600">CH00 0000 0000 0000 0000 0</div>
-            <div>Demo Bank</div>
-            <div>DEMOCHZZXXX</div>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </slot>
     </div>
   </section>
 </template>
