@@ -1,0 +1,22 @@
+{
+  "type": "invoice",
+  "number": "RE-XXXXX",
+  "subtitle": "",
+  "recipient": {
+    "company": "",
+    "name": "",
+    "street": "",
+    "zip": "",
+    "city": "",
+    "country": ""
+  },
+  "meta": {
+    "datum": "",
+    "zahlbarBis": "",
+    "ansprechpartner": "Dix Lidia",
+    "kundennummer": ""
+  },
+  "lineItems": [
+    { "pos": 1, "description": "", "code": "", "quantity": 0, "unitPrice": 0 }
+  ]
+}
