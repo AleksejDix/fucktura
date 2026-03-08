@@ -20,6 +20,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { ref, nextTick } from 'vue';
 import { useModeStore } from '@/stores/mode';
 
 const modeStore = useModeStore();

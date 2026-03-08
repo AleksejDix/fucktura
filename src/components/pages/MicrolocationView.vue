@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useI18N } from '@/composables/localization';
 import { useGlobalStore } from '@/stores/global';
 import { useRatingStore } from '@/stores/rating';

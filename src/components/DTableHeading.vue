@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed, reactive } from 'vue';
 import { isObject } from '@vueuse/core';
 
 export interface Column {

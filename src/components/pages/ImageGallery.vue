@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue';
 import { Plus } from 'lucide-vue-next';
 import { useGalleryStore } from '@/stores/gallery';
 import { useModeStore } from '@/stores/mode';

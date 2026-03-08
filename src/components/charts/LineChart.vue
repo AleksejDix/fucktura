@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import Chart, {
   type ChartConfiguration,
   type ChartData,
@@ -38,7 +39,6 @@ onMounted(async () => {
     options: {
       ...GlobalChartOptions,
       ...props.options,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       cubicInterpolationMode: 'monotone',
       tension: 1,
