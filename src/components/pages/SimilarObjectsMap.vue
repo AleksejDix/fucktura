@@ -8,7 +8,7 @@
         </p>
       </header>
       <div>
-        <image-with-placeholder
+        <img
           class="w-full object-cover max-h-[78.58125mm] h-[78.58125mm] pb-[5mm]"
           :src="imageSrc"
           alt=""

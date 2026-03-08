@@ -3,8 +3,6 @@ export { default as CommuneTwo } from './CommuneTwo.vue';
 export { default as ConstructionSites } from './ConstructionSites.vue';
 export { default as Cover } from './Cover.vue';
 export { default as Disclaimer } from './Disclaimer.vue';
-export { default as ImageGallery } from './ImageGallery.vue';
-
 export { default as Microlocation } from './Microlocation.vue';
 export { default as MicrolocationAccessibility } from './MicrolocationAccessibility.vue';
 export { default as MicrolocationConnectivity } from './MicrolocationConnectivity.vue';

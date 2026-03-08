@@ -7,7 +7,7 @@
       </header>
       <div class="grid gap-y-4">
         <div>
-          <image-with-placeholder
+          <img
             class="w-full object-cover max-h-[78.58125mm] h-[78.58125mm]"
             :src="imageSrc"
             alt="Map of List of all existing construction sites in the area"

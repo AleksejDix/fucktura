@@ -11,7 +11,7 @@
           :key="key"
         >
           <div class="aspect-video relative">
-            <CDNImage :src="composeImageUrl(similarObject.picture)" class="absolute index-0" />
+            <div class="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-400">{{ similarObject.address }}</div>
             <div class="absolute h-8 w-8 bg-secondary flex items-center justify-center">
               <p class="text-white">{{ key + 1 }}</p>
             </div>
@@ -58,7 +58,6 @@
 <script setup lang="ts">
 import type { SimilarObject } from '@/api/dossiers';
 import { useGlobalStore } from '@/stores/global';
-import CDNImage from '@/components/CDNImage.vue';
 import DTable from '../DTable.vue';
 import type { Columns } from '../DTable.vue';
 import PageTemplate from '../PageTemplate.vue';
@@ -82,12 +81,6 @@ const columns: Columns = {
   listedDayCount: t('Listed'),
   isActive: t('Ad status'),
 };
-
-function composeImageUrl(id?: string | null) {
-  if (!id) return '';
-
-  return id ? `${import.meta.env.VITE_APP_RAW_IMAGE_ROOT_URL}${id}` : '';
-}
 
 function buildingInfo(similarObject: SimilarObject) {
   return [

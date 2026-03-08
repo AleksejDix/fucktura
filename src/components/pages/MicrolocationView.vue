@@ -13,7 +13,7 @@
         </p>
       </header>
       <div>
-        <image-with-placeholder
+        <img
           class="w-full object-cover max-h-[78.58125mm] h-[78.58125mm] pb-[5mm]"
           :src="global.data?.property.imageSrcView"
           alt=""
@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useI18N } from '@/composables/localization';
+import { useI18n } from 'vue-i18n';
 import { useGlobalStore } from '@/stores/global';
 import { useRatingStore } from '@/stores/rating';
 import RatingScore from '@/components/RatingScore.vue';
@@ -48,25 +48,25 @@ defineProps({ pageIndex: { type: Number, default: 0 } });
 const global = useGlobalStore();
 const ratingStore = useRatingStore();
 
-const { translate } = useI18N();
+const { t } = useI18n();
 
 const items = ref([
   {
     list: [
       {
-        category: translate('Daylight summer'),
+        category: t('Daylight summer'),
         value: roundToStep(global.data?.neighborhood.view.list.summerSunshineDailyHours)
           ? `${roundToStep(global.data?.neighborhood.view.list.summerSunshineDailyHours)}h`
           : 'Data not available',
       },
       {
-        category: translate('Visible mountains'),
+        category: t('Visible mountains'),
         value: global.data?.neighborhood.view.list.visibleMountainsPeaksCount
           ? `${global.data?.neighborhood.view.list.visibleMountainsPeaksCount}`
           : 'Data not available',
       },
       {
-        category: translate('Slope'),
+        category: t('Slope'),
         value: roundToStep(global.data?.neighborhood.view.list.slopePercent)
           ? `${roundToStep(global.data?.neighborhood.view.list.slopePercent)}°`
           : 'Data not available',
@@ -76,17 +76,17 @@ const items = ref([
   {
     list: [
       {
-        category: translate('Daylight winter'),
+        category: t('Daylight winter'),
         value: roundToStep(global.data?.neighborhood.view.list.winterSunshineDailyHours)
           ? `${roundToStep(global.data?.neighborhood.view.list.winterSunshineDailyHours)}h`
           : 'Data not available',
       },
       {
-        category: translate('Lake View'),
-        value: translate(global.data?.neighborhood.view.list.lakeViewType || ''),
+        category: t('Lake View'),
+        value: t(global.data?.neighborhood.view.list.lakeViewType || ''),
       },
       {
-        category: translate('Average cloud coverage'),
+        category: t('Average cloud coverage'),
         value: roundToStep(global.data?.neighborhood.view.list.averageCloudCoveragePercent)
           ? `${roundToStep(global.data?.neighborhood.view.list.averageCloudCoveragePercent)}%`
           : 'Data not available',

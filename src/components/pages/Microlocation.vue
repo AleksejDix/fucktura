@@ -10,7 +10,7 @@
       </header>
       <div class="grid gap-4">
         <div>
-          <image-with-placeholder
+          <img
             class="w-full object-cover max-h-[78.58125mm] h-[78.58125mm]"
             :src="global.data?.property.imageSrcOverall"
             alt=""

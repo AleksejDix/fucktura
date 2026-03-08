@@ -14,14 +14,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Theming } from '@/api/dossiers';
-import { useLanguage } from '@/composables/language';
+import { i18n } from '@/i18n';
 import { useGlobalStore } from '@/stores/global';
 import Pages from '@/components/Pages.vue';
 import DControls from './components/DControls.vue';
 
 const global = useGlobalStore();
 
-useLanguage();
+document.documentElement.setAttribute('lang', 'de');
+i18n.global.locale.value = 'de';
 
 async function generatePDF() {
   window.print();
