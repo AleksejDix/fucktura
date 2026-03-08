@@ -83,6 +83,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { formatPrice } from '@/formatters/currency';
 import { roundToStep } from '@/functions/roundToStep';
 import { useGlobalStore } from '@/stores/global';

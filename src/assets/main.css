@@ -1,19 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: rgb(var(--primary-rgb));
+  --color-secondary: rgb(var(--secondary-rgb));
+  --color-tertiary: rgb(var(--tertiary-rgb));
+  --color-denim-600: #4B5563;
+  --color-denim-200: #6d7b90;
+}
 
 * {
-  -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
-  color-adjust: exact !important; /* Firefox 48 – 96 */
-  print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
+  -webkit-print-color-adjust: exact !important;
+  color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 @page {
   size: A4 portrait;
-  margin-left: 0px;
-  margin-right: 0px;
-  margin-top: 0px;
-  margin-bottom: 0px;
   margin: 0;
 }
 
@@ -43,6 +45,7 @@
     break-inside: avoid;
   }
 }
+
 [contenteditable='true'],
 .contentEditable {
   @apply outline-dotted outline-emerald-400;
@@ -60,9 +63,9 @@
 
 @layer base {
   :root {
-    --color-primary: 255 115 179;
-    --color-secondary: 255 116 179;
-    --color-tertiary: 255 117 179;
+    --primary-rgb: 255 115 179;
+    --secondary-rgb: 255 116 179;
+    --tertiary-rgb: 255 117 179;
   }
 }
 

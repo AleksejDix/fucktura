@@ -108,6 +108,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, markRaw } from 'vue';
 import { CircleDot, CircleDotDashed } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
 import { useGlobalStore } from '@/stores/global';

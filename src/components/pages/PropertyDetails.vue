@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { HouseType } from '@/api/dossiers';
 import { useI18N } from '@/composables/localization';
 import { useGlobalStore } from '@/stores/global';

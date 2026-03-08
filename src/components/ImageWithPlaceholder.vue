@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, useAttrs } from 'vue';
 import { ImageOff } from 'lucide-vue-next';
 
 const isSuccess = ref(true);

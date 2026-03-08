@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Theming } from '@/api/dossiers';
 import { useLanguage } from '@/composables/language';
 import { useGlobalStore } from '@/stores/global';
@@ -37,8 +38,8 @@ const theming = computed(() => {
 
 <style lang="postcss">
 main {
-  --color-primary: v-bind('theming?.color1');
-  --color-secondary: v-bind('theming?.color2');
-  --color-tertiary: v-bind('theming?.color3');
+  --primary-rgb: v-bind('theming?.color1');
+  --secondary-rgb: v-bind('theming?.color2');
+  --tertiary-rgb: v-bind('theming?.color3');
 }
 </style>

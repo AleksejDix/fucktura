@@ -35,6 +35,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 export interface ListItem {
   [key: string]: any;
   value: unknown;

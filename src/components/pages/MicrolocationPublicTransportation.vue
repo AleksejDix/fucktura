@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { formatDistance } from '@/formatters/number';
 import { useGlobalStore } from '@/stores/global';

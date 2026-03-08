@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import DTableHeading from '../components/DTableHeading.vue';
 import type { Column } from '../components/DTableHeading.vue';
 
