@@ -75,30 +75,20 @@
           <p class="text-[9pt] font-bold text-gray-900 mb-2">{{ $t('Positions') }}</p>
           <div class="space-y-2">
             <div
-              v-for="(pos, i) in (client.positions ?? [])"
+              v-for="(cp, i) in (client.positions ?? [])"
               :key="i"
-              class="grid grid-cols-[1fr_120px_80px_24px] gap-2 items-end text-[9pt]"
+              class="grid grid-cols-[1fr_80px_24px] gap-2 items-end text-[9pt]"
             >
               <div>
-                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Description') }}</label>
-                <input
-                  v-model="pos.description"
-                  @blur="saveClient(client)"
-                  class="w-full border border-gray-300 px-2 py-1 text-gray-900 focus:outline-none focus:border-gray-900"
-                />
+                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Position') }}</label>
+                <div class="border border-gray-300 px-2 py-1 text-gray-900">
+                  {{ positionLabel(cp.positionId) }}
+                </div>
               </div>
               <div>
-                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Description') }}</label>
+                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Price') }}</label>
                 <input
-                  v-model="pos.code"
-                  @blur="saveClient(client)"
-                  class="w-full border border-gray-300 px-2 py-1 text-gray-900 font-mono focus:outline-none focus:border-gray-900"
-                />
-              </div>
-              <div>
-                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Unit price') }}</label>
-                <input
-                  :value="pos.unitPrice"
+                  :value="cp.price"
                   @blur="updatePositionPrice(client, i, ($event.target as HTMLInputElement).value)"
                   type="number"
                   step="0.01"
@@ -108,10 +98,29 @@
               <button @click="removePosition(client, i)" class="text-gray-300 hover:text-red-500 pb-1">&times;</button>
             </div>
           </div>
-          <button
-            @click="addPosition(client)"
-            class="mt-2 text-[8pt] text-gray-400 hover:text-black"
-          >+ {{ $t('Add position') }}</button>
+          <div class="relative mt-2">
+            <button
+              @click="togglePositionPicker(client.id!)"
+              class="text-[8pt] text-gray-400 hover:text-black"
+            >+ {{ $t('Add position') }}</button>
+            <ul
+              v-if="pickerOpenFor === client.id"
+              class="absolute left-0 top-full mt-1 w-80 bg-white border border-gray-300 shadow-lg z-20 max-h-48 overflow-y-auto"
+            >
+              <li
+                v-for="pos in availablePositions(client)"
+                :key="pos.id"
+                @click="assignPosition(client, pos)"
+                class="px-3 py-2 text-[9pt] cursor-pointer hover:bg-gray-100 border-b border-gray-50 last:border-0 flex justify-between"
+              >
+                <span>{{ pos.description }} <span v-if="pos.code" class="text-gray-400">{{ pos.code }}</span></span>
+                <span class="text-gray-400 font-mono">{{ pos.defaultPrice.toFixed(2) }}</span>
+              </li>
+              <li v-if="availablePositions(client).length === 0" class="px-3 py-2 text-[9pt] text-gray-400 italic">
+                {{ $t('All positions assigned') }}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -124,19 +133,54 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { db } from '@/db';
-import type { Client, ClientPosition } from '@/db';
+import type { Client, Position } from '@/db';
 import { useDocumentsStore } from '@/stores/documents';
 
 const documentsStore = useDocumentsStore();
 const clients = ref<Client[]>([]);
+const allPositions = ref<Position[]>([]);
+const pickerOpenFor = ref<number | null>(null);
 
 async function loadClients() {
   clients.value = await db.clients.toArray();
+  allPositions.value = await db.positions.toArray();
 }
 
-onMounted(loadClients);
+onMounted(() => {
+  loadClients();
+  document.addEventListener('click', onClickOutside, true);
+});
+onUnmounted(() => document.removeEventListener('click', onClickOutside, true));
+
+function onClickOutside(e: MouseEvent) {
+  if (pickerOpenFor.value && !(e.target as Element).closest('.relative')) {
+    pickerOpenFor.value = null;
+  }
+}
+
+function positionLabel(positionId: number): string {
+  const pos = allPositions.value.find(p => p.id === positionId);
+  if (!pos) return '—';
+  return pos.code ? `${pos.description} (${pos.code})` : pos.description;
+}
+
+function availablePositions(client: Client): Position[] {
+  const assigned = new Set((client.positions ?? []).map(cp => cp.positionId));
+  return allPositions.value.filter(p => !assigned.has(p.id!));
+}
+
+function togglePositionPicker(clientId: number) {
+  pickerOpenFor.value = pickerOpenFor.value === clientId ? null : clientId;
+}
+
+function assignPosition(client: Client, pos: Position) {
+  if (!client.positions) client.positions = [];
+  client.positions.push({ positionId: pos.id!, price: pos.defaultPrice });
+  pickerOpenFor.value = null;
+  saveClient(client);
+}
 
 async function addClient() {
   await db.clients.add({
@@ -164,12 +208,6 @@ async function deleteClient(id: number) {
   await documentsStore.load();
 }
 
-function addPosition(client: Client) {
-  if (!client.positions) client.positions = [];
-  client.positions.push({ description: '', code: '', unitPrice: 0 });
-  saveClient(client);
-}
-
 function removePosition(client: Client, index: number) {
   client.positions?.splice(index, 1);
   saveClient(client);
@@ -177,7 +215,7 @@ function removePosition(client: Client, index: number) {
 
 function updatePositionPrice(client: Client, index: number, value: string) {
   if (!client.positions) return;
-  client.positions[index].unitPrice = parseFloat(value) || 0;
+  client.positions[index].price = parseFloat(value) || 0;
   saveClient(client);
 }
 </script>

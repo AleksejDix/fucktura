@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import type { Client, Document, DocumentStatus, Sender, SenderSnapshot } from '@/db';
+import type { Client, Document, DocumentStatus, Position, Sender, SenderSnapshot } from '@/db';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
@@ -7,6 +7,7 @@ export const useDocumentsStore = defineStore('documents', () => {
   const documents = ref<Document[]>([]);
   const clients = ref<Client[]>([]);
   const senders = ref<Sender[]>([]);
+  const positions = ref<Position[]>([]);
   const activeSenderId = ref<number | null>(null);
   const loading = ref(true);
   const activeDocumentId = ref<number | null>(null);
@@ -38,6 +39,7 @@ export const useDocumentsStore = defineStore('documents', () => {
       activeSenderId.value = senders.value[0].id!;
     }
     clients.value = await db.clients.toArray();
+    positions.value = await db.positions.toArray();
     documents.value = await db.documents.orderBy('createdAt').reverse().toArray();
     loading.value = false;
   }
@@ -55,8 +57,9 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   async function addDocument(doc: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>) {
     const now = new Date().toISOString();
+    const raw = JSON.parse(JSON.stringify(doc));
     const id = await db.documents.add({
-      ...doc,
+      ...raw,
       createdAt: now,
       updatedAt: now,
     } as Document);
@@ -73,16 +76,8 @@ export const useDocumentsStore = defineStore('documents', () => {
     await load();
   }
 
-  async function nextNumber(prefix: string): Promise<string> {
-    const type = prefix === 'OF' ? 'offerte' : prefix === 'RE' ? 'invoice' : 'mahnung';
-    const docs = await db.documents.where('type').equals(type).toArray();
-
-    const numbers = docs
-      .map((d) => parseInt(d.number.replace(/\D/g, ''), 10))
-      .filter((n) => !isNaN(n));
-
-    const max = numbers.length > 0 ? Math.max(...numbers) : 0;
-    return `${prefix}-${String(max + 1).padStart(5, '0')}`;
+  function generateNumber(prefix: string): string {
+    return `${prefix}-${Math.floor(Date.now() / 1000)}`;
   }
 
   function formatDate(date: Date): string {
@@ -101,9 +96,9 @@ export const useDocumentsStore = defineStore('documents', () => {
     const s = senderId
       ? await db.senders.get(senderId)
       : activeSender.value;
-    if (!s) throw new Error('No sender available');
+    if (!s) return;
 
-    const number = await nextNumber('OF');
+    const number = generateNumber('O');
     const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
     const today = new Date();
     const validUntil = new Date(today);
@@ -130,7 +125,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         contactPerson: s.contact ?? '',
         kundennummer: clientId ? String(clientId).padStart(6, '0') : '',
       },
-      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unitPrice: 0 }],
+      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0 }],
     });
   }
 
@@ -138,7 +133,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     const offerte = documents.value.find((d) => d.id === offerteId);
     if (!offerte || offerte.type !== 'offerte') return;
 
-    const number = await nextNumber('RE');
+    const number = generateNumber('R');
     const today = new Date();
     const dueDate = new Date(today);
     dueDate.setDate(dueDate.getDate() + 15);
@@ -161,17 +156,25 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
+  function resolveClientPositions(client: Client) {
+    return (client.positions ?? []).map((cp, i) => {
+      const pos = positions.value.find(p => p.id === cp.positionId);
+      return {
+        pos: i + 1,
+        description: pos?.description ?? '',
+        code: pos?.code ?? '',
+        quantity: 0,
+        unit: pos?.unit ?? 'h',
+        unitPrice: cp.price,
+      };
+    });
+  }
+
   async function assignClient(docId: number, clientId: number) {
     const client = clients.value.find((c) => c.id === clientId);
     if (!client) return;
 
-    const lineItems = (client.positions ?? []).map((p, i) => ({
-      pos: i + 1,
-      description: p.description,
-      code: p.code,
-      quantity: 0,
-      unitPrice: p.unitPrice,
-    }));
+    const lineItems = resolveClientPositions(client);
 
     await db.documents.update(docId, {
       clientId,
@@ -204,6 +207,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     documents,
     clients,
     senders,
+    positions,
     activeSenderId,
     activeSender,
     loading,
@@ -215,7 +219,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     setActive,
     addDocument,
     deleteDocument,
-    nextNumber,
+    generateNumber,
     createOfferte,
     convertToInvoice,
     assignClient,

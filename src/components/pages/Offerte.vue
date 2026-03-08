@@ -83,7 +83,7 @@
               <DInline v-model="item.code" tag="div" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'code', v)" />
             </td>
             <td class="py-1.5 text-right align-top font-mono">
-              <DInline :model-value="formatAmount(item.quantity)" tag="span" @update:model-value="v => updateLineItem(i, 'quantity', parseFloat(v) || 0)" /> h
+              <DInline :model-value="formatAmount(item.quantity)" tag="span" @update:model-value="v => updateLineItem(i, 'quantity', parseFloat(v) || 0)" /> <DInline :model-value="item.unit || 'h'" tag="span" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'unit', v)" />
             </td>
             <td class="py-1.5 text-right align-top font-mono">
               <DInline :model-value="formatAmount(item.unitPrice)" tag="span" @update:model-value="v => updateLineItem(i, 'unitPrice', parseFloat(v) || 0)" />
@@ -169,7 +169,7 @@ function updateLineItem(index: number, field: string, value: unknown) {
 function addLineItem() {
   if (!props.doc.id) return;
   const items = [...lineItems.value.map(item => ({ ...item }))];
-  items.push({ pos: items.length + 1, description: '', code: '', quantity: 0, unitPrice: 0 });
+  items.push({ pos: items.length + 1, description: '', code: '', quantity: 0, unit: 'h', unitPrice: 0 });
   store.updateDocument(props.doc.id, { lineItems: items });
 }
 
