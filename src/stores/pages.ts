@@ -1,82 +1,56 @@
-import { useSimilarObjectsStore } from '@/stores/similar-objects';
 import { defineStore } from 'pinia';
-import { computed, markRaw, ref } from 'vue';
+import { computed, markRaw, ref, watch } from 'vue';
 import * as Pages from '@/components/pages';
-import { SimilarObjects, SimilarObjectsMap } from '@/components/pages';
-
-export const PAGES = [
-  Pages.Invoice,
-  Pages.Offerte,
-  Pages.Mahnung,
-  Pages.QRBill,
-] as const;
+import { useDocumentsStore } from './documents';
 
 export type PageName = keyof typeof Pages;
-export type PageType = typeof Pages[PageName];
-export type PageNumbers = Record<PageName, boolean>;
-export type PageVisibilities = Record<PageName, boolean>;
+export type PageType = (typeof Pages)[PageName];
 
 export interface Page {
   id: string;
   name: PageName;
   component: PageType;
   enabled: boolean;
-  metadata: any;
-}
-
-// Cache of generated pages
-const cache: Partial<Record<PageName, Page>> = {};
-
-function createPage(component: PageType, metadata = {}, enabled = true): Page {
-  const name = (component.__name || 'Cover') as PageName;
-  const cached = cache[name];
-  if (cached) {
-    return cached;
-  } else {
-    const page = {
-      id: crypto.randomUUID(),
-      name: (component.__name || 'Cover') as PageName,
-      enabled,
-      component: markRaw(component || Pages.Cover),
-      metadata,
-    };
-
-    cache[name] = page;
-
-    return page;
-  }
+  metadata: Record<string, unknown>;
 }
 
 export const usePagesStore = defineStore('pages', () => {
-  const similarObjects = useSimilarObjectsStore();
-
-  const shouldDisplaySimilarObjectsPage = computed(() => similarObjects.objects.length > 0);
-
-  function getSimilarObjectsPages(): Page[] {
-    return shouldDisplaySimilarObjectsPage.value ? [createPage(SimilarObjects)] : [];
-  }
-
-  function getSimilarObjectsMapPages(): Page[] {
-    return shouldDisplaySimilarObjectsPage.value ? [createPage(SimilarObjectsMap)] : [];
-  }
-
+  const documentsStore = useDocumentsStore();
   const pages = ref<Page[]>([]);
 
-  function updateListOfPages() {
-    pages.value = PAGES.map((page) => {
-      const name = page.__name || 'Cover';
-      switch (name) {
-        case 'SimilarObjects':
-          return getSimilarObjectsPages();
-        case 'SimilarObjectsMap':
-          return getSimilarObjectsMapPages();
-        default:
-          return createPage(page);
-      }
-    }).flat(2);
+  function componentForType(type: string): PageType | null {
+    switch (type) {
+      case 'invoice': return Pages.Invoice;
+      case 'offerte': return Pages.Offerte;
+      case 'mahnung': return Pages.Mahnung;
+      default: return null;
+    }
   }
 
-  updateListOfPages();
+  function buildPages() {
+    const result: Page[] = [];
+
+    for (const doc of documentsStore.visibleDocuments) {
+      const component = componentForType(doc.type);
+      if (!component) continue;
+
+      result.push({
+        id: `doc-${doc.id}`,
+        name: component.__name as PageName,
+        component: markRaw(component),
+        enabled: true,
+        metadata: { doc, sender: doc.sender },
+      });
+    }
+
+    pages.value = result;
+  }
+
+  watch(
+    [() => documentsStore.visibleDocuments, () => documentsStore.activeDocumentId],
+    buildPages,
+    { immediate: true },
+  );
 
   const pageNumbers = computed(() => {
     let pageNumber = 1;
@@ -91,6 +65,6 @@ export const usePagesStore = defineStore('pages', () => {
     pages,
     pageNumbers,
     numberOfVisiblePages,
-    updateListOfPages,
+    buildPages,
   };
 });

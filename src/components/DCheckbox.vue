@@ -3,7 +3,7 @@
     <input
       :id="'d-checkbox' + id"
       type="checkbox"
-      class="accent-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-800"
+      class="accent-gray-900 bg-gray-100 border-gray-300 focus:ring-gray-900"
       :class="{ hidden: customIcons, ...[`h-${size}`, `w-${size}`] }"
       :checked="modelValue"
       @change="handleChange"
@@ -11,11 +11,11 @@
     <label
       v-if="customIcons"
       :for="'d-checkbox' + id"
-      class="bg-gray-100 border-gray-300 rounded-sm flex items-center justify-center text-base"
+      class="bg-gray-100 border-gray-300 flex items-center justify-center text-base"
       :class="[
         `h-${size}`,
         `w-${size}`,
-        modelValue ? 'bg-blue-800 text-white' : 'bg-white border-2 border-gray-500 text-gray-500',
+        modelValue ? 'bg-gray-900 text-white' : 'bg-white border-2 border-gray-500 text-gray-500',
       ]"
     >
       <component :is="modelValue ? customIcons.on : customIcons.off" :size="16" />

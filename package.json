@@ -15,12 +15,14 @@
   },
   "dependencies": {
     "@vueuse/core": "^14.2.1",
-    "chart.js": "^4.5.1",
+    "dexie": "^4.3.0",
+    "dinero.js": "^2.0.0-alpha.17",
     "lucide-vue-next": "^0.577.0",
     "pinia": "^3.0.4",
     "swissqrbill": "^4.3.0",
     "vue": "^3.5.29",
-    "vue-i18n": "^11.3.0"
+    "vue-i18n": "^11.3.0",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^11.0.7",
