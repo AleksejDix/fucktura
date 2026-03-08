@@ -18,12 +18,7 @@
         modelValue ? 'bg-primary text-white' : 'bg-white border-2 border-gray-500 text-gray-500',
       ]"
     >
-      <span v-if="modelValue">
-        <i :class="customIcons.on"></i>
-      </span>
-      <span v-else>
-        <i :class="customIcons.off"></i>
-      </span>
+      <component :is="modelValue ? customIcons.on : customIcons.off" :size="16" />
     </label>
     <label v-else for="d-checkbox" class="ml-2 text-sm font-medium text-gray-900">{{
       label
@@ -32,6 +27,8 @@
 </template>
 
 <script setup lang="ts">
+import type { Component } from 'vue';
+
 const emit = defineEmits(['update:modelValue']);
 
 defineProps({
@@ -52,7 +49,7 @@ defineProps({
     default: 8,
   },
   customIcons: {
-    type: Object as PropType<Record<'on' | 'off', string>>,
+    type: Object as PropType<Record<'on' | 'off', Component>>,
     default: () => null,
   },
 });

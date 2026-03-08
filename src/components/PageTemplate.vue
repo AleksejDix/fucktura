@@ -7,7 +7,7 @@
       v-model="pagesStore.pages[pageIndex].enabled"
       :id="pageIndex.toString()"
       class="absolute right-[-16px] top-[-16px]"
-      :custom-icons="{ on: 'fa-solid fa-eye', off: 'fa-solid fa-eye-slash' }"
+      :custom-icons="{ on: Eye, off: EyeOff }"
     />
     <slot name="side-controls" />
     <div :class="{ 'opacity-20': !pagesStore.pages[pageIndex].enabled }">
@@ -59,6 +59,7 @@ import Agency from '@/components/Agency.vue';
 import AgencyLogo from '@/components/AgencyLogo.vue';
 import Agent from '@/components/Agent.vue';
 import PageNumber from '@/components/PageNumber.vue';
+import { Eye, EyeOff } from 'lucide-vue-next';
 import DCheckbox from './DCheckbox.vue';
 import HeaderAddress from './HeaderAddress.vue';
 

@@ -21,9 +21,9 @@
           :key="j"
           v-bind="item"
         >
-          <span v-if="j === 0" class="font-semibold">
+          <span v-if="j === 0" class="font-semibold inline-flex items-center gap-1">
             {{ item[itemKey] }}
-            <i v-if="item['categoryIcon']" :class="`fa-regular ${item['categoryIcon']}`" />
+            <component v-if="item['categoryIcon']" :is="item['categoryIcon']" :size="12" />
           </span>
           <span v-else-if="itemKey !== 'categoryIcon'" class="text-gray-500" notranslate>
             {{ item[itemKey] }}

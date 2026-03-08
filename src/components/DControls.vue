@@ -7,7 +7,7 @@
       class="print:hidden bg-white text-xl text-black px-4 rounded-md font-medium shadow-sm py-2 whitespace-nowrap"
       data-testid="pdf-download-button"
     >
-      <i class="fa-solid fa-print"></i>
+      <Printer :size="20" />
     </button>
 
     <label class="relative inline-flex items-center cursor-pointer">
@@ -27,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import { Printer } from 'lucide-vue-next';
 import { useModeStore } from '@/stores/mode';
 import DLegend from '@/components/DLegend.vue';
 

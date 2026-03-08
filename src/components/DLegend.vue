@@ -5,10 +5,10 @@
       <div class="flex items-center col-span-2">
         <p>{{ $t('Editable content') }}</p>
       </div>
-      <span class="text-base col-span-1">
-        <i class="fa-solid fa-eye"></i>
+      <span class="text-base col-span-1 flex items-center gap-1">
+        <Eye :size="16" />
         /
-        <i class="fa-solid fa-eye-slash"></i>
+        <EyeOff :size="16" />
       </span>
       <div class="flex items-center col-span-2">
         <p>Show/Hide page in print</p>
@@ -16,3 +16,7 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { Eye, EyeOff } from 'lucide-vue-next';
+</script>

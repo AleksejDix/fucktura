@@ -9,7 +9,6 @@ import { useModeStore } from './mode';
 export const PAGES = [
   Pages.Cover,
   Pages.PropertyDetails,
-  Pages.MarketSituation,
   Pages.SimilarObjectsMap, // 0 or 1
   Pages.SimilarObjects, // 0 or 1
   Pages.MicrolocationAccessibility,

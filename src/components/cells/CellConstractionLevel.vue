@@ -1,16 +1,17 @@
 <template>
   <div class="text-right whitespace-nowrap" notranslate>
     <div v-if="isNumberWithZero(level)" class="flex gap-2 justify-end items-center">
-      <i class="fa-regular fa-layer-group" />
+      <Layers :size="16" />
       <span>{{ level }}</span>
     </div>
     <div v-else class="text-red-400">
-      <i class="fa-regular fa-transporter-empty"></i>
+      <PackageOpen :size="16" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Layers, PackageOpen } from 'lucide-vue-next';
 import { isNumberWithZero } from '@/validators/isNumberWithZero';
 
 defineProps({
