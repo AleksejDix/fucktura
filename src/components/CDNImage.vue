@@ -1,7 +1,7 @@
 <template>
   <image-with-placeholder
     @click="toggleObjectFit"
-    :src="getImageSrc(src, size)"
+    :src="src"
     :decoding="decoding"
     :alt="alt"
     class="block h-full w-full border bg-gray-100"
@@ -10,8 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import { BunnyCDNImageSize, imageSizes } from '@/lib/images';
-
 defineEmits(['zoomin']);
 
 defineProps({
@@ -25,8 +23,8 @@ defineProps({
     default: null,
   },
   size: {
-    type: String as PropType<string | BunnyCDNImageSize>,
-    default: imageSizes.SMALL,
+    type: String,
+    default: 'sm',
   },
   alt: {
     type: String,
@@ -37,33 +35,8 @@ defineProps({
 const coverTypes = ref(['object-cover', 'object-contain']);
 const cursor = ref(['cursor-zoom-in', 'cursor-zoom-out']);
 
-function isValidHttpUrl(url: string) {
-  try {
-    const { protocol } = new URL(url);
-    return protocol === 'http:' || protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
 function toggleObjectFit() {
   coverTypes.value = coverTypes.value.reverse();
   cursor.value = cursor.value.reverse();
 }
-
-function isValidDataUrl(url: string) {
-  return (url || '').startsWith('data:');
-}
-
-const getImageSrc = (src: string, size: BunnyCDNImageSize | string) => {
-  if (isValidHttpUrl(src)) {
-    return size === imageSizes.SMALL
-      ? `${src}?optimizer=image&class=${imageSizes.LARGE}`
-      : `${src}?optimizer=image&class=${imageSizes.EXTRA_LARGE}`;
-  } else if (isValidDataUrl(src)) {
-    return src;
-  } else {
-    return null;
-  }
-};
 </script>

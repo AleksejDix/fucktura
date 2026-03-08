@@ -1,4 +1,3 @@
-import type { FeatureCollection, MultiPolygon } from 'geojson';
 import type { Nullable } from '@/lib/types';
 
 export interface Coordinates {
@@ -612,7 +611,7 @@ export interface PoiInDistance {
 }
 
 export interface Distance {
-  area: FeatureCollection<MultiPolygon>;
+  area: any;
   pois: PoiInDistance[];
 }
 

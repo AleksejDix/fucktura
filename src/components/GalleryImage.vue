@@ -13,7 +13,7 @@
         v-if="modeStore.isEditMode"
         @click="galleryStore.removeImage(image)"
       >
-        <i class="fa-solid fa-trash-xmark"></i>
+        <Trash2 :size="12" />
         <span> remove </span>
       </button>
     </figcaption>
@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
 import type { GalleryItem } from '@/api/dossiers';
+import { Trash2 } from 'lucide-vue-next';
 import { useI18N } from '@/composables/localization';
 import { useGalleryStore } from '@/stores/gallery';
 import { useModeStore } from '@/stores/mode';

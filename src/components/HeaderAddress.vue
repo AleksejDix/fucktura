@@ -1,7 +1,7 @@
 <template>
   <address v-if="address" class="flex not-italic text-black" notranslate>
     <div class="flex items-center gap-3">
-      <i class="fa-regular fa-location-dot text-2xl" />
+      <MapPin :size="24" />
       <div>
         <p>{{ street }}</p>
         <p>{{ locality }}</p>
@@ -11,6 +11,8 @@
 </template>
 
 <script setup lang="ts">
+import { MapPin } from 'lucide-vue-next';
+
 const props = defineProps({
   address: {
     type: String,

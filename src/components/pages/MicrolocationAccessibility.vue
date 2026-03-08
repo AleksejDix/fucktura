@@ -46,11 +46,13 @@
 </template>
 
 <script setup lang="ts">
-import { useAccessibilityData } from '@/stores/accessibility';
 import DList from '../DList.vue';
 import PageTemplate from '../PageTemplate.vue';
 
 defineProps({ pageIndex: { type: Number, default: 0 } });
 
-const { walkPois, bikePois, carPois, transportationPois } = useAccessibilityData();
+const walkPois: any[] = [];
+const bikePois: any[] = [];
+const carPois: any[] = [];
+const transportationPois: any[] = [];
 </script>

@@ -11,7 +11,7 @@
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-[11px] rounded-sm"
           @click="addImage"
         >
-          <i class="fa-solid fa-add"></i>
+          <Plus :size="16" />
         </button>
       </div>
     </template>
@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import { Plus } from 'lucide-vue-next';
 import { useGalleryStore } from '@/stores/gallery';
 import { useModeStore } from '@/stores/mode';
 import GalleryBundle from '@/components/GalleryBundle.vue';

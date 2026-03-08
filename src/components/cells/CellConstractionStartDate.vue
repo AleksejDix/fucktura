@@ -4,12 +4,13 @@
       <span>{{ formatDateShort(new Date(date)) }}</span>
     </div>
     <div v-if="!date" class="text-red-500">
-      <i class="fa-regular fa-transporter-empty"></i>
+      <PackageOpen :size="16" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { PackageOpen } from 'lucide-vue-next';
 import { formatDateShort } from '../../formatters/date';
 
 defineProps({

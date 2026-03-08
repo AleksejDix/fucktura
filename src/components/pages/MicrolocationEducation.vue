@@ -25,7 +25,7 @@
               <span notranslate> {{ category }}</span>
             </template>
             <template #suffix>
-              <i class="fa-solid fa-location-pin" :style="{ color: '#' + item.color }" />
+              <MapPin :size="14" :style="{ color: '#' + item.color }" />
             </template>
           </DList>
         </div>
@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+import { MapPin } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
 import { formatDistance } from '@/formatters/number';
 import { useGlobalStore } from '@/stores/global';

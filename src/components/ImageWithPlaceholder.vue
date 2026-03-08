@@ -7,11 +7,13 @@
     @load="imageOnLoad"
   />
   <div v-else class="flex items-center justify-center text-5xl bg-slate-200">
-    <i class="fa-regular fa-image-slash" />
+    <ImageOff :size="48" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ImageOff } from 'lucide-vue-next';
+
 const isSuccess = ref(true);
 const attrs = useAttrs();
 const imageOnError = () => {

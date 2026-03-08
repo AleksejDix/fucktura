@@ -108,6 +108,7 @@
 </template>
 
 <script setup lang="ts">
+import { CircleDot, CircleDotDashed } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
 import { useGlobalStore } from '@/stores/global';
 import type { ChartDataset } from 'chart.js';
@@ -154,12 +155,12 @@ const populationShareInfo = ref([
   {
     category: t('Female'),
     value: Math.round(communeFemaleShare || 0) + '%',
-    categoryIcon: 'fa-venus',
+    categoryIcon: markRaw(CircleDot),
   },
   {
     category: t('Male'),
     value: Math.round(communeMaleShare || 0) + '%',
-    categoryIcon: 'fa-mars',
+    categoryIcon: markRaw(CircleDotDashed),
   },
 ]);
 
