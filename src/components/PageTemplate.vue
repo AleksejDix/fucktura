@@ -35,19 +35,14 @@
         <footer class="absolute bottom-0 left-0 right-0 w-full pb-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)]">
           <div class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4">
             <div>
-              <div class="font-bold text-gray-600">Acme Consulting</div>
-              <div>Bahnhofstrasse 1</div>
-              <div>8001 Zürich</div>
+              <div class="font-bold text-gray-600">{{ sender.name }}</div>
+              <div>{{ sender.street }}</div>
+              <div>{{ sender.zip }} {{ sender.city }}</div>
             </div>
-            <div>
-              <div class="font-bold text-gray-600">Alex Example</div>
-              <div>alex@acme.example</div>
-              <div>www.acme.example</div>
-            </div>
-            <div>
-              <div class="font-bold text-gray-600 font-mono">CH00 0000 0000 0000 0000 0</div>
-              <div>Demo Bank</div>
-              <div class="font-mono">DEMOCHZZXXX</div>
+            <div v-for="account in sender.accounts" :key="account.iban">
+              <div class="font-bold text-gray-600">{{ account.iban }}</div>
+              <div>{{ account.bank }}</div>
+              <div>{{ account.bic }}</div>
             </div>
           </div>
         </footer>
@@ -60,6 +55,7 @@
 import { useGlobalStore } from '@/stores/global';
 import { usePagesStore } from '@/stores/pages';
 import { useLetterNormStore } from '@/stores/letterNorm';
+import sender from '@/data/sender.json';
 import AgencyLogo from '@/components/AgencyLogo.vue';
 import { Eye, EyeOff } from 'lucide-vue-next';
 import DCheckbox from './DCheckbox.vue';

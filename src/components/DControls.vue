@@ -18,6 +18,15 @@
       <option value="DIN5008">DIN 5008 (DE)</option>
     </select>
 
+    <select
+      v-model="locale"
+      class="bg-white text-sm text-black px-3 py-2 rounded-md shadow-sm border border-gray-200"
+    >
+      <option value="de">DE</option>
+      <option value="en">EN</option>
+      <option value="es">ES</option>
+    </select>
+
     <label class="relative inline-flex items-center cursor-pointer">
       <input
         v-model="modeStore.mode"
@@ -36,10 +45,12 @@
 
 <script setup lang="ts">
 import { Printer } from 'lucide-vue-next';
+import { useI18n } from 'vue-i18n';
 import { useModeStore } from '@/stores/mode';
 import { useLetterNormStore } from '@/stores/letterNorm';
 import DLegend from '@/components/DLegend.vue';
 
+const { locale } = useI18n();
 const modeStore = useModeStore();
 const normStore = useLetterNormStore();
 

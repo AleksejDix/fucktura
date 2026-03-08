@@ -217,4 +217,5 @@ export default {
   // Public transportation page
   'Education': 'Bildung',
   'Transport': 'Verkehr',
+
 };
