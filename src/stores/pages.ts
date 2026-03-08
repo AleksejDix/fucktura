@@ -5,6 +5,7 @@ import * as Pages from '@/components/pages';
 import { SimilarObjects, SimilarObjectsMap } from '@/components/pages';
 
 export const PAGES = [
+  Pages.Letter,
   Pages.Cover,
   Pages.PropertyDetails,
   Pages.SimilarObjectsMap, // 0 or 1
@@ -21,6 +22,7 @@ export const PAGES = [
   Pages.CommuneOne,
   Pages.CommuneTwo,
   Pages.Disclaimer,
+  Pages.QRBill,
 ] as const;
 
 export type PageName = keyof typeof Pages;

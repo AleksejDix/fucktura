@@ -27,7 +27,7 @@
           />
         </div>
         <div class="w-full h-[78mm] pb-[5mm]">
-          <div class="text-primary font-bold pb-2">{{ $t('Decibel scale') }}</div>
+          <div class="text-blue-800 font-bold pb-2">{{ $t('Decibel scale') }}</div>
           <div class="flex justify-between h-[6mm] text-[8pt] text-gray-600" notranslate>
             <span v-for="(decibelItem, index) in decibelNumberList" :key="index">
               {{ decibelItem }}db

@@ -12,13 +12,13 @@
         >
           <div class="aspect-video relative">
             <div class="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-400">{{ similarObject.address }}</div>
-            <div class="absolute h-8 w-8 bg-secondary flex items-center justify-center">
+            <div class="absolute h-8 w-8 bg-blue-500 flex items-center justify-center">
               <p class="text-white">{{ key + 1 }}</p>
             </div>
           </div>
           <div>
             <div>
-              <div class="text-primary font-bold pb-2">
+              <div class="text-blue-800 font-bold pb-2">
                 {{ similarObject.address }}
               </div>
               <DTable

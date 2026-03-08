@@ -2,7 +2,7 @@
   <table class="table-auto border-collapse w-full">
     <template v-if="variant === 'vertical'">
       <thead>
-        <tr class="align-middle text-primary">
+        <tr class="align-middle text-blue-800">
           <DTableHeading
             class="p-2"
             v-for="(value, key, index) in columns"
