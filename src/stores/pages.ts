@@ -5,24 +5,10 @@ import * as Pages from '@/components/pages';
 import { SimilarObjects, SimilarObjectsMap } from '@/components/pages';
 
 export const PAGES = [
-  Pages.Letter,
+  Pages.Invoice,
+  Pages.Offerte,
+  Pages.Mahnung,
   Pages.QRBill,
-  Pages.Cover,
-  Pages.PropertyDetails,
-  Pages.SimilarObjectsMap, // 0 or 1
-  Pages.SimilarObjects, // 0 or 1
-  Pages.MicrolocationAccessibility,
-  Pages.Microlocation,
-  Pages.MicrolocationSilence,
-  Pages.MicrolocationEducation,
-  Pages.MicrolocationShopping,
-  Pages.MicrolocationView,
-  Pages.MicrolocationConnectivity,
-  Pages.MicrolocationImmissions,
-  Pages.ConstructionSites,
-  Pages.CommuneOne,
-  Pages.CommuneTwo,
-  Pages.Disclaimer,
 ] as const;
 
 export type PageName = keyof typeof Pages;

@@ -1,0 +1,25 @@
+{
+  "type": "mahnung",
+  "number": "RE-00110",
+  "subtitle": "November 2025 - Automated Testing - Andrew Pichkur",
+  "stufe": 1,
+  "recipient": {
+    "company": "Property Captain Tech AG",
+    "name": "Frau Ilic Manuela",
+    "street": "Rüdigerstrasse 15",
+    "zip": "8045",
+    "city": "Zürich",
+    "country": "Schweiz"
+  },
+  "meta": {
+    "datum": "08.01.2026",
+    "rechnungsDatum": "04.12.2025",
+    "faelligSeit": "19.12.2025",
+    "zahlbarBis": "22.01.2026",
+    "ansprechpartner": "Dix Lidia",
+    "kundennummer": "000005"
+  },
+  "offenerBetrag": 4147,
+  "mahngebuehr": 0,
+  "verzugszins": 0
+}

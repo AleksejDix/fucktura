@@ -1,0 +1,27 @@
+{
+  "type": "invoice",
+  "number": "RE-00110",
+  "subtitle": "November 2025 - Automated Testing - Andrew Pichkur",
+  "recipient": {
+    "company": "Property Captain Tech AG",
+    "name": "Frau Ilic Manuela",
+    "street": "Rüdigerstrasse 15",
+    "zip": "8045",
+    "city": "Zürich",
+    "country": "Schweiz"
+  },
+  "meta": {
+    "datum": "04.12.2025",
+    "zahlbarBis": "19.12.2025",
+    "ansprechpartner": "Dix Lidia",
+    "kundennummer": "000005"
+  },
+  "lineItems": [
+    { "pos": 1, "description": "Cockpit Investoren / Parzellen Betrieb", "code": "6220", "quantity": 12, "unitPrice": 29 },
+    { "pos": 2, "description": "Cockpit Investoren / Parzellen Entwicklung", "code": "6221", "quantity": 6, "unitPrice": 29 },
+    { "pos": 3, "description": "Cockpit Makler Betrieb", "code": "6222", "quantity": 117, "unitPrice": 29 },
+    { "pos": 4, "description": "Cockpit Makler Entwicklung", "code": "6223", "quantity": 8, "unitPrice": 29 },
+    { "pos": 5, "description": "Portal Betrieb", "code": "6224", "quantity": 0, "unitPrice": 29 },
+    { "pos": 6, "description": "Portal Entwicklung", "code": "6225", "quantity": 0, "unitPrice": 29 }
+  ]
+}
