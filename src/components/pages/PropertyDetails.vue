@@ -33,16 +33,9 @@
           </DList>
         </div>
       </div>
-      <div
-        v-if="global.data?.images.detailImageOne || global.data?.images.detailImageTwo"
-        class="grid grid-cols-2 gap-x-12 grid-rows-1"
-      >
-        <div class="aspect-[3/2] relative">
-          <CDNImage class="absolute inset-0" :src="global.data?.images.detailImageOne" />
-        </div>
-        <div class="aspect-[3/2] relative test">
-          <CDNImage class="absolute inset-0" :src="global.data?.images.detailImageTwo" />
-        </div>
+      <div class="grid grid-cols-2 gap-x-12 grid-rows-1">
+        <div class="aspect-[3/2] bg-gray-200 flex items-center justify-center text-gray-400">Detail Image 1</div>
+        <div class="aspect-[3/2] bg-gray-200 flex items-center justify-center text-gray-400">Detail Image 2</div>
       </div>
     </section>
   </PageTemplate>
@@ -51,9 +44,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { HouseType } from '@/api/dossiers';
-import { useI18N } from '@/composables/localization';
+import { useI18n } from 'vue-i18n';
 import { useGlobalStore } from '@/stores/global';
-import CDNImage from '../CDNImage.vue';
 import DList from '../DList.vue';
 import type { ListItem } from '../DList.vue';
 import PageTemplate from '../PageTemplate.vue';
@@ -61,25 +53,25 @@ import PageTemplate from '../PageTemplate.vue';
 defineProps({ pageIndex: { type: Number, default: 0 } });
 
 const global = useGlobalStore();
-const { translate } = useI18N();
+const { t } = useI18n();
 
-const CATEGORY_MARKED_FOR_TRANSLATION = [translate('Building type'), translate('House type'), translate('Zone')];
+const CATEGORY_MARKED_FOR_TRANSLATION = [t('Building type'), t('House type'), t('Zone')];
 
 const buildingInfo = ref([
   {
-    category: translate('Building type'),
-    value: translate(global.data?.property?.propertyType || ''),
+    category: t('Building type'),
+    value: t(global.data?.property?.propertyType || ''),
   },
   {
-    category: translate('Year of construction'),
+    category: t('Year of construction'),
     value: global.data?.property?.builtYear,
   },
   {
-    category: translate('Renovation year'),
+    category: t('Renovation year'),
     value: global.data?.property?.renovationYear,
   },
   {
-    category: translate('Property area'),
+    category: t('Property area'),
     value: global.data?.property?.propertyArea && `${global.data?.property?.propertyArea} m2`,
   },
 ]);
@@ -87,13 +79,13 @@ const buildingInfo = ref([
 if (global.data?.property?.propertyType === 'House') {
   if (global.data?.property?.houseType) {
     buildingInfo.value.splice(1, 0, {
-      category: translate('House type'),
-      value: translate(HouseType[global.data?.property?.houseType]) || '',
+      category: t('House type'),
+      value: t(HouseType[global.data?.property?.houseType]) || '',
     });
   }
   if (global.data?.property?.cubature) {
     buildingInfo.value.splice(2, 0, {
-      category: translate('Cubature'),
+      category: t('Cubature'),
       value: global.data?.property?.cubature ? `${global.data?.property?.cubature} m³` : '',
     });
   }
@@ -101,19 +93,19 @@ if (global.data?.property?.propertyType === 'House') {
 
 const apartmentInfo = ref([
   {
-    category: translate('Rooms'),
+    category: t('Rooms'),
     value: global.data?.property?.roomCount,
   },
   {
-    category: translate('Living Area'),
+    category: t('Living Area'),
     value: (global.data?.property?.livingArea || 'N/A') + ' m2',
   },
   {
-    category: translate('Bathroom'),
+    category: t('Bathroom'),
     value: global.data?.property?.bathroomCount,
   },
   {
-    category: translate('Garages'),
+    category: t('Garages'),
     value: global.data?.property?.garageCount,
   },
 ]);
@@ -125,15 +117,15 @@ function splitPascalCase(word: string | undefined) {
 
 const parcelInfo = ref([
   {
-    category: translate('Zone'),
-    value: `${translate(splitPascalCase(global.data?.parcel?.zoneGroup))}`,
+    category: t('Zone'),
+    value: `${t(splitPascalCase(global.data?.parcel?.zoneGroup))}`,
   },
   {
-    category: translate('EGRID'),
+    category: t('EGRID'),
     value: global.data?.parcel?.data?.egrid,
   },
   {
-    category: translate('Property area'),
+    category: t('Property area'),
     value: `${global.data?.parcel?.data?.area || 'N/A'}${
       global.data?.parcel?.data?.area ? ' m2' : ''
     }`,
@@ -144,20 +136,20 @@ const scoreInfo: ListItem[] = [];
 
 if (global.data?.property?.constructionQuality?.value) {
   scoreInfo.push({
-    category: translate('Build quality'),
-    value: translate(global.data?.property?.constructionQuality?.value),
+    category: t('Build quality'),
+    value: t(global.data?.property?.constructionQuality?.value),
   });
 }
 if (global.data?.property?.buildingCondition?.value) {
   scoreInfo.push({
-    category: translate('Building condition'),
-    value: translate(global.data?.property?.buildingCondition?.value),
+    category: t('Building condition'),
+    value: t(global.data?.property?.buildingCondition?.value),
   });
 }
 if (global.data?.property?.microLocation?.value) {
   scoreInfo.push({
-    category: translate('Microlocation'),
-    value: translate(global.data?.property?.microLocation?.value),
+    category: t('Microlocation'),
+    value: t(global.data?.property?.microLocation?.value),
   });
 }
 </script>

@@ -4,27 +4,17 @@
   --color-primary: rgb(var(--primary-rgb));
   --color-secondary: rgb(var(--secondary-rgb));
   --color-tertiary: rgb(var(--tertiary-rgb));
-  --color-denim-600: #4B5563;
-  --color-denim-200: #6d7b90;
 }
 
 * {
   -webkit-print-color-adjust: exact !important;
-  color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
+/* size: A4 is Chromium-only; margin: 0 suppresses browser headers/footers */
 @page {
   size: A4 portrait;
   margin: 0;
-}
-
-@page :footer {
-  display: none;
-}
-
-@page :header {
-  display: none;
 }
 
 @media print {
@@ -33,16 +23,26 @@
   h3,
   h4,
   h5 {
+    page-break-after: avoid;
     break-after: avoid;
   }
 
   table,
   figure {
+    page-break-inside: avoid;
     break-inside: avoid;
   }
 
   section.page {
+    page-break-inside: avoid;
     break-inside: avoid;
+  }
+
+  /* Reset properties that break in print */
+  * {
+    overflow: visible !important;
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
 

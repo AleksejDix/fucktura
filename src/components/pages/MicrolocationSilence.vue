@@ -11,7 +11,7 @@
         </p>
       </header>
       <div>
-        <image-with-placeholder
+        <img
           class="w-full object-cover max-h-[78.58125mm] h-[78.58125mm] pb-[5mm]"
           :src="global.data?.property.imageSrcSilence"
           alt=""
@@ -28,7 +28,7 @@
         </div>
         <div class="w-full h-[78mm] pb-[5mm]">
           <div class="text-primary font-bold pb-2">{{ $t('Decibel scale') }}</div>
-          <div class="flex justify-between h-[6mm] text-[8pt] text-denim-600" notranslate>
+          <div class="flex justify-between h-[6mm] text-[8pt] text-gray-600" notranslate>
             <span v-for="(decibelItem, index) in decibelNumberList" :key="index">
               {{ decibelItem }}db
             </span>
@@ -37,8 +37,8 @@
             <span
               class="w-full indent-0 absolute h-[4px] rounded bg-gradient-to-r from-[#a4cea1] via-[#eee161] to-[#d52947]"
             ></span>
-            <span class="absolute text-denim-600 top-[10px]">{{ $t('Quiet') }}</span>
-            <span class="absolute text-denim-600 right-0 top-[10px]">{{ $t('Very loud') }}</span>
+            <span class="absolute text-gray-600 top-[10px]">{{ $t('Quiet') }}</span>
+            <span class="absolute text-gray-600 right-0 top-[10px]">{{ $t('Very loud') }}</span>
             <div class="relative">
               <div
                 v-for="(marker, index) in markerConfigList"
@@ -46,13 +46,13 @@
                 class="top-0 w-[140px] h-[140px] flex items-center flex-col absolute"
                 :style="`left:${marker.posFromLeft}`"
               >
-                <span class="w-[4px] h-[4px] rounded-full bg-white border border-[#4b5563]"></span>
+                <span class="w-[4px] h-[4px] rounded-full bg-white border border-gray-600"></span>
                 <span
-                  class="border border-[#4b5563]"
+                  class="border border-gray-600"
                   :style="{ height: index % 2 === 0 ? '120px' : '60px' }"
                 ></span>
                 <span class="font-bold">{{ marker.description }}</span>
-                <span class="text-denim-600" notranslate>{{ marker.decibelLabel }}</span>
+                <span class="text-gray-600" notranslate>{{ marker.decibelLabel }}</span>
               </div>
             </div>
           </div>

@@ -1,10 +1,8 @@
-import { useGalleryStore } from '@/stores/gallery';
 import { useSimilarObjectsStore } from '@/stores/similar-objects';
 import { defineStore } from 'pinia';
 import { computed, markRaw, ref } from 'vue';
 import * as Pages from '@/components/pages';
-import { ImageGallery, SimilarObjects, SimilarObjectsMap } from '@/components/pages';
-import { useModeStore } from './mode';
+import { SimilarObjects, SimilarObjectsMap } from '@/components/pages';
 
 export const PAGES = [
   Pages.Cover,
@@ -22,7 +20,6 @@ export const PAGES = [
   Pages.ConstructionSites,
   Pages.CommuneOne,
   Pages.CommuneTwo,
-  Pages.ImageGallery, // 0 or more
   Pages.Disclaimer,
 ] as const;
 
@@ -56,31 +53,14 @@ function createPage(component: PageType, metadata = {}, enabled = true): Page {
       metadata,
     };
 
-    // Don't cache image gallery pages, because those are changing with the number
-    // of images, which in turn is generated based on the number of images in gallery.
-    if (name !== 'ImageGallery') cache[name] = page;
+    cache[name] = page;
 
     return page;
   }
 }
 
 export const usePagesStore = defineStore('pages', () => {
-  const gallery = useGalleryStore();
   const similarObjects = useSimilarObjectsStore();
-  const modeStore = useModeStore();
-
-  function arrayOfNulls<T>(length: number): (T | null)[] {
-    return new Array(length).fill(null);
-  }
-
-  function getImageGalleryPages(): Page[] {
-    const numberOfGalleryPages = Math.ceil(gallery.images.length / gallery.imagesPerPage);
-    const numberOfEmptyGalleryPages = modeStore.isEditMode && numberOfGalleryPages === 0 ? 1 : 0;
-
-    return arrayOfNulls(numberOfGalleryPages + numberOfEmptyGalleryPages).map(
-      (_, galleryPageIndex) => createPage(ImageGallery, { galleryPageIndex }),
-    );
-  }
 
   const shouldDisplaySimilarObjectsPage = computed(() => similarObjects.objects.length > 0);
 
@@ -92,26 +72,12 @@ export const usePagesStore = defineStore('pages', () => {
     return shouldDisplaySimilarObjectsPage.value ? [createPage(SimilarObjectsMap)] : [];
   }
 
-  // Siamese pages are pages that are created from multiplying a page definition 0 or more times.
-  // This is different to most other pages, where there is a 1:1 correlation between how many pages
-  // there are in the PAGES array.
-  // An example ofa Siamese page is the ImageGallery. There is one mentioned in the PAGES array,
-  // but there can be 0 or more pages depending on how many images there are to be displayed.
-  // On top of that the number of pages changes depending on the user adding/removing images in edit mode.
-  const MAX_SIAMESE_PAGE_DEPTH = 2;
-
   const pages = ref<Page[]>([]);
 
-  /**
-   * This function can be used when the content of any of the Siamese pages changes,
-   * for example when images are added/removed from the gallery
-   */
   function updateListOfPages() {
     pages.value = PAGES.map((page) => {
       const name = page.__name || 'Cover';
       switch (name) {
-        case 'ImageGallery':
-          return getImageGalleryPages();
         case 'SimilarObjects':
           return getSimilarObjectsPages();
         case 'SimilarObjectsMap':
@@ -119,7 +85,7 @@ export const usePagesStore = defineStore('pages', () => {
         default:
           return createPage(page);
       }
-    }).flat(MAX_SIAMESE_PAGE_DEPTH);
+    }).flat(2);
   }
 
   updateListOfPages();

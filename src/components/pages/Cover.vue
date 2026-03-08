@@ -3,7 +3,7 @@
     <section class="grid gap-[0.5cm]">
       <figure>
         <div class="aspect-[3/2] relative">
-          <CDNImage :src="global.data?.images.main" size="xl" class="absolute inset-0" />
+          <div class="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-400">Main Image</div>
           <figcaption
             class="absolute bottom-0 py-4 -left-[1px] space-y-4 text-3xl text-primary font-bold text-left"
           >
@@ -34,10 +34,7 @@
 
         <div class="grid grid-cols-2 gap-8">
           <div>
-            <image-with-placeholder
-              :src="global.data?.property.imageSrcSmall"
-              class="w-full h-full object-cover"
-            />
+            <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">Property Image</div>
           </div>
           <DTable variant="horizontal" :columns="columns" class="w-full" :data="tableData">
             <template #col-propertyType="{ propertyType }">
@@ -88,7 +85,6 @@ import { formatPrice } from '@/formatters/currency';
 import { roundToStep } from '@/functions/roundToStep';
 import { useGlobalStore } from '@/stores/global';
 import { usePriceStore } from '@/stores/price';
-import CDNImage from '@/components/CDNImage.vue';
 import ContentEditablePriceField from '@/components/ContentEditablePriceField.vue';
 import DTable from '../DTable.vue';
 import type { Columns } from '../DTable.vue';
