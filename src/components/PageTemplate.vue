@@ -30,25 +30,27 @@
         <slot />
       </div>
 
-      <footer class="absolute bottom-0 left-0 right-0 w-full pl-[26mm] pr-[15mm] pb-[10mm]">
-        <div class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4">
-          <div>
-            <div class="font-bold text-gray-600">Dix Consulting</div>
-            <div>Glärnischstrasse 214</div>
-            <div>8708 Männedorf</div>
+      <slot name="footer">
+        <footer class="absolute bottom-0 left-0 right-0 w-full pl-[26mm] pr-[15mm] pb-[10mm]">
+          <div class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4">
+            <div>
+              <div class="font-bold text-gray-600">Dix Consulting</div>
+              <div>Glärnischstrasse 214</div>
+              <div>8708 Männedorf</div>
+            </div>
+            <div>
+              <div class="font-bold text-gray-600">Lidia Dix</div>
+              <div>lidia@dix.consulting</div>
+              <div>www.dix.consulting</div>
+            </div>
+            <div>
+              <div class="font-bold text-gray-600 font-mono">CH58 0070 0114 8057 5961 3</div>
+              <div>Zürcher Kantonalbank</div>
+              <div class="font-mono">ZKBKCHZZ80A</div>
+            </div>
           </div>
-          <div>
-            <div class="font-bold text-gray-600">Lidia Dix</div>
-            <div>lidia@dix.consulting</div>
-            <div>www.dix.consulting</div>
-          </div>
-          <div>
-            <div class="font-bold text-gray-600">CH58 0070 0114 8057 5961 3</div>
-            <div>Zürcher Kantonalbank</div>
-            <div>ZKBKCHZZ80A</div>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </slot>
     </div>
   </section>
 </template>
