@@ -3,7 +3,7 @@
     <input
       :id="'d-checkbox' + id"
       type="checkbox"
-      class="accent-primary bg-gray-100 border-gray-300 focus:ring-primary"
+      class="accent-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-800"
       :class="{ hidden: customIcons, ...[`h-${size}`, `w-${size}`] }"
       :checked="modelValue"
       @change="handleChange"
@@ -15,7 +15,7 @@
       :class="[
         `h-${size}`,
         `w-${size}`,
-        modelValue ? 'bg-primary text-white' : 'bg-white border-2 border-gray-500 text-gray-500',
+        modelValue ? 'bg-blue-800 text-white' : 'bg-white border-2 border-gray-500 text-gray-500',
       ]"
     >
       <component :is="modelValue ? customIcons.on : customIcons.off" :size="16" />

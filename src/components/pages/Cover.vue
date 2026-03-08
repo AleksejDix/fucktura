@@ -5,7 +5,7 @@
         <div class="aspect-[3/2] relative">
           <div class="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-400">Main Image</div>
           <figcaption
-            class="absolute bottom-0 py-4 -left-[1px] space-y-4 text-3xl text-primary font-bold text-left"
+            class="absolute bottom-0 py-4 -left-[1px] space-y-4 text-3xl text-blue-800 font-bold text-left"
           >
             <ContentEditablePriceField
               class="bg-white inline-block px-4 py-3"

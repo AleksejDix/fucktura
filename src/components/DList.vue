@@ -1,6 +1,6 @@
 <template>
   <article>
-    <header v-if="title" class="text-primary font-semibold mb-[2.5mm] flex gap-2">
+    <header v-if="title" class="text-blue-800 font-semibold mb-[2.5mm] flex gap-2">
       <div v-if="$slots.suffix">
         <slot name="suffix" />
       </div>

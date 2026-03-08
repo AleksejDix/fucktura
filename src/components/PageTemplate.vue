@@ -1,6 +1,6 @@
 <template>
   <section
-    class="page w-[210mm] h-[296.99999999mm] print:m-0 rounded-sm bg-white shadow-xl relative mx-auto border-b px-[1cm] border-none"
+    class="page w-[210mm] h-[297mm] print:m-0 rounded-sm bg-white shadow-xl relative mx-auto border-none pl-[26mm] pr-[15mm]"
     :class="{ 'print:hidden': !pagesStore.pages[pageIndex].enabled }"
   >
     <DCheckbox
@@ -11,42 +11,44 @@
     />
     <slot name="side-controls" />
     <div :class="{ 'opacity-20': !pagesStore.pages[pageIndex].enabled }">
+      <!-- SN 010130: Letterhead max 38mm height -->
       <slot name="header">
-        <header class="absolute top-0 left-0 right-0 w-full px-[1cm]" notranslate>
-          <div class="flex py-[0.5cm]">
-            <div class="w-1/2 grow h-[1.5cm] flex items-center">
-              <HeaderAddress :address="global.data?.address"></HeaderAddress>
+        <header class="absolute top-0 left-0 right-0 w-full pl-[26mm] pr-[15mm] pt-[10mm] max-h-[38mm]" notranslate>
+          <div class="flex items-start justify-between">
+            <div class="h-[15mm] flex items-center">
+              <HeaderAddress :address="global.data?.address" />
             </div>
-
-            <div class="w-1/2 grow flex justify-end-end">
+            <div class="flex justify-end">
               <AgencyLogo />
             </div>
           </div>
         </header>
       </slot>
 
-      <div class="pt-[2.5cm] max-w-[19cm] max-h-[26.5cm] overflow-hidden">
+      <!-- SN 010130: Content starts below letterhead (38mm) -->
+      <div class="pt-[38mm] pb-[20mm] max-h-[257mm] overflow-hidden">
         <slot />
       </div>
 
-      <slot name="footer">
-        <footer class="absolute bottom-0 left-0 right-0 w-full max-h-[3.5cm] overflow-hidden">
-          <div class="mx-[1cm] py-[0.5cm] pb-[0.75cm]">
-            <div>
-              <div class="flex items-center justify-between gap-4">
-                <Agent />
-                <Agency />
-              </div>
-            </div>
-            <div class="flex justify-end pt-2 space-x-2 divide-x-2">
-              <div notranslate>
-                {{ formatDateLong(new Date(global.data?.created || Date.now())) }}
-              </div>
-              <PageNumber :page-index="pageIndex" />
-            </div>
+      <footer class="absolute bottom-0 left-0 right-0 w-full pl-[26mm] pr-[15mm] pb-[10mm]">
+        <div class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4">
+          <div>
+            <div class="font-bold text-gray-600">Acme Consulting</div>
+            <div>Bahnhofstrasse 1</div>
+            <div>8001 Zürich</div>
           </div>
-        </footer>
-      </slot>
+          <div>
+            <div class="font-bold text-gray-600">Alex Example</div>
+            <div>alex@acme.example</div>
+            <div>www.acme.example</div>
+          </div>
+          <div>
+            <div class="font-bold text-gray-600">CH00 0000 0000 0000 0000 0</div>
+            <div>Demo Bank</div>
+            <div>DEMOCHZZXXX</div>
+          </div>
+        </div>
+      </footer>
     </div>
   </section>
 </template>

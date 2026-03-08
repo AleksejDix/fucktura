@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --color-primary: rgb(var(--primary-rgb));
-  --color-secondary: rgb(var(--secondary-rgb));
-  --color-tertiary: rgb(var(--tertiary-rgb));
-}
-
 * {
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
@@ -40,8 +34,6 @@
 
   /* Reset properties that break in print */
   * {
-    overflow: visible !important;
-    transform: none !important;
     box-shadow: none !important;
   }
 }
@@ -58,14 +50,6 @@
 @media print {
   [contenteditable] {
     @apply outline-none;
-  }
-}
-
-@layer base {
-  :root {
-    --primary-rgb: 255 115 179;
-    --secondary-rgb: 255 116 179;
-    --tertiary-rgb: 255 117 179;
   }
 }
 

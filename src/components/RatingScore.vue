@@ -1,7 +1,7 @@
 <template>
   <span notranslate class="inline-flex items-center space-x-2">
     <div class="inline-flex">
-      <div class="text-primary flex">
+      <div class="text-blue-800 flex">
         <template v-for="n in 5" :key="n">
           <Star v-if="roundedRating >= n" :size="16" fill="currentColor" :stroke-width="0" />
           <StarHalf v-else-if="roundedRating >= n - 0.5" :size="16" fill="currentColor" :stroke-width="1" />

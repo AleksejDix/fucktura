@@ -2,7 +2,7 @@
   <div class="flex items-center gap-4">
     <div
       v-if="agentStore.data.avatar"
-      class="border-2 border-primary rounded-full aspect-square w-[15mm] relative"
+      class="border-2 border-blue-800 rounded-full aspect-square w-[15mm] relative"
     >
       <img
         class="absolute rounded-full inset-0 object-cover w-full h-full"

@@ -83,16 +83,16 @@
               />
               <div class="flex gap-3 pt-2">
                 <div class="flex items-center gap-2">
-                  <span class="h-3 w-8 inline-block bg-primary" />
+                  <span class="h-3 w-8 inline-block bg-blue-800" />
                   <p>{{ $t('Switzerland') }}</p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="h-3 w-8 inline-block bg-secondary" />
+                  <span class="h-3 w-8 inline-block bg-blue-500" />
                   <p>{{ $t('Canton') }}</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <div class="flex">
-                    <div class="w-8 h-3 bg-tertiary"></div>
+                    <div class="w-8 h-3 bg-blue-300"></div>
                   </div>
                   <p>{{ $t('Commune') }}</p>
                 </div>
