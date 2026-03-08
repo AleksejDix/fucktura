@@ -68,3 +68,23 @@ h2 {
 h3 {
   @apply text-xl font-semibold;
 }
+
+/* SN 010130 (Schweiz) */
+.norm-SN010130 {
+  --norm-ml: 26mm;
+  --norm-mr: 15mm;
+  --norm-header-h: 38mm;
+  --norm-addr-w: 90mm;
+  --norm-addr-offset: 14mm; /* 52mm - 38mm */
+  --norm-content-h: 257mm; /* 297mm - 38mm - 20mm footer */
+}
+
+/* DIN 5008 Form B (Deutschland) */
+.norm-DIN5008 {
+  --norm-ml: 25mm;
+  --norm-mr: 20mm;
+  --norm-header-h: 45mm;
+  --norm-addr-w: 85mm;
+  --norm-addr-offset: 0mm; /* 45mm - 45mm */
+  --norm-content-h: 232mm; /* 297mm - 45mm - 20mm footer */
+}

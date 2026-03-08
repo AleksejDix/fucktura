@@ -3,10 +3,7 @@
     <!-- Same header as Letter page -->
     <template #header>
       <header class="absolute top-0 left-0 right-0 pl-[26mm] pr-[15mm] pt-[10mm] max-h-[38mm]">
-        <div class="flex items-start justify-between">
-          <div class="h-[15mm] flex items-center">
-            <div class="text-lg font-bold text-gray-400">[Logo]</div>
-          </div>
+        <div class="flex justify-end">
           <div class="text-[8pt] text-right leading-relaxed">
             <div class="font-bold">{{ creditor.name }}</div>
             <div>{{ creditor.address }}</div>

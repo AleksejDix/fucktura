@@ -10,6 +10,14 @@
       <Printer :size="20" />
     </button>
 
+    <select
+      v-model="normStore.norm"
+      class="bg-white text-sm text-black px-3 py-2 rounded-md shadow-sm border border-gray-200"
+    >
+      <option value="SN010130">SN 010130 (CH)</option>
+      <option value="DIN5008">DIN 5008 (DE)</option>
+    </select>
+
     <label class="relative inline-flex items-center cursor-pointer">
       <input
         v-model="modeStore.mode"
@@ -29,9 +37,11 @@
 <script setup lang="ts">
 import { Printer } from 'lucide-vue-next';
 import { useModeStore } from '@/stores/mode';
+import { useLetterNormStore } from '@/stores/letterNorm';
 import DLegend from '@/components/DLegend.vue';
 
 const modeStore = useModeStore();
+const normStore = useLetterNormStore();
 
 defineEmits(['generate-pdf']);
 </script>
