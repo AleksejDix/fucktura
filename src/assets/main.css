@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
+  color-adjust: exact !important; /* Firefox 48 – 96 */
+  print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
+}
+
+@page {
+  size: A4 portrait;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin: 0;
+}
+
+@page :footer {
+  display: none;
+}
+
+@page :header {
+  display: none;
+}
+
+@media print {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    break-after: avoid;
+  }
+
+  table,
+  figure {
+    break-inside: avoid;
+  }
+
+  section.page {
+    break-inside: avoid;
+  }
+}
+[contenteditable='true'],
+.contentEditable {
+  @apply outline-dotted outline-emerald-400;
+}
+
+[contenteditable='false'] {
+  @apply outline-none;
+}
+
+@media print {
+  [contenteditable] {
+    @apply outline-none;
+  }
+}
+
+@layer base {
+  :root {
+    --color-primary: 255 115 179;
+    --color-secondary: 255 116 179;
+    --color-tertiary: 255 117 179;
+  }
+}
+
+body {
+  @apply text-xs;
+}
+
+h1 {
+  @apply text-4xl font-semibold;
+}
+
+h2 {
+  @apply text-2xl font-semibold;
+}
+
+h3 {
+  @apply text-xl font-semibold;
+}
