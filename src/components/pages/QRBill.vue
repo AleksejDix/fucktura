@@ -1,13 +1,15 @@
 <template>
   <PageTemplate :page-index="pageIndex">
-    <!-- Same header as Letter page -->
     <template #header>
-      <header class="absolute top-0 left-0 right-0 pl-[26mm] pr-[15mm] pt-[10mm] max-h-[38mm]">
+      <header class="absolute top-0 left-0 right-0 pl-[var(--norm-ml)] pr-[var(--norm-mr)] pt-[10mm] max-h-[var(--norm-header-h)]">
         <div class="flex justify-end">
-          <div class="text-[8pt] text-right leading-relaxed">
-            <div class="font-bold">{{ creditor.name }}</div>
-            <div>{{ creditor.address }}</div>
-            <div>{{ creditor.zip }} {{ creditor.city }}</div>
+          <div class="text-[9pt] text-right leading-relaxed">
+            <div class="font-bold">{{ sender.name }}</div>
+            <div>{{ sender.street }}</div>
+            <div><span class="font-mono">{{ sender.zip }}</span> {{ sender.city }}, Schweiz</div>
+            <div>{{ sender.email }}</div>
+            <div>{{ sender.website }}</div>
+            <div class="text-gray-500 font-mono">{{ sender.uid }}</div>
           </div>
         </div>
       </header>
@@ -15,54 +17,100 @@
 
     <template #footer><span /></template>
 
-    <!-- Thank you message -->
-    <section class="pt-[20mm] text-[10pt] leading-relaxed">
-      <p>Wir danken Ihnen herzlich für Ihr Vertrauen und die angenehme Zusammenarbeit.</p>
-      <p class="mt-3">Bei Fragen zu dieser Rechnung stehen wir Ihnen jederzeit gerne zur Verfügung.</p>
-      <p class="mt-6">Freundliche Grüsse</p>
-      <p class="font-bold">{{ creditor.name }}</p>
+    <section class="pt-[20mm] text-[9pt] leading-relaxed">
+      <p>{{ t('Thank you note') }}</p>
+      <p class="mt-2">{{ t('Questions note') }}</p>
+      <p class="mt-6">{{ t('Kind regards') }}</p>
+      <p class="font-bold">{{ sender.contact || sender.name }}</p>
     </section>
 
-    <!-- Dashed separator above QR bill -->
     <div class="absolute bottom-[105mm] left-0 w-[210mm] border-t border-dashed border-gray-400"></div>
-
-    <!-- QR Bill payment slip: 210x105mm at page bottom -->
     <div class="h-[105mm] w-[210mm] absolute bottom-0 left-0" v-html="qrBillSvg"></div>
   </PageTemplate>
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { SwissQRBill } from 'swissqrbill/svg';
+import { toDecimal } from 'dinero.js';
+import type { Document, SenderSnapshot } from '@/db';
+import { useMoney } from '@/composables/useMoney';
 import PageTemplate from '../PageTemplate.vue';
 
-defineProps({ pageIndex: { type: Number, default: 0 } });
+const { t, locale } = useI18n({ useScope: 'local' });
+const { sumLineItems } = useMoney();
 
-const creditor = {
-  name: 'Acme Consulting',
-  address: 'Bahnhofstrasse 1',
-  zip: '8001',
-  city: 'Zürich',
-  country: 'CH',
-  account: 'CH00 0000 0000 0000 0000 0',
+const props = defineProps<{
+  pageIndex?: number;
+  doc: Document;
+  sender: SenderSnapshot;
+}>();
+
+const qrBillSvg = ref('');
+
+const qrLanguageMap: Record<string, 'DE' | 'FR' | 'IT' | 'EN'> = {
+  de: 'DE', en: 'EN', fr: 'FR', it: 'IT', es: 'EN',
 };
 
-const data = {
-  currency: 'CHF' as const,
-  amount: 4147.00,
-  creditor,
-  debtor: {
-    name: 'Sample AG',
-    address: 'Beispielstrasse 1',
-    zip: '8045',
-    city: 'Zürich',
-    country: 'CH',
+watch(
+  () => JSON.stringify(props.doc) + locale.value,
+  () => {
+    const items = props.doc.lineItems ?? [];
+    const amount = items.length
+      ? parseFloat(toDecimal(sumLineItems(items)))
+      : 0;
+
+    const account = props.sender.accounts?.find(a => a.iban.startsWith('CH')) ?? props.sender.accounts?.[0];
+    if (!account) { qrBillSvg.value = ''; return; }
+
+    const data = {
+      currency: 'CHF' as const,
+      amount,
+      creditor: {
+        name: props.sender.name,
+        address: props.sender.street,
+        zip: props.sender.zip,
+        city: props.sender.city,
+        country: 'CH',
+        account: account.iban,
+      },
+      debtor: {
+        name: props.doc.recipient.company || props.doc.recipient.name,
+        address: props.doc.recipient.street,
+        zip: props.doc.recipient.zip,
+        city: props.doc.recipient.city,
+        country: props.doc.recipient.country === 'Schweiz' ? 'CH' : props.doc.recipient.country?.slice(0, 2).toUpperCase() || 'CH',
+      },
+      message: `${props.doc.number}`,
+    };
+
+    try {
+      qrBillSvg.value = new SwissQRBill(data, { language: qrLanguageMap[locale.value] ?? 'DE' }).toString();
+    } catch {
+      qrBillSvg.value = '';
+    }
   },
-  message: 'Rechnung RE-00110',
-};
-
-const qrBill = new SwissQRBill(data, {
-  language: 'DE',
-});
-
-const qrBillSvg = qrBill.toString();
+  { immediate: true },
+);
 </script>
+
+<i18n lang="json">
+{
+  "de": {
+    "Thank you note": "Wir danken Ihnen herzlich für Ihr Vertrauen und die angenehme Zusammenarbeit.",
+    "Questions note": "Bei Fragen zu dieser Rechnung stehen wir Ihnen jederzeit gerne zur Verfügung.",
+    "Kind regards": "Freundliche Grüsse"
+  },
+  "en": {
+    "Thank you note": "Thank you for your trust and the pleasant cooperation.",
+    "Questions note": "If you have any questions about this invoice, please do not hesitate to contact us.",
+    "Kind regards": "Kind regards"
+  },
+  "es": {
+    "Thank you note": "Le agradecemos su confianza y la agradable colaboración.",
+    "Questions note": "Si tiene alguna pregunta sobre esta factura, no dude en contactarnos.",
+    "Kind regards": "Atentamente"
+  }
+}
+</i18n>

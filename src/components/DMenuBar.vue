@@ -26,7 +26,10 @@
             @click.stop="runAction(item)"
             :disabled="item.disabled"
             class="w-full flex items-center justify-between px-3 py-1.5 text-left text-[13px] transition-colors"
-            :class="item.disabled ? 'text-gray-300 cursor-default' : item.destructive ? 'text-red-500 hover:bg-gray-100' : 'text-gray-800 hover:bg-black hover:text-white'"
+            :class="[
+              item.disabled ? 'text-gray-300 cursor-default' : item.destructive ? 'text-red-500 hover:bg-gray-100' : 'text-gray-800 hover:bg-black hover:text-white',
+              item.strikethrough ? 'line-through decoration-gray-400' : '',
+            ]"
           >
             <span class="flex items-center gap-2">
               <span class="w-4 text-center">{{ item.checked ? '✓' : '' }}</span>
@@ -51,6 +54,17 @@
       </select>
       <span v-else-if="store.activeSender" class="text-[12px] text-gray-500">{{ store.activeSender.name }}</span>
     </div>
+    <Teleport to="body">
+      <div v-if="showAbout" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30" @click.self="showAbout = false">
+        <div class="bg-white w-[300px] p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] text-center">
+          <p class="text-[18pt] font-bold">Fucktura</p>
+          <p class="text-[9pt] text-gray-500 mt-1">v1.0.0</p>
+          <p class="text-[9pt] text-gray-600 mt-4">{{ t('About description') }}</p>
+          <p class="text-[8pt] text-gray-400 mt-4">Made by Aleksej Dix</p>
+          <button @click="showAbout = false" class="mt-4 px-4 py-1.5 text-[9pt] bg-black text-white hover:bg-gray-800">OK</button>
+        </div>
+      </div>
+    </Teleport>
   </nav>
 </template>
 
@@ -61,6 +75,7 @@ import { useI18n } from 'vue-i18n';
 import { useDocumentsStore } from '@/stores/documents';
 import { useModeStore } from '@/stores/mode';
 import { useLetterNormStore } from '@/stores/letterNorm';
+import { useMoney } from '@/composables/useMoney';
 
 interface MenuItem {
   label?: string;
@@ -71,6 +86,7 @@ interface MenuItem {
   destructive?: boolean;
   separator?: boolean;
   checked?: boolean;
+  strikethrough?: boolean;
 }
 
 interface Menu {
@@ -84,10 +100,12 @@ const store = useDocumentsStore();
 const modeStore = useModeStore();
 const normStore = useLetterNormStore();
 const router = useRouter();
+const { sumLineItems, formatChf, sumAmounts } = useMoney();
 
 const emit = defineEmits<{ 'generate-pdf': [] }>();
 
 const openMenu = ref<string | null>(null);
+const showAbout = ref(false);
 
 function toggleMenu(label: string) {
   openMenu.value = openMenu.value === label ? null : label;
@@ -113,6 +131,230 @@ const isOfferte = computed(() => store.activeDocument?.type === 'offerte');
 const activeDoc = computed(() => store.activeDocument);
 const activeType = computed(() => activeDoc.value?.type);
 const activeStatus = computed(() => activeDoc.value?.status);
+
+const activeClient = computed(() => {
+  const cid = activeDoc.value?.clientId;
+  return cid ? store.clients.find(c => c.id === cid) : undefined;
+});
+
+function emailBody(): string {
+  const doc = activeDoc.value;
+  if (!doc) return '';
+  const sender = doc.sender;
+  const recipient = doc.recipient;
+  const name = recipient.name || recipient.company;
+  const lang = locale.value;
+
+  const bodies: Record<string, Record<string, (d: typeof doc) => string>> = {
+    de: {
+      offerte: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Guten Tag ${name}
+
+Anbei erhalten Sie unsere Offerte ${d.number} vom ${d.meta.datum}.
+
+Offertbetrag: CHF ${total}
+Gültig bis: ${d.meta.gueltigBis ?? ''}
+
+${d.subtitle ? `Betreff: ${d.subtitle}\n\n` : ''}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
+
+Freundliche Grüsse
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      invoice: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Guten Tag ${name}
+
+Anbei erhalten Sie unsere Rechnung ${d.number} vom ${d.meta.datum}.
+
+Rechnungsbetrag: CHF ${total}
+Zahlbar bis: ${d.meta.zahlbarBis ?? ''}
+
+${d.subtitle ? `Betreff: ${d.subtitle}\n\n` : ''}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
+
+Freundliche Grüsse
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      mahnung: (d) => {
+        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        return `Guten Tag ${name}
+
+Leider haben wir für die Rechnung ${d.number} vom ${d.meta.rechnungsDatum ?? d.meta.datum} noch keinen Zahlungseingang feststellen können.
+
+Offener Betrag: CHF ${total}
+Fällig seit: ${d.meta.faelligSeit ?? ''}
+Zahlbar bis: ${d.meta.zahlbarBis ?? ''}
+
+Wir bitten Sie, den ausstehenden Betrag innert der genannten Frist zu überweisen.
+
+Freundliche Grüsse
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+    },
+    en: {
+      offerte: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Dear ${name}
+
+Please find attached our quote ${d.number} dated ${d.meta.datum}.
+
+Quote amount: CHF ${total}
+Valid until: ${d.meta.gueltigBis ?? ''}
+
+${d.subtitle ? `Subject: ${d.subtitle}\n\n` : ''}Please do not hesitate to contact us if you have any questions.
+
+Kind regards
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      invoice: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Dear ${name}
+
+Please find attached our invoice ${d.number} dated ${d.meta.datum}.
+
+Invoice amount: CHF ${total}
+Due date: ${d.meta.zahlbarBis ?? ''}
+
+${d.subtitle ? `Subject: ${d.subtitle}\n\n` : ''}Please do not hesitate to contact us if you have any questions.
+
+Kind regards
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      mahnung: (d) => {
+        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        return `Dear ${name}
+
+We have not yet received payment for invoice ${d.number} dated ${d.meta.rechnungsDatum ?? d.meta.datum}.
+
+Outstanding amount: CHF ${total}
+Overdue since: ${d.meta.faelligSeit ?? ''}
+Due date: ${d.meta.zahlbarBis ?? ''}
+
+We kindly ask you to settle the outstanding amount within the stated deadline.
+
+Kind regards
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+    },
+    es: {
+      offerte: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Estimado/a ${name}
+
+Adjunto le enviamos nuestro presupuesto ${d.number} del ${d.meta.datum}.
+
+Importe: CHF ${total}
+Válido hasta: ${d.meta.gueltigBis ?? ''}
+
+${d.subtitle ? `Asunto: ${d.subtitle}\n\n` : ''}Quedamos a su disposición para cualquier consulta.
+
+Atentamente
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      invoice: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Estimado/a ${name}
+
+Adjunto le enviamos nuestra factura ${d.number} del ${d.meta.datum}.
+
+Importe: CHF ${total}
+Fecha de vencimiento: ${d.meta.zahlbarBis ?? ''}
+
+${d.subtitle ? `Asunto: ${d.subtitle}\n\n` : ''}Quedamos a su disposición para cualquier consulta.
+
+Atentamente
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      mahnung: (d) => {
+        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        return `Estimado/a ${name}
+
+Lamentablemente no hemos recibido el pago de la factura ${d.number} del ${d.meta.rechnungsDatum ?? d.meta.datum}.
+
+Importe pendiente: CHF ${total}
+Vencido desde: ${d.meta.faelligSeit ?? ''}
+Fecha límite de pago: ${d.meta.zahlbarBis ?? ''}
+
+Le rogamos que realice la transferencia dentro del plazo indicado.
+
+Atentamente
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+    },
+    nl: {
+      offerte: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Geachte ${name}
+
+Hierbij ontvangt u onze offerte ${d.number} van ${d.meta.datum}.
+
+Offertebedrag: CHF ${total}
+Geldig tot: ${d.meta.gueltigBis ?? ''}
+
+${d.subtitle ? `Betreft: ${d.subtitle}\n\n` : ''}Mocht u vragen hebben, neem dan gerust contact met ons op.
+
+Met vriendelijke groet
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      invoice: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Geachte ${name}
+
+Hierbij ontvangt u onze factuur ${d.number} van ${d.meta.datum}.
+
+Factuurbedrag: CHF ${total}
+Betaalbaar tot: ${d.meta.zahlbarBis ?? ''}
+
+${d.subtitle ? `Betreft: ${d.subtitle}\n\n` : ''}Mocht u vragen hebben, neem dan gerust contact met ons op.
+
+Met vriendelijke groet
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      mahnung: (d) => {
+        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        return `Geachte ${name}
+
+Helaas hebben wij voor factuur ${d.number} van ${d.meta.rechnungsDatum ?? d.meta.datum} nog geen betaling ontvangen.
+
+Openstaand bedrag: CHF ${total}
+Vervallen sinds: ${d.meta.faelligSeit ?? ''}
+Betaalbaar tot: ${d.meta.zahlbarBis ?? ''}
+
+Wij verzoeken u het openstaande bedrag binnen de genoemde termijn over te maken.
+
+Met vriendelijke groet
+${sender.contact || sender.name}
+${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+    },
+  };
+
+  const templates = bodies[lang] ?? bodies.de;
+  const template = templates[doc.type] ?? templates.invoice;
+  return template(doc);
+}
+
+function sendEmail() {
+  const doc = activeDoc.value;
+  if (!doc) return;
+  const client = activeClient.value;
+  const to = client?.email ?? '';
+  const typeLabel = doc.type === 'invoice' ? t('Rechnungen') : doc.type === 'offerte' ? t('Offerten') : t('Mahnungen');
+  const subject = `${typeLabel} ${doc.number}`;
+  const body = emailBody();
+  window.open(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+}
 
 function statusItems(): MenuItem[] {
   if (!activeDoc.value) return [];
@@ -141,7 +383,7 @@ const menus = computed<Menu[]>(() => [
     label: 'Fucktura',
     bold: true,
     items: [
-      { label: t('About Fucktura'), action: () => {} },
+      { label: t('About Fucktura'), action: () => { showAbout.value = true; } },
       { separator: true },
       { label: t('Settings'), shortcut: '⌘,', action: () => router.push('/settings') },
     ],
@@ -157,19 +399,20 @@ const menus = computed<Menu[]>(() => [
       { label: t('Positions'), action: () => router.push('/positions') },
       { separator: true },
       { label: t('Print / PDF'), shortcut: '⌘P', action: () => emit('generate-pdf') },
+      { label: t('Send email'), shortcut: '⌘⇧E', action: sendEmail, disabled: !hasActiveDoc.value, hidden: !hasActiveDoc.value },
     ],
   },
   {
     label: t('Edit'),
     items: [
-      { label: t('Undo'), shortcut: '⌘Z', action: () => document.execCommand('undo') },
-      { label: t('Redo'), shortcut: '⌘⇧Z', action: () => document.execCommand('redo') },
+      { label: t('Undo'), shortcut: '⌘Z', action: () => document.execCommand('undo'), strikethrough: true },
+      { label: t('Redo'), shortcut: '⌘⇧Z', action: () => document.execCommand('redo'), strikethrough: true },
       { separator: true },
-      { label: t('Cut'), shortcut: '⌘X', action: () => document.execCommand('cut') },
-      { label: t('Copy'), shortcut: '⌘C', action: () => document.execCommand('copy') },
-      { label: t('Paste'), shortcut: '⌘V', action: () => document.execCommand('paste') },
+      { label: t('Cut'), shortcut: '⌘X', action: () => document.execCommand('cut'), strikethrough: true },
+      { label: t('Copy'), shortcut: '⌘C', action: () => document.execCommand('copy'), strikethrough: true },
+      { label: t('Paste'), shortcut: '⌘V', action: () => document.execCommand('paste'), strikethrough: true },
       { separator: true },
-      { label: t('Select all'), shortcut: '⌘A', action: () => document.execCommand('selectAll') },
+      { label: t('Select all'), shortcut: '⌘A', action: () => document.execCommand('selectAll'), strikethrough: true },
     ],
   },
   {
@@ -187,12 +430,28 @@ const menus = computed<Menu[]>(() => [
     items: [
       { label: 'SN 010130 (CH)', action: () => { normStore.norm = 'SN010130'; }, checked: normStore.norm === 'SN010130' },
       { label: 'DIN 5008 (DE)', action: () => { normStore.norm = 'DIN5008'; }, checked: normStore.norm === 'DIN5008' },
+      { label: 'NEN 1026 (NL)', action: () => { normStore.norm = 'NEN1026'; }, checked: normStore.norm === 'NEN1026' },
+      { label: 'UNE (ES)', action: () => { normStore.norm = 'UNE'; }, checked: normStore.norm === 'UNE' },
       { separator: true },
-      { label: 'Deutsch', action: () => { locale.value = 'de'; } },
-      { label: 'English', action: () => { locale.value = 'en'; } },
-      { label: 'Español', action: () => { locale.value = 'es'; } },
+      { label: 'Deutsch', action: () => { locale.value = 'de'; document.documentElement.setAttribute('lang', 'de'); }, checked: locale.value === 'de' },
+      { label: 'English', action: () => { locale.value = 'en'; document.documentElement.setAttribute('lang', 'en'); }, checked: locale.value === 'en' },
+      { label: 'Español', action: () => { locale.value = 'es'; document.documentElement.setAttribute('lang', 'es'); }, checked: locale.value === 'es' },
+      { label: 'Nederlands', action: () => { locale.value = 'nl'; document.documentElement.setAttribute('lang', 'nl'); }, checked: locale.value === 'nl' },
       { separator: true },
-      { label: t('Edit mode'), action: () => { modeStore.mode = modeStore.mode === 'edit' ? 'read' : 'edit'; } },
+      { label: t('Edit mode'), action: () => { modeStore.mode = modeStore.mode === 'edit' ? 'read' : 'edit'; }, checked: modeStore.mode === 'edit' },
+    ],
+  },
+  {
+    label: t('Window'),
+    items: [
+      { label: t('Minimize'), shortcut: '⌘M', action: () => { window.blur(); }, strikethrough: true },
+      { label: t('Full screen'), action: () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }, checked: !!document.fullscreenElement },
+    ],
+  },
+  {
+    label: t('Help'),
+    items: [
+      { label: t('Fucktura Help'), action: () => { window.open('https://github.com/AleksejDix/fucktura', '_blank'); } },
     ],
   },
 ]);

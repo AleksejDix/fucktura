@@ -41,6 +41,16 @@ export const usePagesStore = defineStore('pages', () => {
         enabled: true,
         metadata: { doc, sender: doc.sender },
       });
+
+      if (doc.type === 'invoice') {
+        result.push({
+          id: `doc-${doc.id}-qr`,
+          name: 'QRBill' as PageName,
+          component: markRaw(Pages.QRBill),
+          enabled: true,
+          metadata: { doc, sender: doc.sender },
+        });
+      }
     }
 
     pages.value = result;

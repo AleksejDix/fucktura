@@ -199,6 +199,27 @@ const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, 
     "Reminder crossing note": "Si su pago se ha cruzado con esta carta, le rogamos que ignore este recordatorio.",
     "Questions note": "¿Tiene preguntas? No dude en contactarnos.",
     "Kind regards": "Atentamente"
+  },
+  "nl": {
+    "Reminder": "Aanmaning",
+    "Date": "Datum",
+    "Invoice date": "Factuurdatum",
+    "Overdue since": "Vervallen sinds",
+    "Due date": "Vervaldatum",
+    "Your contact": "Uw contactpersoon",
+    "Customer number": "Klantnummer",
+    "Greeting": "Geachte {name}",
+    "Reminder intro": "Volgens onze administratie is bovengenoemde factuur nog niet voldaan. Wij verzoeken u het openstaande bedrag binnen de aangegeven termijn over te maken.",
+    "Description": "Omschrijving",
+    "Price in CHF": "Bedrag in CHF",
+    "Outstanding amount": "Openstaand factuurbedrag",
+    "reminder to invoice": "bij factuur",
+    "Reminder fee": "Aanmaningskosten",
+    "Default interest": "Wettelijke rente",
+    "Total amount due": "Totaal verschuldigd bedrag",
+    "Reminder crossing note": "Mocht uw betaling deze brief hebben gekruist, dan kunt u deze aanmaning als niet verzonden beschouwen.",
+    "Questions note": "Heeft u vragen? Neem gerust contact met ons op.",
+    "Kind regards": "Met vriendelijke groet"
   }
 }
 </i18n>

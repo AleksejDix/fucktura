@@ -88,3 +88,23 @@ h3 {
   --norm-addr-offset: 0mm; /* 45mm - 45mm */
   --norm-content-h: 232mm; /* 297mm - 45mm - 20mm footer */
 }
+
+/* NEN 1026 (Nederland) */
+.norm-NEN1026 {
+  --norm-ml: 25mm;
+  --norm-mr: 20mm;
+  --norm-header-h: 40mm;
+  --norm-addr-w: 85mm;
+  --norm-addr-offset: 5mm; /* 45mm - 40mm */
+  --norm-content-h: 237mm; /* 297mm - 40mm - 20mm footer */
+}
+
+/* UNE (España) */
+.norm-UNE {
+  --norm-ml: 25mm;
+  --norm-mr: 20mm;
+  --norm-header-h: 42mm;
+  --norm-addr-w: 90mm;
+  --norm-addr-offset: 3mm; /* 45mm - 42mm */
+  --norm-content-h: 235mm; /* 297mm - 42mm - 20mm footer */
+}

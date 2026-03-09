@@ -16,25 +16,25 @@
       >+ {{ $t('Add sender') }}</button>
     </div>
 
-    <form v-if="form" @submit.prevent="save" class="text-[9pt] space-y-5">
+    <div v-if="form" class="text-[9pt] space-y-5">
       <section>
         <p class="text-[8pt] text-gray-900 mb-2">{{ $t('Company') }}</p>
         <div class="grid grid-cols-2 gap-2">
-          <input v-model="form.name" :placeholder="$t('Company name')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
-          <input v-model="form.street" :placeholder="$t('Street')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
-          <input v-model="form.zip" :placeholder="$t('ZIP')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
-          <input v-model="form.city" :placeholder="$t('City')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
-          <input v-model="form.email" :placeholder="$t('Email')" type="email" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
-          <input v-model="form.website" :placeholder="$t('Website')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
-          <input v-model="form.uid" :placeholder="$t('UID')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
+          <input v-model="form.name" @blur="save" :placeholder="$t('Company name')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.street" @blur="save" :placeholder="$t('Street')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.zip" @blur="save" :placeholder="$t('ZIP')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
+          <input v-model="form.city" @blur="save" :placeholder="$t('City')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.email" @blur="save" :placeholder="$t('Email')" type="email" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.website" @blur="save" :placeholder="$t('Website')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.uid" @blur="save" :placeholder="$t('UID')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
         </div>
       </section>
 
       <section>
         <p class="text-[8pt] text-gray-900 mb-2">{{ $t('Contact person') }}</p>
         <div class="grid grid-cols-2 gap-2">
-          <input v-model="form.contact" :placeholder="$t('Name')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
-          <input v-model="form.contactEmail" :placeholder="$t('Email')" type="email" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.contact" @blur="save" :placeholder="$t('Name')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.contactEmail" @blur="save" :placeholder="$t('Email')" type="email" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
         </div>
       </section>
 
@@ -46,14 +46,14 @@
           </button>
         </div>
         <div v-for="(account, i) in form.accounts" :key="i" class="grid grid-cols-3 gap-2 mb-2">
-          <input v-model="account.iban" placeholder="IBAN" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
-          <input v-model="account.bank" :placeholder="$t('Bank')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="account.iban" @blur="save" placeholder="IBAN" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
+          <input v-model="account.bank" @blur="save" :placeholder="$t('Bank')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
           <div class="flex items-center gap-2">
-            <input v-model="account.bic" placeholder="BIC" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono flex-1" />
+            <input v-model="account.bic" @blur="save" placeholder="BIC" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono flex-1" />
             <button
               v-if="form.accounts.length > 1"
               type="button"
-              @click="form.accounts.splice(i, 1)"
+              @click="removeAccount(i)"
               class="text-[8pt] text-red-400 hover:text-red-600 shrink-0"
             >&times;</button>
           </div>
@@ -61,9 +61,6 @@
       </section>
 
       <div class="flex items-center gap-3 pt-2 border-t border-gray-200">
-        <button type="submit" class="bg-black text-white text-[9pt] font-medium px-5 py-1.5 hover:bg-gray-800 transition-colors">
-          {{ $t('Save') }}
-        </button>
         <button
           v-if="form.id && senderList.length > 1"
           type="button"
@@ -72,9 +69,8 @@
         >
           {{ $t('Delete') }}
         </button>
-        <span v-if="saved" class="text-[8pt] text-green-600">{{ $t('Saved') }}</span>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -87,7 +83,6 @@ import { useDocumentsStore } from '@/stores/documents';
 const documentsStore = useDocumentsStore();
 const senderList = ref<Sender[]>([]);
 const form = ref<Sender | null>(null);
-const saved = ref(false);
 
 function emptySender(): Sender {
   return {
@@ -127,20 +122,23 @@ function addAccount() {
   form.value?.accounts.push({ iban: '', bank: '', bic: '' });
 }
 
+function removeAccount(i: number) {
+  form.value?.accounts.splice(i, 1);
+  save();
+}
+
 async function save() {
   if (!form.value) return;
-  saved.value = false;
 
-  if (form.value.id) {
-    await db.senders.update(form.value.id, { ...form.value });
+  const raw = JSON.parse(JSON.stringify(form.value));
+  if (raw.id) {
+    await db.senders.update(raw.id, raw);
   } else {
-    form.value.id = await db.senders.add({ ...form.value }) as number;
+    form.value.id = await db.senders.add(raw) as number;
   }
 
   await loadSenders();
   await documentsStore.load();
-  saved.value = true;
-  setTimeout(() => { saved.value = false; }, 2000);
 }
 
 async function deleteSender() {

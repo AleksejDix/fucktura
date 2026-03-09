@@ -80,7 +80,6 @@
             <td class="py-1.5 align-top font-mono">{{ item.pos }}</td>
             <td class="py-1.5 align-top">
               <DInline v-model="item.description" tag="div" class="font-bold" @update:model-value="v => updateLineItem(i, 'description', v)" />
-              <DInline v-model="item.code" tag="div" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'code', v)" />
             </td>
             <td class="py-1.5 text-right align-top font-mono">
               <DInline :model-value="formatAmount(item.quantity)" tag="span" @update:model-value="v => updateLineItem(i, 'quantity', parseFloat(v) || 0)" /> <DInline :model-value="item.unit || 'h'" tag="span" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'unit', v)" />
@@ -242,6 +241,25 @@ function formatAmount(n: number): string {
     "Questions note": "¿Tiene preguntas? No dude en contactarnos.",
     "Kind regards": "Atentamente",
     "Add line item": "Añadir posición"
+  },
+  "nl": {
+    "Invoice": "Factuur",
+    "Date": "Datum",
+    "Due date": "Vervaldatum",
+    "Your contact": "Uw contactpersoon",
+    "Customer number": "Klantnummer",
+    "Greeting": "Geachte {name}",
+    "Invoice intro": "Bedankt voor uw vertrouwen. Uw factuur is als volgt samengesteld:",
+    "Pos": "Pos.",
+    "Description": "Omschrijving",
+    "Quantity": "Aantal",
+    "Unit price": "Eenheidsprijs",
+    "Price in CHF": "Prijs in CHF",
+    "Product code": "Productcode",
+    "Amount (tax exempt)": "Bedrag (vrijgesteld van BTW)",
+    "Questions note": "Heeft u vragen? Neem gerust contact met ons op.",
+    "Kind regards": "Met vriendelijke groet",
+    "Add line item": "Positie toevoegen"
   }
 }
 </i18n>

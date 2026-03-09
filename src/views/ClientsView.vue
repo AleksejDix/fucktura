@@ -14,6 +14,14 @@
         </div>
         <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-[9pt]">
           <div class="col-span-2">
+            <label class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Client number') }}</label>
+            <input
+              v-model="client.kundennummer"
+              @blur="saveClient(client)"
+              class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 font-mono"
+            />
+          </div>
+          <div class="col-span-2">
             <label class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Company name') }}</label>
             <input
               v-model="client.company"
@@ -182,8 +190,17 @@ function assignPosition(client: Client, pos: Position) {
   saveClient(client);
 }
 
+async function nextKundennummer(): Promise<string> {
+  const all = await db.clients.toArray();
+  const nums = all.map(c => parseInt(c.kundennummer, 10)).filter(n => !isNaN(n));
+  const max = nums.length ? Math.max(...nums) : 0;
+  return String(max + 1).padStart(4, '0');
+}
+
 async function addClient() {
+  const kundennummer = await nextKundennummer();
   await db.clients.add({
+    kundennummer,
     company: '',
     name: '',
     street: '',

@@ -30,9 +30,18 @@ documentsStore.setNavigator((id) => {
 });
 
 function printPage() {
+  const doc = documentsStore.activeDocument;
+  const originalTitle = document.title;
+  if (doc) {
+    document.title = doc.number;
+  }
   window.print();
+  document.title = originalTitle;
 }
 
-document.documentElement.setAttribute('lang', 'de');
-i18n.global.locale.value = 'de';
+const supported = ['de', 'en', 'es', 'nl'];
+const browserLang = navigator.language.split('-')[0];
+const defaultLocale = supported.includes(browserLang) ? browserLang : 'en';
+document.documentElement.setAttribute('lang', defaultLocale);
+i18n.global.locale.value = defaultLocale;
 </script>

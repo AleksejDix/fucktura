@@ -123,7 +123,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         datum: formatDate(today),
         gueltigBis: formatDate(validUntil),
         contactPerson: s.contact ?? '',
-        kundennummer: clientId ? String(clientId).padStart(6, '0') : '',
+        kundennummer: client?.kundennummer ?? '',
       },
       lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0 }],
     });
@@ -187,7 +187,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         country: client.country,
       },
       lineItems,
-      'meta.kundennummer': String(clientId).padStart(6, '0'),
+      'meta.kundennummer': client.kundennummer ?? '',
       updatedAt: new Date().toISOString(),
     });
     await load();
