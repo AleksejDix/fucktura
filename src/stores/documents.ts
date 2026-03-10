@@ -1,5 +1,6 @@
 import { db } from '@/db';
 import type { Client, Document, DocumentStatus, Position, Sender, SenderSnapshot } from '@/db';
+import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
@@ -102,7 +103,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
     const today = new Date();
     const validUntil = new Date(today);
-    validUntil.setDate(validUntil.getDate() + 30);
+    validUntil.setDate(validUntil.getDate() + (s.quoteValidDays ?? 14));
 
     return addDocument({
       type: 'offerte',
@@ -129,14 +130,94 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
+  async function createInvoice(clientId?: number, senderId?: number) {
+    const s = senderId
+      ? await db.senders.get(senderId)
+      : activeSender.value;
+    if (!s) return;
+
+    const number = generateNumber('R');
+    const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
+    const today = new Date();
+    const dueDate = new Date(today);
+    dueDate.setDate(dueDate.getDate() + (s.invoiceDueDays ?? 14));
+
+    return addDocument({
+      type: 'invoice',
+      status: 'draft',
+      number,
+      subtitle: '',
+      clientId,
+      sender: senderSnapshot(s),
+      recipient: {
+        company: client?.company ?? '',
+        name: client?.name ?? '',
+        street: client?.street ?? '',
+        zip: client?.zip ?? '',
+        city: client?.city ?? '',
+        country: client?.country ?? '',
+      },
+      meta: {
+        datum: formatDate(today),
+        zahlbarBis: formatDate(dueDate),
+        contactPerson: s.contact ?? '',
+        kundennummer: client?.kundennummer ?? '',
+      },
+      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0 }],
+    });
+  }
+
+  async function createMahnung(clientId?: number, senderId?: number) {
+    const s = senderId
+      ? await db.senders.get(senderId)
+      : activeSender.value;
+    if (!s) return;
+
+    const number = generateNumber('M');
+    const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
+    const country = client?.country ?? 'Schweiz';
+    const md = getMahnungDefaults(country);
+    const today = new Date();
+    const dueDate = new Date(today);
+    dueDate.setDate(dueDate.getDate() + md.zahlungsfrist);
+
+    return addDocument({
+      type: 'mahnung',
+      status: 'draft',
+      number,
+      subtitle: '',
+      clientId,
+      sender: senderSnapshot(s),
+      recipient: {
+        company: client?.company ?? '',
+        name: client?.name ?? '',
+        street: client?.street ?? '',
+        zip: client?.zip ?? '',
+        city: client?.city ?? '',
+        country,
+      },
+      meta: {
+        datum: formatDate(today),
+        zahlbarBis: formatDate(dueDate),
+        contactPerson: s.contact ?? '',
+        kundennummer: client?.kundennummer ?? '',
+      },
+      stufe: 1,
+      offenerBetrag: 0,
+      mahngebuehr: md.mahngebuehr[0],
+      verzugszins: 0,
+    });
+  }
+
   async function convertToInvoice(offerteId: number) {
     const offerte = documents.value.find((d) => d.id === offerteId);
     if (!offerte || offerte.type !== 'offerte') return;
 
+    const s = activeSender.value;
     const number = generateNumber('R');
     const today = new Date();
     const dueDate = new Date(today);
-    dueDate.setDate(dueDate.getDate() + 15);
+    dueDate.setDate(dueDate.getDate() + (s?.invoiceDueDays ?? 14));
 
     return addDocument({
       type: 'invoice',
@@ -221,6 +302,8 @@ export const useDocumentsStore = defineStore('documents', () => {
     deleteDocument,
     generateNumber,
     createOfferte,
+    createInvoice,
+    createMahnung,
     convertToInvoice,
     assignClient,
     updateDocument,

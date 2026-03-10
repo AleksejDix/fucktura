@@ -43,7 +43,7 @@
 
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ t('Date') }}:</span>
+          <span class="text-gray-600">{{ t('Quote date') }}:</span>
           <DInline v-model="meta.datum" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.datum': v })" />
         </div>
         <div class="flex justify-between">
@@ -80,6 +80,7 @@
             <td class="py-1.5 align-top font-mono">{{ item.pos }}</td>
             <td class="py-1.5 align-top">
               <DInline v-model="item.description" tag="div" class="font-bold" @update:model-value="v => updateLineItem(i, 'description', v)" />
+              <DInline v-if="item.code" v-model="item.code" tag="div" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'code', v)" />
             </td>
             <td class="py-1.5 text-right align-top font-mono">
               <DInline :model-value="formatAmount(item.quantity)" tag="span" @update:model-value="v => updateLineItem(i, 'quantity', parseFloat(v) || 0)" /> <DInline :model-value="item.unit || 'h'" tag="span" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'unit', v)" />
@@ -187,7 +188,7 @@ function formatAmount(n: number): string {
 {
   "de": {
     "Quote": "Offerte",
-    "Date": "Datum",
+    "Quote date": "Offertdatum",
     "Valid until": "Gültig bis",
     "Your contact": "Ihr Ansprechpartner",
     "Customer number": "Kundennummer",
@@ -207,7 +208,7 @@ function formatAmount(n: number): string {
   },
   "en": {
     "Quote": "Quote",
-    "Date": "Date",
+    "Quote date": "Quote date",
     "Valid until": "Valid until",
     "Your contact": "Your contact",
     "Customer number": "Customer number",
@@ -227,7 +228,7 @@ function formatAmount(n: number): string {
   },
   "es": {
     "Quote": "Presupuesto",
-    "Date": "Fecha",
+    "Quote date": "Fecha de presupuesto",
     "Valid until": "Válido hasta",
     "Your contact": "Su persona de contacto",
     "Customer number": "Número de cliente",
@@ -247,7 +248,7 @@ function formatAmount(n: number): string {
   },
   "nl": {
     "Quote": "Offerte",
-    "Date": "Datum",
+    "Quote date": "Offertedatum",
     "Valid until": "Geldig tot",
     "Your contact": "Uw contactpersoon",
     "Customer number": "Klantnummer",

@@ -392,6 +392,8 @@ const menus = computed<Menu[]>(() => [
     label: t('File'),
     items: [
       { label: t('New Offerte'), shortcut: '⌘N', action: () => store.createOfferte() },
+      { label: t('New invoice'), action: () => store.createInvoice() },
+      { label: t('New reminder'), action: () => store.createMahnung() },
       { separator: true },
       { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.id!), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
       { separator: true, hidden: !hasActiveDoc.value },

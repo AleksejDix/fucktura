@@ -39,6 +39,20 @@
       </section>
 
       <section>
+        <p class="text-[8pt] text-gray-900 mb-2">{{ $t('Payment terms') }}</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Invoice due days') }}</label>
+            <input v-model.number="form.invoiceDueDays" @blur="save" type="number" min="1" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
+          </div>
+          <div>
+            <label class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Quote valid days') }}</label>
+            <input v-model.number="form.quoteValidDays" @blur="save" type="number" min="1" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
+          </div>
+        </div>
+      </section>
+
+      <section>
         <div class="flex items-baseline justify-between mb-2">
           <p class="text-[8pt] text-gray-900">{{ $t('Bank accounts') }}</p>
           <button type="button" @click="addAccount" class="text-[8pt] text-gray-500 hover:text-black">
@@ -90,6 +104,8 @@ function emptySender(): Sender {
     email: '', website: '', uid: '',
     contact: '', contactEmail: '',
     accounts: [{ iban: '', bank: '', bic: '' }],
+    invoiceDueDays: 14,
+    quoteValidDays: 14,
   };
 }
 

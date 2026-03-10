@@ -18,48 +18,55 @@
     <section>
       <div class="pt-[var(--norm-addr-offset)]">
         <div class="w-[var(--norm-addr-w)]">
-          <address class="not-italic text-[9pt] leading-relaxed">
-            <div v-if="recipient.company">{{ recipient.company }}</div>
-            <div v-if="recipient.name">{{ recipient.name }}</div>
-            <div>{{ recipient.street }}</div>
-            <div><span class="font-mono">{{ recipient.zip }}</span> {{ recipient.city }}</div>
-            <div v-if="recipient.country">{{ recipient.country }}</div>
+          <DClientPicker :doc-id="doc.id!" :has-client="!!recipient.company || !!recipient.name" />
+          <address v-if="recipient.company || recipient.name" class="not-italic text-[9pt] leading-relaxed">
+            <DInline v-model="recipient.company" tag="div" @update:model-value="v => update({ 'recipient.company': v })" />
+            <DInline v-model="recipient.name" tag="div" @update:model-value="v => update({ 'recipient.name': v })" />
+            <DInline v-model="recipient.street" tag="div" @update:model-value="v => update({ 'recipient.street': v })" />
+            <div>
+              <DInline v-model="recipient.zip" tag="span" class="font-mono" @update:model-value="v => update({ 'recipient.zip': v })" />
+              {{ ' ' }}
+              <DInline v-model="recipient.city" tag="span" @update:model-value="v => update({ 'recipient.city': v })" />
+            </div>
+            <DInline v-if="recipient.country" v-model="recipient.country" tag="div" @update:model-value="v => update({ 'recipient.country': v })" />
           </address>
         </div>
       </div>
 
       <div class="pt-[12mm]">
         <div class="flex justify-between items-baseline">
-          <h2 class="text-[14pt] font-bold">{{ mahnungStufe }}. {{ t('Reminder') }}</h2>
-          <span class="text-[14pt] font-bold">{{ invoiceNumber }}</span>
+          <h2 class="text-[14pt] font-bold">
+            <DInline :model-value="String(mahnungStufe)" tag="span" @update:model-value="v => updateStufe(v)" />. {{ t('Reminder') }}
+          </h2>
+          <span class="text-[14pt] font-bold">{{ doc.number }}</span>
         </div>
-        <p class="font-bold text-[9pt]">{{ invoiceSubtitle }}</p>
+        <DInline v-model="doc.subtitle" tag="p" class="font-bold text-[9pt]" @update:model-value="v => update({ subtitle: v })" />
       </div>
 
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Date') }}:</span>
-          <span class="font-mono">{{ meta.datum }}</span>
+          <DInline v-model="meta.datum" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.datum': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Invoice date') }}:</span>
-          <span class="font-mono">{{ meta.rechnungsDatum }}</span>
+          <DInline :model-value="meta.rechnungsDatum ?? ''" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.rechnungsDatum': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Overdue since') }}:</span>
-          <span class="font-mono">{{ meta.faelligSeit }}</span>
+          <DInline :model-value="meta.faelligSeit ?? ''" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.faelligSeit': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Customer number') }}:</span>
-          <span class="font-mono">{{ meta.kundennummer }}</span>
+          <DInline v-model="meta.kundennummer" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.kundennummer': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Due date') }}:</span>
-          <span class="font-mono">{{ meta.zahlbarBis }}</span>
+          <DInline :model-value="meta.zahlbarBis ?? ''" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.zahlbarBis': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Your contact') }}:</span>
-          <span>{{ meta.contactPerson }}</span>
+          <DInline v-model="meta.contactPerson" tag="span" @update:model-value="v => update({ 'meta.contactPerson': v })" />
         </div>
       </div>
 
@@ -77,16 +84,22 @@
         </thead>
         <tbody>
           <tr class="border-b border-gray-200">
-            <td class="py-1.5">{{ t('Outstanding amount') }} ({{ t('reminder to invoice') }} <span class="font-mono">{{ invoiceNumber }}</span>)</td>
-            <td class="py-1.5 text-right font-mono">{{ formatChfFromNumber(offenerBetrag) }}</td>
+            <td class="py-1.5">{{ t('Outstanding amount') }} ({{ t('reminder to invoice') }} <span class="font-mono">{{ doc.number }}</span>)</td>
+            <td class="py-1.5 text-right font-mono">
+              <DInline :model-value="formatAmount(offenerBetrag)" tag="span" @update:model-value="v => update({ offenerBetrag: parseFloat(v) || 0 })" />
+            </td>
           </tr>
-          <tr v-if="mahngebuehr > 0" class="border-b border-gray-200">
+          <tr class="border-b border-gray-200">
             <td class="py-1.5">{{ t('Reminder fee') }}</td>
-            <td class="py-1.5 text-right font-mono">{{ formatChfFromNumber(mahngebuehr) }}</td>
+            <td class="py-1.5 text-right font-mono">
+              <DInline :model-value="formatAmount(mahngebuehr)" tag="span" @update:model-value="v => update({ mahngebuehr: parseFloat(v) || 0 })" />
+            </td>
           </tr>
-          <tr v-if="verzugszins > 0" class="border-b border-gray-200">
+          <tr class="border-b border-gray-200">
             <td class="py-1.5">{{ t('Default interest') }}</td>
-            <td class="py-1.5 text-right font-mono">{{ formatChfFromNumber(verzugszins) }}</td>
+            <td class="py-1.5 text-right font-mono">
+              <DInline :model-value="formatAmount(verzugszins)" tag="span" @update:model-value="v => update({ verzugszins: parseFloat(v) || 0 })" />
+            </td>
           </tr>
         </tbody>
         <tfoot>
@@ -103,6 +116,8 @@
         <p class="mt-3">{{ t('Kind regards') }}</p>
         <p>{{ meta.contactPerson }}</p>
       </div>
+
+      <p class="text-[7pt] text-gray-400 mt-6">{{ t('Legal basis') }}: {{ countryDefaults.legalBasis }} · {{ t('Interest rate') }}: {{ (countryDefaults.verzugszinsRate * 100).toFixed(1) }}% p.a.</p>
     </section>
   </PageTemplate>
 </template>
@@ -111,11 +126,16 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { Document, Sender } from '@/db';
+import { useDocumentsStore } from '@/stores/documents';
 import { useMoney } from '@/composables/useMoney';
+import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import PageTemplate from '../PageTemplate.vue';
+import DClientPicker from '../DClientPicker.vue';
+import DInline from '../DInline.vue';
 
 const { t } = useI18n({ useScope: 'local' });
-const { sumAmounts, formatChf, formatChfFromNumber } = useMoney();
+const store = useDocumentsStore();
+const { sumAmounts, formatChf } = useMoney();
 
 const props = defineProps<{
   pageIndex?: number;
@@ -125,14 +145,28 @@ const props = defineProps<{
 
 const recipient = computed(() => props.doc.recipient);
 const meta = computed(() => props.doc.meta);
-const invoiceNumber = computed(() => props.doc.number);
-const invoiceSubtitle = computed(() => props.doc.subtitle);
 const mahnungStufe = computed(() => props.doc.stufe ?? 1);
 const offenerBetrag = computed(() => props.doc.offenerBetrag ?? 0);
 const mahngebuehr = computed(() => props.doc.mahngebuehr ?? 0);
 const verzugszins = computed(() => props.doc.verzugszins ?? 0);
+const countryDefaults = computed(() => getMahnungDefaults(recipient.value.country || 'Schweiz'));
 
 const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, verzugszins.value));
+
+function update(changes: Record<string, unknown>) {
+  if (!props.doc.id) return;
+  store.updateDocument(props.doc.id, changes);
+}
+
+function updateStufe(value: string) {
+  const stufe = Math.max(1, Math.min(3, parseInt(value) || 1));
+  const fee = countryDefaults.value.mahngebuehr[stufe - 1] ?? 0;
+  update({ stufe, mahngebuehr: fee });
+}
+
+function formatAmount(n: number): string {
+  return n.toFixed(2);
+}
 </script>
 
 <i18n lang="json">
@@ -156,7 +190,9 @@ const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, 
     "Total amount due": "Fälliger Gesamtbetrag",
     "Reminder crossing note": "Sollte sich Ihre Zahlung mit diesem Schreiben gekreuzt haben, betrachten Sie diese Mahnung bitte als gegenstandslos.",
     "Questions note": "Bei Fragen stehen wir Ihnen gerne zur Verfügung.",
-    "Kind regards": "Freundliche Grüsse"
+    "Kind regards": "Freundliche Grüsse",
+    "Legal basis": "Rechtsgrundlage",
+    "Interest rate": "Verzugszins"
   },
   "en": {
     "Reminder": "Reminder",
@@ -177,7 +213,9 @@ const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, 
     "Total amount due": "Total amount due",
     "Reminder crossing note": "Should your payment have crossed with this letter, please disregard this reminder.",
     "Questions note": "If you have any questions, please contact us.",
-    "Kind regards": "Kind regards"
+    "Kind regards": "Kind regards",
+    "Legal basis": "Legal basis",
+    "Interest rate": "Interest rate"
   },
   "es": {
     "Reminder": "Recordatorio de pago",
@@ -198,7 +236,9 @@ const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, 
     "Total amount due": "Importe total adeudado",
     "Reminder crossing note": "Si su pago se ha cruzado con esta carta, le rogamos que ignore este recordatorio.",
     "Questions note": "¿Tiene preguntas? No dude en contactarnos.",
-    "Kind regards": "Atentamente"
+    "Kind regards": "Atentamente",
+    "Legal basis": "Base legal",
+    "Interest rate": "Tipo de interés"
   },
   "nl": {
     "Reminder": "Aanmaning",
@@ -219,7 +259,9 @@ const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, 
     "Total amount due": "Totaal verschuldigd bedrag",
     "Reminder crossing note": "Mocht uw betaling deze brief hebben gekruist, dan kunt u deze aanmaning als niet verzonden beschouwen.",
     "Questions note": "Heeft u vragen? Neem gerust contact met ons op.",
-    "Kind regards": "Met vriendelijke groet"
+    "Kind regards": "Met vriendelijke groet",
+    "Legal basis": "Rechtsgrond",
+    "Interest rate": "Vertragingsrente"
   }
 }
 </i18n>
