@@ -24,7 +24,7 @@
         <footer class="absolute bottom-0 left-0 right-0 w-full pb-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)]">
           <div class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4">
             <div>
-              <div class="font-bold text-gray-600">{{ sender?.name }}</div>
+              <div class="font-bold text-gray-600">{{ sender?.contact || sender?.company }}</div>
               <div>{{ sender?.street }}</div>
               <div>{{ sender?.zip }} {{ sender?.city }}</div>
             </div>

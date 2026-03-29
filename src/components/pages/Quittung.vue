@@ -35,7 +35,7 @@
 
       <div class="pt-[12mm]">
         <div class="flex justify-between items-baseline">
-          <h2 class="text-[14pt] font-bold">{{ t('Invoice') }}</h2>
+          <h2 class="text-[14pt] font-bold">{{ t('Receipt') }}</h2>
           <span class="text-[14pt] font-bold">{{ doc.number }}</span>
         </div>
         <DInline v-model="doc.subtitle" tag="p" class="font-bold text-[9pt]" @update:model-value="v => update({ subtitle: v })" />
@@ -43,7 +43,7 @@
 
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ t('Invoice date') }}:</span>
+          <span class="text-gray-600">{{ t('Date') }}:</span>
           <DDate :value="meta.date" @update="v => update({ 'meta.date': v })" />
         </div>
         <div class="flex justify-between">
@@ -51,8 +51,8 @@
           <DInline v-model="meta.contactPerson" tag="span" @update:model-value="v => update({ 'meta.contactPerson': v })" />
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600">{{ t('Due date') }}:</span>
-          <DDate :value="meta.dueDate" @update="v => update({ 'meta.dueDate': v })" />
+          <span class="text-gray-600">{{ t('Payment method') }}:</span>
+          <span class="font-bold">{{ t('Paid via Demo Booking') }}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Customer number') }}:</span>
@@ -62,7 +62,7 @@
 
       <div class="text-[9pt] leading-relaxed mt-3">
         <p>{{ t('Greeting', { name: recipient.name }) }}</p>
-        <p class="mt-2">{{ t('Invoice intro') }}</p>
+        <p class="mt-2">{{ t('Receipt intro') }}</p>
       </div>
 
       <table class="w-full text-[9pt] mt-3">
@@ -83,7 +83,7 @@
               <DInline v-if="item.code" v-model="item.code" tag="div" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'code', v)" />
             </td>
             <td class="py-1.5 text-right align-top font-mono">
-              <DInline :model-value="formatAmount(item.quantity)" tag="span" @update:model-value="v => updateLineItem(i, 'quantity', parseFloat(v) || 0)" /> <DInline :model-value="item.unit || 'h'" tag="span" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'unit', v)" />
+              <DInline :model-value="formatAmount(item.quantity)" tag="span" @update:model-value="v => updateLineItem(i, 'quantity', parseFloat(v) || 0)" /> <DInline :model-value="item.unit || 'Stk'" tag="span" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'unit', v)" />
             </td>
             <td class="py-1.5 text-right align-top font-mono">
               <DInline :model-value="formatAmount(item.unitPrice)" tag="span" @update:model-value="v => updateLineItem(i, 'unitPrice', parseFloat(v) || 0)" />
@@ -105,7 +105,6 @@
             <td></td>
             <td></td>
             <td class="py-1.5 text-right font-bold font-mono">{{ formatChf(total) }}</td>
-
           </tr>
         </tfoot>
       </table>
@@ -117,7 +116,8 @@
       >+ {{ t('Add line item') }}</button>
 
       <div class="text-[9pt] leading-relaxed mt-4">
-        <p>{{ t('Questions note') }}</p>
+        <p>{{ t('Tax note') }}</p>
+        <p class="mt-3">{{ t('Thank you') }}</p>
         <p class="mt-3">{{ t('Kind regards') }}</p>
         <p>{{ meta.contactPerson }}</p>
       </div>
@@ -140,7 +140,7 @@ import DDate from '../DDate.vue';
 const { t } = useI18n({ useScope: 'local' });
 const store = useDocumentsStore();
 const modeStore = useModeStore();
-const { lineTotal, sumLineItems, formatChf, formatChfFromNumber } = useMoney();
+const { lineTotal, sumLineItems, formatChf } = useMoney();
 const isEdit = computed(() => modeStore.isEditMode);
 
 const props = defineProps<{
@@ -174,7 +174,7 @@ function updateLineItem(index: number, field: string, value: unknown) {
 function addLineItem() {
   if (!props.doc.id) return;
   const items = [...lineItems.value.map(item => ({ ...item }))];
-  items.push({ pos: items.length + 1, description: '', code: '', quantity: 0, unit: 'h', unitPrice: 0 });
+  items.push({ pos: items.length + 1, description: '', code: '', quantity: 0, unit: 'Stk', unitPrice: 0 });
   store.updateDocument(props.doc.id, { lineItems: items });
 }
 
@@ -192,97 +192,62 @@ function formatAmount(n: number): string {
 <i18n lang="json">
 {
   "de": {
-    "Invoice": "Rechnung",
-    "Invoice date": "Rechnungsdatum",
-    "Due date": "Zahlbar bis",
+    "Receipt": "Quittung",
+    "Date": "Datum",
     "Your contact": "Ihr Ansprechpartner",
-    "Customer number": "Kundennummer",
+    "Payment method": "Zahlungsart",
+    "Paid via Demo Booking": "Bezahlt über Demo Booking",
+    "Customer number": "Buchungsnummer",
     "Greeting": "Guten Tag {name}",
-    "Invoice intro": "Danke für Ihr Vertrauen. Ihre Rechnung setzt sich wie folgt zusammen:",
+    "Receipt intro": "Hiermit bestätigen wir den Erhalt folgender Zahlung:",
     "Pos": "Pos.",
     "Description": "Beschreibung",
     "Quantity": "Menge",
     "Unit price": "Einzelpreis",
-    "Price in": "Preis in",
-    "Product code": "Produktcode",
-    "Amount (tax exempt)": "Betrag (von Steuer befreit)",
-    "Questions note": "Bei Fragen stehen wir Ihnen gerne zur Verfügung.",
-    "Kind regards": "Freundliche Grüsse",
+    "Price in": "Betrag in",
+    "Amount (tax exempt)": "Gesamtbetrag (von Steuer befreit)",
+    "Tax note": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmerregelung).",
+    "Thank you": "Vielen Dank für Ihren Aufenthalt!",
+    "Kind regards": "Freundliche Grüße",
     "Add line item": "Position hinzufügen"
   },
   "en": {
-    "Invoice": "Invoice",
-    "Invoice date": "Invoice date",
-    "Due date": "Due date",
+    "Receipt": "Receipt",
+    "Date": "Date",
     "Your contact": "Your contact",
-    "Customer number": "Customer number",
+    "Payment method": "Payment method",
+    "Paid via Demo Booking": "Paid via Demo Booking",
+    "Customer number": "Booking number",
     "Greeting": "Dear {name}",
-    "Invoice intro": "Thank you for your trust. Your invoice is as follows:",
+    "Receipt intro": "We hereby confirm receipt of the following payment:",
     "Pos": "Pos.",
     "Description": "Description",
     "Quantity": "Quantity",
     "Unit price": "Unit price",
-    "Price in": "Price in",
-    "Product code": "Product code",
-    "Amount (tax exempt)": "Amount (tax exempt)",
-    "Questions note": "If you have any questions, please contact us.",
+    "Price in": "Amount in",
+    "Amount (tax exempt)": "Total amount (tax exempt)",
+    "Tax note": "No VAT charged pursuant to § 19 UStG (small business regulation).",
+    "Thank you": "Thank you for your stay!",
     "Kind regards": "Kind regards",
     "Add line item": "Add line item"
   },
-  "es": {
-    "Invoice": "Factura",
-    "Invoice date": "Fecha de factura",
-    "Due date": "Fecha de vencimiento",
-    "Your contact": "Su persona de contacto",
-    "Customer number": "Número de cliente",
-    "Greeting": "Estimado/a {name}",
-    "Invoice intro": "Gracias por su confianza. Su factura se compone de la siguiente manera:",
-    "Pos": "Pos.",
-    "Description": "Descripción",
-    "Quantity": "Cantidad",
-    "Unit price": "Precio unitario",
-    "Price in": "Precio en",
-    "Product code": "Código de producto",
-    "Amount (tax exempt)": "Importe (exento de impuestos)",
-    "Questions note": "¿Tiene preguntas? No dude en contactarnos.",
-    "Kind regards": "Atentamente",
-    "Add line item": "Añadir posición"
-  },
-  "nl": {
-    "Invoice": "Factuur",
-    "Invoice date": "Factuurdatum",
-    "Due date": "Vervaldatum",
-    "Your contact": "Uw contactpersoon",
-    "Customer number": "Klantnummer",
-    "Greeting": "Geachte {name}",
-    "Invoice intro": "Bedankt voor uw vertrouwen. Uw factuur is als volgt samengesteld:",
-    "Pos": "Pos.",
-    "Description": "Omschrijving",
-    "Quantity": "Aantal",
-    "Unit price": "Eenheidsprijs",
-    "Price in": "Prijs in",
-    "Product code": "Productcode",
-    "Amount (tax exempt)": "Bedrag (vrijgesteld van BTW)",
-    "Questions note": "Heeft u vragen? Neem gerust contact met ons op.",
-    "Kind regards": "Met vriendelijke groet",
-    "Add line item": "Positie toevoegen"
-  },
   "ru": {
-    "Invoice": "Счёт",
-    "Invoice date": "Дата счёта",
-    "Due date": "Срок оплаты",
+    "Receipt": "Квитанция",
+    "Date": "Дата",
     "Your contact": "Контактное лицо",
-    "Customer number": "Номер клиента",
+    "Payment method": "Способ оплаты",
+    "Paid via Demo Booking": "Оплачено через Demo Booking",
+    "Customer number": "Номер бронирования",
     "Greeting": "Здравствуйте, {name}",
-    "Invoice intro": "Благодарим за доверие. Ваш счёт составлен следующим образом:",
+    "Receipt intro": "Настоящим подтверждаем получение следующего платежа:",
     "Pos": "Поз.",
     "Description": "Описание",
     "Quantity": "Количество",
     "Unit price": "Цена за единицу",
-    "Price in": "Цена в",
-    "Product code": "Код продукта",
-    "Amount (tax exempt)": "Сумма (без НДС)",
-    "Questions note": "При возникновении вопросов обращайтесь к нам.",
+    "Price in": "Сумма в",
+    "Amount (tax exempt)": "Итого (без НДС)",
+    "Tax note": "НДС не взимается в соответствии с § 19 UStG (режим малого предпринимательства).",
+    "Thank you": "Спасибо за ваше пребывание!",
     "Kind regards": "С уважением",
     "Add line item": "Добавить позицию"
   }

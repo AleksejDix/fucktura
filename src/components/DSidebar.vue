@@ -13,7 +13,7 @@
             <span class="shrink-0 w-1.5 h-1.5 inline-block" :class="doc.id === store.activeDocumentId ? 'bg-white' : isOverdue(doc) ? 'bg-red-500' : dotClass[doc.type]" />
             {{ doc.recipient.company || doc.recipient.name || $t('No client') }}
           </span>
-          <span class="shrink-0 ml-2 text-[11px]" :class="doc.id === store.activeDocumentId ? 'text-gray-400' : isOverdue(doc) ? 'text-red-400' : 'text-gray-400'">{{ dueDate(doc) || doc.meta.datum }}</span>
+          <span class="shrink-0 ml-2 text-[11px]" :class="doc.id === store.activeDocumentId ? 'text-gray-400' : isOverdue(doc) ? 'text-red-400' : 'text-gray-400'">{{ formatDate(dueDateField(doc) || doc.meta.date) }}</span>
         </div>
         <div class="text-[11px] truncate mt-0.5 pl-[12px]" :class="doc.id === store.activeDocumentId ? 'text-gray-400' : 'text-gray-500'">{{ doc.number }} · {{ doc.subtitle || '—' }}</div>
       </div>
@@ -29,35 +29,32 @@
 <script setup lang="ts">
 import type { Document } from '@/db';
 import { useDocumentsStore } from '@/stores/documents';
+import { useDate } from '@/composables/useDate';
 
 const store = useDocumentsStore();
+const { formatDate } = useDate();
 
 const dotClass: Record<string, string> = {
   offerte: 'bg-amber-500',
   invoice: 'bg-emerald-500',
   mahnung: 'bg-red-500',
+  quittung: 'bg-blue-500',
 };
 
-function parseDate(str: string): Date | null {
-  const parts = str.split('.');
-  if (parts.length !== 3) return null;
-  return new Date(+parts[2], +parts[1] - 1, +parts[0]);
-}
-
-function dueDate(doc: Document): string | null {
-  if (doc.type === 'invoice') return doc.meta.zahlbarBis ?? null;
-  if (doc.type === 'offerte') return doc.meta.gueltigBis ?? null;
-  if (doc.type === 'mahnung') return doc.meta.faelligSeit ?? null;
+function dueDateField(doc: Document): string | null {
+  if (doc.type === 'invoice') return doc.meta.dueDate ?? null;
+  if (doc.type === 'offerte') return doc.meta.validUntil ?? null;
+  if (doc.type === 'mahnung') return doc.meta.overdueSince ?? null;
   return null;
 }
 
 function isOverdue(doc: Document): boolean {
   if (doc.type === 'invoice' && doc.status === 'paid') return false;
   if (doc.type === 'offerte' && (doc.status === 'accepted' || doc.status === 'rejected')) return false;
-  const due = dueDate(doc);
+  const due = dueDateField(doc);
   if (!due) return false;
-  const d = parseDate(due);
-  if (!d) return false;
+  const d = new Date(due);
+  if (isNaN(d.getTime())) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return d < today;

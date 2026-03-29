@@ -4,9 +4,9 @@
       <header class="absolute top-0 left-0 right-0 pl-[var(--norm-ml)] pr-[var(--norm-mr)] pt-[10mm] max-h-[var(--norm-header-h)]">
         <div class="flex justify-end">
           <div class="text-[9pt] text-right leading-relaxed">
-            <div class="font-bold">{{ sender.name }}</div>
+            <div class="font-bold">{{ sender.company }}</div>
             <div>{{ sender.street }}</div>
-            <div><span class="font-mono">{{ sender.zip }}</span> {{ sender.city }}, Schweiz</div>
+            <div><span class="font-mono">{{ sender.zip }}</span> {{ sender.city }}, {{ sender.country }}</div>
             <div>{{ sender.email }}</div>
             <div>{{ sender.website }}</div>
             <div class="text-gray-500 font-mono">{{ sender.uid }}</div>
@@ -21,7 +21,7 @@
       <p>{{ t('Thank you note') }}</p>
       <p class="mt-2">{{ t('Questions note') }}</p>
       <p class="mt-6">{{ t('Kind regards') }}</p>
-      <p class="font-bold">{{ sender.contact || sender.name }}</p>
+      <p class="font-bold">{{ sender.contact || sender.company }}</p>
     </section>
 
     <div class="absolute bottom-[105mm] left-0 w-[210mm] border-t border-dashed border-gray-400"></div>
@@ -39,7 +39,7 @@ import { useMoney } from '@/composables/useMoney';
 import PageTemplate from '../PageTemplate.vue';
 
 const { t, locale } = useI18n({ useScope: 'local' });
-const { sumLineItems } = useMoney();
+const { sumLineItems, sumAmounts } = useMoney();
 
 const props = defineProps<{
   pageIndex?: number;
@@ -50,16 +50,19 @@ const props = defineProps<{
 const qrBillSvg = ref('');
 
 const qrLanguageMap: Record<string, 'DE' | 'FR' | 'IT' | 'EN'> = {
-  de: 'DE', en: 'EN', fr: 'FR', it: 'IT', es: 'EN',
+  de: 'DE', en: 'EN', fr: 'FR', it: 'IT', es: 'EN', ru: 'EN',
 };
 
 watch(
   () => JSON.stringify(props.doc) + locale.value,
   () => {
-    const items = props.doc.lineItems ?? [];
-    const amount = items.length
-      ? parseFloat(toDecimal(sumLineItems(items)))
-      : 0;
+    let amount = 0;
+    if (props.doc.type === 'mahnung') {
+      amount = parseFloat(toDecimal(sumAmounts(props.doc.offenerBetrag ?? 0, props.doc.mahngebuehr ?? 0, props.doc.verzugszins ?? 0)));
+    } else {
+      const items = props.doc.lineItems ?? [];
+      amount = items.length ? parseFloat(toDecimal(sumLineItems(items))) : 0;
+    }
 
     const account = props.sender.accounts?.find(a => a.iban.startsWith('CH')) ?? props.sender.accounts?.[0];
     if (!account) { qrBillSvg.value = ''; return; }
@@ -68,7 +71,7 @@ watch(
       currency: 'CHF' as const,
       amount,
       creditor: {
-        name: props.sender.name,
+        name: props.sender.company,
         address: props.sender.street,
         zip: props.sender.zip,
         city: props.sender.city,
@@ -111,6 +114,16 @@ watch(
     "Thank you note": "Le agradecemos su confianza y la agradable colaboración.",
     "Questions note": "Si tiene alguna pregunta sobre esta factura, no dude en contactarnos.",
     "Kind regards": "Atentamente"
+  },
+  "nl": {
+    "Thank you note": "Wij danken u hartelijk voor uw vertrouwen en de prettige samenwerking.",
+    "Questions note": "Heeft u vragen over deze factuur? Neem dan gerust contact met ons op.",
+    "Kind regards": "Met vriendelijke groet"
+  },
+  "ru": {
+    "Thank you note": "Благодарим вас за доверие и приятное сотрудничество.",
+    "Questions note": "При возникновении вопросов по данному счёту обращайтесь к нам.",
+    "Kind regards": "С уважением"
   }
 }
 </i18n>

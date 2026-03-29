@@ -50,9 +50,9 @@
         @change="store.activeSenderId = Number(($event.target as HTMLSelectElement).value)"
         class="bg-transparent text-[12px] text-gray-600 border-none focus:outline-none cursor-pointer"
       >
-        <option v-for="s in store.senders" :key="s.id" :value="s.id">{{ s.name }}</option>
+        <option v-for="s in store.senders" :key="s.id" :value="s.id">{{ s.company }}</option>
       </select>
-      <span v-else-if="store.activeSender" class="text-[12px] text-gray-500">{{ store.activeSender.name }}</span>
+      <span v-else-if="store.activeSender" class="text-[12px] text-gray-500">{{ store.activeSender.company }}</span>
     </div>
     <Teleport to="body">
       <div v-if="showAbout" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30" @click.self="showAbout = false">
@@ -76,6 +76,7 @@ import { useDocumentsStore } from '@/stores/documents';
 import { useModeStore } from '@/stores/mode';
 import { useLetterNormStore } from '@/stores/letterNorm';
 import { useMoney } from '@/composables/useMoney';
+import { useDate } from '@/composables/useDate';
 
 interface MenuItem {
   label?: string;
@@ -101,6 +102,7 @@ const modeStore = useModeStore();
 const normStore = useLetterNormStore();
 const router = useRouter();
 const { sumLineItems, formatChf, sumAmounts } = useMoney();
+const { formatDate: fmtDate } = useDate();
 
 const emit = defineEmits<{ 'generate-pdf': [] }>();
 
@@ -151,47 +153,47 @@ function emailBody(): string {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Guten Tag ${name}
 
-Anbei erhalten Sie unsere Offerte ${d.number} vom ${d.meta.datum}.
+Anbei erhalten Sie unsere Offerte ${d.number} vom ${fmtDate(d.meta.date)}.
 
 Offertbetrag: CHF ${total}
-Gültig bis: ${d.meta.gueltigBis ?? ''}
+Gültig bis: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Betreff: ${d.subtitle}\n\n` : ''}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
 
 Freundliche Grüsse
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       invoice: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Guten Tag ${name}
 
-Anbei erhalten Sie unsere Rechnung ${d.number} vom ${d.meta.datum}.
+Anbei erhalten Sie unsere Rechnung ${d.number} vom ${fmtDate(d.meta.date)}.
 
 Rechnungsbetrag: CHF ${total}
-Zahlbar bis: ${d.meta.zahlbarBis ?? ''}
+Zahlbar bis: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Betreff: ${d.subtitle}\n\n` : ''}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
 
 Freundliche Grüsse
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
         const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
         return `Guten Tag ${name}
 
-Leider haben wir für die Rechnung ${d.number} vom ${d.meta.rechnungsDatum ?? d.meta.datum} noch keinen Zahlungseingang feststellen können.
+Leider haben wir für die Rechnung ${d.number} vom ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} noch keinen Zahlungseingang feststellen können.
 
 Offener Betrag: CHF ${total}
-Fällig seit: ${d.meta.faelligSeit ?? ''}
-Zahlbar bis: ${d.meta.zahlbarBis ?? ''}
+Fällig seit: ${fmtDate(d.meta.overdueSince)}
+Zahlbar bis: ${fmtDate(d.meta.dueDate)}
 
 Wir bitten Sie, den ausstehenden Betrag innert der genannten Frist zu überweisen.
 
 Freundliche Grüsse
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
     },
     en: {
@@ -199,47 +201,47 @@ ${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Dear ${name}
 
-Please find attached our quote ${d.number} dated ${d.meta.datum}.
+Please find attached our quote ${d.number} dated ${fmtDate(d.meta.date)}.
 
 Quote amount: CHF ${total}
-Valid until: ${d.meta.gueltigBis ?? ''}
+Valid until: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Subject: ${d.subtitle}\n\n` : ''}Please do not hesitate to contact us if you have any questions.
 
 Kind regards
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       invoice: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Dear ${name}
 
-Please find attached our invoice ${d.number} dated ${d.meta.datum}.
+Please find attached our invoice ${d.number} dated ${fmtDate(d.meta.date)}.
 
 Invoice amount: CHF ${total}
-Due date: ${d.meta.zahlbarBis ?? ''}
+Due date: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Subject: ${d.subtitle}\n\n` : ''}Please do not hesitate to contact us if you have any questions.
 
 Kind regards
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
         const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
         return `Dear ${name}
 
-We have not yet received payment for invoice ${d.number} dated ${d.meta.rechnungsDatum ?? d.meta.datum}.
+We have not yet received payment for invoice ${d.number} dated ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
 
 Outstanding amount: CHF ${total}
-Overdue since: ${d.meta.faelligSeit ?? ''}
-Due date: ${d.meta.zahlbarBis ?? ''}
+Overdue since: ${fmtDate(d.meta.overdueSince)}
+Due date: ${fmtDate(d.meta.dueDate)}
 
 We kindly ask you to settle the outstanding amount within the stated deadline.
 
 Kind regards
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
     },
     es: {
@@ -247,47 +249,47 @@ ${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Estimado/a ${name}
 
-Adjunto le enviamos nuestro presupuesto ${d.number} del ${d.meta.datum}.
+Adjunto le enviamos nuestro presupuesto ${d.number} del ${fmtDate(d.meta.date)}.
 
 Importe: CHF ${total}
-Válido hasta: ${d.meta.gueltigBis ?? ''}
+Válido hasta: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Asunto: ${d.subtitle}\n\n` : ''}Quedamos a su disposición para cualquier consulta.
 
 Atentamente
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       invoice: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Estimado/a ${name}
 
-Adjunto le enviamos nuestra factura ${d.number} del ${d.meta.datum}.
+Adjunto le enviamos nuestra factura ${d.number} del ${fmtDate(d.meta.date)}.
 
 Importe: CHF ${total}
-Fecha de vencimiento: ${d.meta.zahlbarBis ?? ''}
+Fecha de vencimiento: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Asunto: ${d.subtitle}\n\n` : ''}Quedamos a su disposición para cualquier consulta.
 
 Atentamente
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
         const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
         return `Estimado/a ${name}
 
-Lamentablemente no hemos recibido el pago de la factura ${d.number} del ${d.meta.rechnungsDatum ?? d.meta.datum}.
+Lamentablemente no hemos recibido el pago de la factura ${d.number} del ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
 
 Importe pendiente: CHF ${total}
-Vencido desde: ${d.meta.faelligSeit ?? ''}
-Fecha límite de pago: ${d.meta.zahlbarBis ?? ''}
+Vencido desde: ${fmtDate(d.meta.overdueSince)}
+Fecha límite de pago: ${fmtDate(d.meta.dueDate)}
 
 Le rogamos que realice la transferencia dentro del plazo indicado.
 
 Atentamente
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
     },
     nl: {
@@ -295,47 +297,95 @@ ${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Geachte ${name}
 
-Hierbij ontvangt u onze offerte ${d.number} van ${d.meta.datum}.
+Hierbij ontvangt u onze offerte ${d.number} van ${fmtDate(d.meta.date)}.
 
 Offertebedrag: CHF ${total}
-Geldig tot: ${d.meta.gueltigBis ?? ''}
+Geldig tot: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Betreft: ${d.subtitle}\n\n` : ''}Mocht u vragen hebben, neem dan gerust contact met ons op.
 
 Met vriendelijke groet
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       invoice: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Geachte ${name}
 
-Hierbij ontvangt u onze factuur ${d.number} van ${d.meta.datum}.
+Hierbij ontvangt u onze factuur ${d.number} van ${fmtDate(d.meta.date)}.
 
 Factuurbedrag: CHF ${total}
-Betaalbaar tot: ${d.meta.zahlbarBis ?? ''}
+Betaalbaar tot: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Betreft: ${d.subtitle}\n\n` : ''}Mocht u vragen hebben, neem dan gerust contact met ons op.
 
 Met vriendelijke groet
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
         const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
         return `Geachte ${name}
 
-Helaas hebben wij voor factuur ${d.number} van ${d.meta.rechnungsDatum ?? d.meta.datum} nog geen betaling ontvangen.
+Helaas hebben wij voor factuur ${d.number} van ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} nog geen betaling ontvangen.
 
 Openstaand bedrag: CHF ${total}
-Vervallen sinds: ${d.meta.faelligSeit ?? ''}
-Betaalbaar tot: ${d.meta.zahlbarBis ?? ''}
+Vervallen sinds: ${fmtDate(d.meta.overdueSince)}
+Betaalbaar tot: ${fmtDate(d.meta.dueDate)}
 
 Wij verzoeken u het openstaande bedrag binnen de genoemde termijn over te maken.
 
 Met vriendelijke groet
-${sender.contact || sender.name}
-${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+    },
+    ru: {
+      offerte: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Здравствуйте, ${name}
+
+В приложении наше коммерческое предложение ${d.number} от ${fmtDate(d.meta.date)}.
+
+Сумма предложения: CHF ${total}
+Действительно до: ${fmtDate(d.meta.validUntil)}
+
+${d.subtitle ? `Тема: ${d.subtitle}\n\n` : ''}При возникновении вопросов обращайтесь к нам.
+
+С уважением
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      invoice: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Здравствуйте, ${name}
+
+В приложении наш счёт ${d.number} от ${fmtDate(d.meta.date)}.
+
+Сумма счёта: CHF ${total}
+Срок оплаты: ${fmtDate(d.meta.dueDate)}
+
+${d.subtitle ? `Тема: ${d.subtitle}\n\n` : ''}При возникновении вопросов обращайтесь к нам.
+
+С уважением
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      mahnung: (d) => {
+        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        return `Здравствуйте, ${name}
+
+К сожалению, мы ещё не получили оплату по счёту ${d.number} от ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
+
+Сумма задолженности: CHF ${total}
+Просрочено с: ${fmtDate(d.meta.overdueSince)}
+Срок оплаты: ${fmtDate(d.meta.dueDate)}
+
+Просим произвести оплату в указанный срок.
+
+С уважением
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
     },
   };
@@ -345,11 +395,17 @@ ${sender.name}${sender.email ? `\n${sender.email}` : ''}`;
   return template(doc);
 }
 
+function setLocale(lang: string) {
+  locale.value = lang;
+  document.documentElement.setAttribute('lang', lang);
+  localStorage.setItem('locale', lang);
+}
+
 function sendEmail() {
   const doc = activeDoc.value;
   if (!doc) return;
   const client = activeClient.value;
-  const to = client?.email ?? '';
+  const to = doc.recipient.email || client?.email || '';
   const typeLabel = doc.type === 'invoice' ? t('Rechnungen') : doc.type === 'offerte' ? t('Offerten') : t('Mahnungen');
   const subject = `${typeLabel} ${doc.number}`;
   const body = emailBody();
@@ -394,6 +450,7 @@ const menus = computed<Menu[]>(() => [
       { label: t('New Offerte'), shortcut: '⌘N', action: () => store.createOfferte() },
       { label: t('New invoice'), action: () => store.createInvoice() },
       { label: t('New reminder'), action: () => store.createMahnung() },
+      { label: t('New receipt'), action: () => store.createQuittung() },
       { separator: true },
       { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.id!), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
       { separator: true, hidden: !hasActiveDoc.value },
@@ -435,10 +492,11 @@ const menus = computed<Menu[]>(() => [
       { label: 'NEN 1026 (NL)', action: () => { normStore.norm = 'NEN1026'; }, checked: normStore.norm === 'NEN1026' },
       { label: 'UNE (ES)', action: () => { normStore.norm = 'UNE'; }, checked: normStore.norm === 'UNE' },
       { separator: true },
-      { label: 'Deutsch', action: () => { locale.value = 'de'; document.documentElement.setAttribute('lang', 'de'); }, checked: locale.value === 'de' },
-      { label: 'English', action: () => { locale.value = 'en'; document.documentElement.setAttribute('lang', 'en'); }, checked: locale.value === 'en' },
-      { label: 'Español', action: () => { locale.value = 'es'; document.documentElement.setAttribute('lang', 'es'); }, checked: locale.value === 'es' },
-      { label: 'Nederlands', action: () => { locale.value = 'nl'; document.documentElement.setAttribute('lang', 'nl'); }, checked: locale.value === 'nl' },
+      { label: 'Deutsch', action: () => setLocale('de'), checked: locale.value === 'de' },
+      { label: 'English', action: () => setLocale('en'), checked: locale.value === 'en' },
+      { label: 'Español', action: () => setLocale('es'), checked: locale.value === 'es' },
+      { label: 'Nederlands', action: () => setLocale('nl'), checked: locale.value === 'nl' },
+      { label: 'Русский', action: () => setLocale('ru'), checked: locale.value === 'ru' },
       { separator: true },
       { label: t('Edit mode'), action: () => { modeStore.mode = modeStore.mode === 'edit' ? 'read' : 'edit'; }, checked: modeStore.mode === 'edit' },
     ],

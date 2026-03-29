@@ -9,7 +9,7 @@
         @click="selectSender(s)"
         class="text-[9pt] px-3 py-1.5 border transition-colors"
         :class="form?.id === s.id ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 text-gray-600 hover:border-gray-400'"
-      >{{ s.name || $t('New sender') }}</button>
+      >{{ s.company || $t('New sender') }}</button>
       <button
         @click="addSender"
         class="text-[9pt] px-3 py-1.5 border border-dashed border-gray-300 text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors"
@@ -20,10 +20,11 @@
       <section>
         <p class="text-[8pt] text-gray-900 mb-2">{{ $t('Company') }}</p>
         <div class="grid grid-cols-2 gap-2">
-          <input v-model="form.name" @blur="save" :placeholder="$t('Company name')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.company" @blur="save" :placeholder="$t('Company name')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
           <input v-model="form.street" @blur="save" :placeholder="$t('Street')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
           <input v-model="form.zip" @blur="save" :placeholder="$t('ZIP')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
           <input v-model="form.city" @blur="save" :placeholder="$t('City')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
+          <input v-model="form.country" @blur="save" :placeholder="$t('Country')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
           <input v-model="form.email" @blur="save" :placeholder="$t('Email')" type="email" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
           <input v-model="form.website" @blur="save" :placeholder="$t('Website')" class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full" />
           <input v-model="form.uid" @blur="save" :placeholder="$t('UID')" class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono" />
@@ -100,7 +101,7 @@ const form = ref<Sender | null>(null);
 
 function emptySender(): Sender {
   return {
-    name: '', street: '', zip: '', city: '',
+    company: '', street: '', zip: '', city: '', country: 'Schweiz',
     email: '', website: '', uid: '',
     contact: '', contactEmail: '',
     accounts: [{ iban: '', bank: '', bic: '' }],

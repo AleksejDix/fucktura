@@ -27,6 +27,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     offerte: documents.value.filter((d) => d.type === 'offerte'),
     invoice: documents.value.filter((d) => d.type === 'invoice'),
     mahnung: documents.value.filter((d) => d.type === 'mahnung'),
+    quittung: documents.value.filter((d) => d.type === 'quittung'),
   }));
 
   const activeSender = computed(() =>
@@ -81,16 +82,15 @@ export const useDocumentsStore = defineStore('documents', () => {
     return `${prefix}-${Math.floor(Date.now() / 1000)}`;
   }
 
-  function formatDate(date: Date): string {
-    const dd = String(date.getDate()).padStart(2, '0');
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const yyyy = date.getFullYear();
-    return `${dd}.${mm}.${yyyy}`;
-  }
-
   function senderSnapshot(s: Sender): SenderSnapshot {
     const { id: _, ...snapshot } = s;
     return snapshot;
+  }
+
+  function addDays(date: Date, days: number): string {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result.toISOString();
   }
 
   async function createOfferte(clientId?: number, senderId?: number) {
@@ -102,8 +102,6 @@ export const useDocumentsStore = defineStore('documents', () => {
     const number = generateNumber('O');
     const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
     const today = new Date();
-    const validUntil = new Date(today);
-    validUntil.setDate(validUntil.getDate() + (s.quoteValidDays ?? 14));
 
     return addDocument({
       type: 'offerte',
@@ -121,10 +119,10 @@ export const useDocumentsStore = defineStore('documents', () => {
         country: client?.country ?? '',
       },
       meta: {
-        datum: formatDate(today),
-        gueltigBis: formatDate(validUntil),
+        date: today.toISOString(),
+        validUntil: addDays(today, s.quoteValidDays ?? 14),
         contactPerson: s.contact ?? '',
-        kundennummer: client?.kundennummer ?? '',
+        customerNumber: client?.customerNumber ?? '',
       },
       lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0 }],
     });
@@ -139,8 +137,6 @@ export const useDocumentsStore = defineStore('documents', () => {
     const number = generateNumber('R');
     const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
     const today = new Date();
-    const dueDate = new Date(today);
-    dueDate.setDate(dueDate.getDate() + (s.invoiceDueDays ?? 14));
 
     return addDocument({
       type: 'invoice',
@@ -158,12 +154,46 @@ export const useDocumentsStore = defineStore('documents', () => {
         country: client?.country ?? '',
       },
       meta: {
-        datum: formatDate(today),
-        zahlbarBis: formatDate(dueDate),
+        date: today.toISOString(),
+        dueDate: addDays(today, s.invoiceDueDays ?? 14),
         contactPerson: s.contact ?? '',
-        kundennummer: client?.kundennummer ?? '',
+        customerNumber: client?.customerNumber ?? '',
       },
       lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0 }],
+    });
+  }
+
+  async function createQuittung(clientId?: number, senderId?: number) {
+    const s = senderId
+      ? await db.senders.get(senderId)
+      : activeSender.value;
+    if (!s) return;
+
+    const number = generateNumber('Q');
+    const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
+    const today = new Date();
+
+    return addDocument({
+      type: 'quittung',
+      status: 'paid',
+      number,
+      subtitle: '',
+      clientId,
+      sender: senderSnapshot(s),
+      recipient: {
+        company: client?.company ?? '',
+        name: client?.name ?? '',
+        street: client?.street ?? '',
+        zip: client?.zip ?? '',
+        city: client?.city ?? '',
+        country: client?.country ?? '',
+      },
+      meta: {
+        date: today.toISOString(),
+        contactPerson: s.contact ?? '',
+        customerNumber: client?.customerNumber ?? '',
+      },
+      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'Pauschal', unitPrice: 0 }],
     });
   }
 
@@ -178,8 +208,6 @@ export const useDocumentsStore = defineStore('documents', () => {
     const country = client?.country ?? 'Schweiz';
     const md = getMahnungDefaults(country);
     const today = new Date();
-    const dueDate = new Date(today);
-    dueDate.setDate(dueDate.getDate() + md.zahlungsfrist);
 
     return addDocument({
       type: 'mahnung',
@@ -197,10 +225,12 @@ export const useDocumentsStore = defineStore('documents', () => {
         country,
       },
       meta: {
-        datum: formatDate(today),
-        zahlbarBis: formatDate(dueDate),
+        date: today.toISOString(),
+        dueDate: addDays(today, md.zahlungsfrist),
+        invoiceDate: '',
+        overdueSince: '',
         contactPerson: s.contact ?? '',
-        kundennummer: client?.kundennummer ?? '',
+        customerNumber: client?.customerNumber ?? '',
       },
       stufe: 1,
       offenerBetrag: 0,
@@ -216,8 +246,6 @@ export const useDocumentsStore = defineStore('documents', () => {
     const s = activeSender.value;
     const number = generateNumber('R');
     const today = new Date();
-    const dueDate = new Date(today);
-    dueDate.setDate(dueDate.getDate() + (s?.invoiceDueDays ?? 14));
 
     return addDocument({
       type: 'invoice',
@@ -228,10 +256,10 @@ export const useDocumentsStore = defineStore('documents', () => {
       sender: { ...offerte.sender },
       recipient: { ...offerte.recipient },
       meta: {
-        datum: formatDate(today),
-        zahlbarBis: formatDate(dueDate),
+        date: today.toISOString(),
+        dueDate: addDays(today, s?.invoiceDueDays ?? 14),
         contactPerson: offerte.meta.contactPerson,
-        kundennummer: offerte.meta.kundennummer,
+        customerNumber: offerte.meta.customerNumber,
       },
       lineItems: offerte.lineItems?.map((item) => ({ ...item })),
     });
@@ -266,9 +294,10 @@ export const useDocumentsStore = defineStore('documents', () => {
         zip: client.zip,
         city: client.city,
         country: client.country,
+        email: client.email ?? '',
       },
       lineItems,
-      'meta.kundennummer': client.kundennummer ?? '',
+      'meta.customerNumber': client.customerNumber ?? '',
       updatedAt: new Date().toISOString(),
     });
     await load();
@@ -304,6 +333,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     createOfferte,
     createInvoice,
     createMahnung,
+    createQuittung,
     convertToInvoice,
     assignClient,
     updateDocument,

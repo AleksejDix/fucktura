@@ -25,7 +25,7 @@ export interface MahnungDefaults {
 const defaults: Record<string, MahnungDefaults> = {
   // Switzerland
   Schweiz: {
-    mahngebuehr: [0, 20, 40],
+    mahngebuehr: [20, 40, 60],
     verzugszinsRate: 0.05,
     zahlungsfrist: 14,
     currency: 'CHF',
@@ -33,7 +33,7 @@ const defaults: Record<string, MahnungDefaults> = {
   },
   // Germany
   Deutschland: {
-    mahngebuehr: [0, 5, 10],
+    mahngebuehr: [5, 10, 20],
     verzugszinsRate: 0.05, // + Basiszinssatz (~3.12%), effectively ~8.12%
     zahlungsfrist: 14,
     currency: 'EUR',
@@ -41,14 +41,14 @@ const defaults: Record<string, MahnungDefaults> = {
   },
   // Netherlands
   Niederlande: {
-    mahngebuehr: [0, 40, 40],
+    mahngebuehr: [40, 40, 40],
     verzugszinsRate: 0.08,
     zahlungsfrist: 14,
     currency: 'EUR',
     legalBasis: 'WIK (Wet Incassokosten)',
   },
   Nederland: {
-    mahngebuehr: [0, 40, 40],
+    mahngebuehr: [40, 40, 40],
     verzugszinsRate: 0.08,
     zahlungsfrist: 14,
     currency: 'EUR',
@@ -56,14 +56,14 @@ const defaults: Record<string, MahnungDefaults> = {
   },
   // Spain
   Spanien: {
-    mahngebuehr: [0, 40, 40],
+    mahngebuehr: [40, 40, 40],
     verzugszinsRate: 0.08,
     zahlungsfrist: 30,
     currency: 'EUR',
     legalBasis: 'Ley 3/2004',
   },
   España: {
-    mahngebuehr: [0, 40, 40],
+    mahngebuehr: [40, 40, 40],
     verzugszinsRate: 0.08,
     zahlungsfrist: 30,
     currency: 'EUR',
@@ -71,7 +71,7 @@ const defaults: Record<string, MahnungDefaults> = {
   },
   // Austria
   Österreich: {
-    mahngebuehr: [0, 20, 40],
+    mahngebuehr: [20, 40, 60],
     verzugszinsRate: 0.0912,
     zahlungsfrist: 14,
     currency: 'EUR',

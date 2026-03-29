@@ -4,9 +4,9 @@
       <header class="absolute top-0 left-0 right-0 pt-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)] max-h-[var(--norm-header-h)]">
         <div class="flex justify-end">
           <div class="text-[9pt] text-right leading-relaxed">
-            <div class="font-bold">{{ sender.name }}</div>
+            <div class="font-bold">{{ sender.company }}</div>
             <div>{{ sender.street }}</div>
-            <div><span class="font-mono">{{ sender.zip }}</span> {{ sender.city }}, Schweiz</div>
+            <div><span class="font-mono">{{ sender.zip }}</span> {{ sender.city }}, {{ sender.country }}</div>
             <div>{{ sender.email }}</div>
             <div>{{ sender.website }}</div>
             <div class="text-gray-500 font-mono">{{ sender.uid }}</div>
@@ -44,7 +44,7 @@
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Quote date') }}:</span>
-          <DInline v-model="meta.datum" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.datum': v })" />
+          <DDate :value="meta.date" @update="v => update({ 'meta.date': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Your contact') }}:</span>
@@ -52,11 +52,11 @@
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Valid until') }}:</span>
-          <DInline v-model="meta.gueltigBis!" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.gueltigBis': v })" />
+          <DDate :value="meta.validUntil" @update="v => update({ 'meta.validUntil': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Customer number') }}:</span>
-          <DInline v-model="meta.kundennummer" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.kundennummer': v })" />
+          <DInline v-model="meta.customerNumber" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.customerNumber': v })" />
         </div>
       </div>
 
@@ -116,7 +116,7 @@
       >+ {{ t('Add line item') }}</button>
 
       <div class="text-[9pt] leading-relaxed mt-4">
-        <p>{{ t('Quote valid note', { date: meta.gueltigBis }) }}</p>
+        <p>{{ t('Quote valid note', { date: formatDate(meta.validUntil) }) }}</p>
         <p class="mt-2">{{ t('Quote closing') }}</p>
         <p class="mt-3">{{ t('Kind regards') }}</p>
         <p>{{ meta.contactPerson }}</p>
@@ -135,8 +135,11 @@ import { useMoney } from '@/composables/useMoney';
 import PageTemplate from '../PageTemplate.vue';
 import DClientPicker from '../DClientPicker.vue';
 import DInline from '../DInline.vue';
+import DDate from '../DDate.vue';
+import { useDate } from '@/composables/useDate';
 
 const { t } = useI18n({ useScope: 'local' });
+const { formatDate } = useDate();
 const store = useDocumentsStore();
 const modeStore = useModeStore();
 const { lineTotal, sumLineItems, formatChf } = useMoney();
@@ -265,6 +268,26 @@ function formatAmount(n: number): string {
     "Quote closing": "Wij zien uw reactie met belangstelling tegemoet.",
     "Kind regards": "Met vriendelijke groet",
     "Add line item": "Positie toevoegen"
+  },
+  "ru": {
+    "Quote": "Коммерческое предложение",
+    "Quote date": "Дата предложения",
+    "Valid until": "Действительно до",
+    "Your contact": "Контактное лицо",
+    "Customer number": "Номер клиента",
+    "Greeting": "Здравствуйте, {name}",
+    "Quote intro": "Благодарим за ваш запрос. Рады предложить вам следующее:",
+    "Pos": "Поз.",
+    "Description": "Описание",
+    "Quantity": "Количество",
+    "Unit price": "Цена за единицу",
+    "Price in CHF": "Цена в CHF",
+    "Product code": "Код продукта",
+    "Quote amount (tax exempt)": "Сумма предложения (без НДС)",
+    "Quote valid note": "Данное предложение действительно до {date}.",
+    "Quote closing": "Ждём вашего ответа.",
+    "Kind regards": "С уважением",
+    "Add line item": "Добавить позицию"
   }
 }
 </i18n>

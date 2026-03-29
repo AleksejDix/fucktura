@@ -39,9 +39,10 @@ function printPage() {
   document.title = originalTitle;
 }
 
-const supported = ['de', 'en', 'es', 'nl'];
+const supported = ['de', 'en', 'es', 'nl', 'ru'];
+const saved = localStorage.getItem('locale');
 const browserLang = navigator.language.split('-')[0];
-const defaultLocale = supported.includes(browserLang) ? browserLang : 'en';
-document.documentElement.setAttribute('lang', defaultLocale);
-i18n.global.locale.value = defaultLocale;
+const locale = (saved && supported.includes(saved)) ? saved : supported.includes(browserLang) ? browserLang : 'en';
+document.documentElement.setAttribute('lang', locale);
+i18n.global.locale.value = locale;
 </script>

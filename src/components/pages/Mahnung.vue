@@ -4,9 +4,9 @@
       <header class="absolute top-0 left-0 right-0 pt-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)] max-h-[var(--norm-header-h)]">
         <div class="flex justify-end">
           <div class="text-[9pt] text-right leading-relaxed">
-            <div class="font-bold">{{ sender.name }}</div>
+            <div class="font-bold">{{ sender.company }}</div>
             <div>{{ sender.street }}</div>
-            <div><span class="font-mono">{{ sender.zip }}</span> {{ sender.city }}, Schweiz</div>
+            <div><span class="font-mono">{{ sender.zip }}</span> {{ sender.city }}, {{ sender.country }}</div>
             <div>{{ sender.email }}</div>
             <div>{{ sender.website }}</div>
             <div class="text-gray-500 font-mono">{{ sender.uid }}</div>
@@ -46,23 +46,23 @@
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Date') }}:</span>
-          <DInline v-model="meta.datum" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.datum': v })" />
+          <DDate :value="meta.date" @update="v => update({ 'meta.date': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Invoice date') }}:</span>
-          <DInline :model-value="meta.rechnungsDatum ?? ''" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.rechnungsDatum': v })" />
+          <DDate :value="meta.invoiceDate" @update="v => update({ 'meta.invoiceDate': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Overdue since') }}:</span>
-          <DInline :model-value="meta.faelligSeit ?? ''" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.faelligSeit': v })" />
+          <DDate :value="meta.overdueSince" @update="v => update({ 'meta.overdueSince': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Customer number') }}:</span>
-          <DInline v-model="meta.kundennummer" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.kundennummer': v })" />
+          <DInline v-model="meta.customerNumber" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.customerNumber': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Due date') }}:</span>
-          <DInline :model-value="meta.zahlbarBis ?? ''" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.zahlbarBis': v })" />
+          <DDate :value="meta.dueDate" @update="v => update({ 'meta.dueDate': v })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Your contact') }}:</span>
@@ -132,6 +132,7 @@ import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import PageTemplate from '../PageTemplate.vue';
 import DClientPicker from '../DClientPicker.vue';
 import DInline from '../DInline.vue';
+import DDate from '../DDate.vue';
 
 const { t } = useI18n({ useScope: 'local' });
 const store = useDocumentsStore();
@@ -262,6 +263,29 @@ function formatAmount(n: number): string {
     "Kind regards": "Met vriendelijke groet",
     "Legal basis": "Rechtsgrond",
     "Interest rate": "Vertragingsrente"
+  },
+  "ru": {
+    "Reminder": "Напоминание об оплате",
+    "Date": "Дата",
+    "Invoice date": "Дата счёта",
+    "Overdue since": "Просрочено с",
+    "Due date": "Срок оплаты",
+    "Your contact": "Контактное лицо",
+    "Customer number": "Номер клиента",
+    "Greeting": "Здравствуйте, {name}",
+    "Reminder intro": "Согласно нашим данным, указанный выше счёт до сих пор не оплачен. Просим произвести оплату в указанный срок.",
+    "Description": "Описание",
+    "Price in CHF": "Сумма в CHF",
+    "Outstanding amount": "Сумма задолженности",
+    "reminder to invoice": "к счёту",
+    "Reminder fee": "Сбор за напоминание",
+    "Default interest": "Пени за просрочку",
+    "Total amount due": "Итого к оплате",
+    "Reminder crossing note": "Если ваш платёж разминулся с данным письмом, просим не принимать его во внимание.",
+    "Questions note": "При возникновении вопросов обращайтесь к нам.",
+    "Kind regards": "С уважением",
+    "Legal basis": "Правовое основание",
+    "Interest rate": "Процент пени"
   }
 }
 </i18n>

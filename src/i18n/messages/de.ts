@@ -10,6 +10,8 @@ export default {
   'New Offerte': 'Neue Offerte',
   'New invoice': 'Neue Rechnung',
   'New reminder': 'Neue Mahnung',
+  'New receipt': 'Neue Quittung',
+  'Quittungen': 'Quittungen',
   'Convert to invoice': 'In Rechnung umwandeln',
   'All documents': 'Alle Dokumente',
   'Delete': 'Löschen',
