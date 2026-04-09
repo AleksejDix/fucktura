@@ -2,7 +2,7 @@
   <aside class="bg-white border-r border-gray-200 flex flex-col overflow-hidden">
     <div class="flex-1 overflow-y-auto">
       <div
-        v-for="doc in store.documents"
+        v-for="doc in sortedDocuments"
         :key="doc.id"
         @click="store.setActive(doc.id === store.activeDocumentId ? null : doc.id!)"
         class="px-3 py-2.5 cursor-pointer border-b border-gray-100 transition-colors"
@@ -30,9 +30,18 @@
 import type { Document } from '@/db';
 import { useDocumentsStore } from '@/stores/documents';
 import { useDate } from '@/composables/useDate';
+import { computed } from 'vue';
 
 const store = useDocumentsStore();
 const { formatDate } = useDate();
+
+const sortedDocuments = computed(() =>
+  [...store.documents].sort((a, b) => {
+    const da = new Date(a.meta.date).getTime();
+    const db = new Date(b.meta.date).getTime();
+    return db - da;
+  }),
+);
 
 const dotClass: Record<string, string> = {
   offerte: 'bg-amber-500',
