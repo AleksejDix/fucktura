@@ -12,8 +12,11 @@
     <span
       v-if="count > 0"
       class="shrink-0 text-[10px] font-mono"
-      :class="active ? 'text-gray-400' : view.danger && count > 0 ? 'text-red-500' : 'text-gray-400'"
-    >{{ count }}</span>
+      :class="
+        active ? 'text-gray-400' : view.danger && count > 0 ? 'text-red-500' : 'text-gray-400'
+      "
+      >{{ count }}</span
+    >
   </button>
 </template>
 

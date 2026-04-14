@@ -20,11 +20,16 @@ export const usePagesStore = defineStore('pages', () => {
 
   function componentForType(type: string): PageType | null {
     switch (type) {
-      case 'invoice': return Pages.Invoice;
-      case 'offerte': return Pages.Offerte;
-      case 'mahnung': return Pages.Mahnung;
-      case 'quittung': return Pages.Quittung;
-      default: return null;
+      case 'invoice':
+        return Pages.Invoice;
+      case 'offerte':
+        return Pages.Offerte;
+      case 'mahnung':
+        return Pages.Mahnung;
+      case 'quittung':
+        return Pages.Quittung;
+      default:
+        return null;
     }
   }
 
@@ -43,7 +48,9 @@ export const usePagesStore = defineStore('pages', () => {
         metadata: { doc, sender: doc.sender },
       });
 
-      const hasSwissIban = doc.sender?.accounts?.some((a: { iban: string }) => a.iban.startsWith('CH'));
+      const hasSwissIban = doc.sender?.accounts?.some((a: { iban: string }) =>
+        a.iban.startsWith('CH'),
+      );
       if ((doc.type === 'invoice' || doc.type === 'mahnung') && hasSwissIban) {
         result.push({
           id: `doc-${doc.number}-qr`,

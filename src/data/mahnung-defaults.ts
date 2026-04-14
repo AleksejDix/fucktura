@@ -85,10 +85,6 @@ export function getMahnungDefaults(country: string): MahnungDefaults {
   return defaults[country] ?? fallback;
 }
 
-export function calculateVerzugszins(
-  amount: number,
-  rate: number,
-  overdueDays: number,
-): number {
+export function calculateVerzugszins(amount: number, rate: number, overdueDays: number): number {
   return Math.round(amount * rate * (overdueDays / 365) * 100) / 100;
 }

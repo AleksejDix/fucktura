@@ -13,18 +13,20 @@ describe('i18n completeness', () => {
   for (const [lang, messages] of Object.entries(languages)) {
     it(`${lang} has all keys from en`, () => {
       const langKeys = Object.keys(messages).sort();
-      const missing = enKeys.filter(k => !langKeys.includes(k));
+      const missing = enKeys.filter((k) => !langKeys.includes(k));
       expect(missing, `${lang} is missing keys: ${missing.join(', ')}`).toEqual([]);
     });
 
     it(`${lang} has no extra keys beyond en`, () => {
       const langKeys = Object.keys(messages);
-      const extra = langKeys.filter(k => !enKeys.includes(k));
+      const extra = langKeys.filter((k) => !enKeys.includes(k));
       expect(extra, `${lang} has extra keys: ${extra.join(', ')}`).toEqual([]);
     });
 
     it(`${lang} has no empty values`, () => {
-      const empty = Object.entries(messages).filter(([, v]) => v.trim() === '').map(([k]) => k);
+      const empty = Object.entries(messages)
+        .filter(([, v]) => v.trim() === '')
+        .map(([k]) => k);
       expect(empty, `${lang} has empty values: ${empty.join(', ')}`).toEqual([]);
     });
   }

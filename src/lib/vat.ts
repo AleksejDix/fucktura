@@ -16,31 +16,38 @@ const VAT_RATES: Record<string, VatRateSet[]> = {
     { from: '2020-07-01', to: '2020-12-31', standard: 16, reduced: 5 },
     { from: '2021-01-01', standard: 19, reduced: 7 },
   ],
-  AT: [
-    { from: '2016-01-01', standard: 20, reduced: 10, accommodation: 13 },
-  ],
-  NL: [
-    { from: '2019-01-01', standard: 21, reduced: 9 },
-  ],
-  ES: [
-    { from: '2012-09-01', standard: 21, reduced: 10, superReduced: 4 },
-  ],
-  IT: [
-    { from: '2013-10-01', standard: 22, reduced: 10, superReduced: 4 },
-  ],
-  FR: [
-    { from: '2014-01-01', standard: 20, reduced: 10, superReduced: 5.5 },
-  ],
+  AT: [{ from: '2016-01-01', standard: 20, reduced: 10, accommodation: 13 }],
+  NL: [{ from: '2019-01-01', standard: 21, reduced: 9 }],
+  ES: [{ from: '2012-09-01', standard: 21, reduced: 10, superReduced: 4 }],
+  IT: [{ from: '2013-10-01', standard: 22, reduced: 10, superReduced: 4 }],
+  FR: [{ from: '2014-01-01', standard: 20, reduced: 10, superReduced: 5.5 }],
 };
 
 const COUNTRY_TO_ISO: Record<string, string> = {
-  Schweiz: 'CH', Switzerland: 'CH', Suisse: 'CH', Svizzera: 'CH', Svizra: 'CH',
-  Deutschland: 'DE', Germany: 'DE', Allemagne: 'DE',
-  Österreich: 'AT', Austria: 'AT',
-  Nederland: 'NL', Netherlands: 'NL', 'Pays-Bas': 'NL',
-  España: 'ES', Spain: 'ES', Spanien: 'ES', Espagne: 'ES',
-  Italia: 'IT', Italy: 'IT', Italien: 'IT', Italie: 'IT',
-  France: 'FR', Frankreich: 'FR', Francia: 'FR',
+  Schweiz: 'CH',
+  Switzerland: 'CH',
+  Suisse: 'CH',
+  Svizzera: 'CH',
+  Svizra: 'CH',
+  Deutschland: 'DE',
+  Germany: 'DE',
+  Allemagne: 'DE',
+  Österreich: 'AT',
+  Austria: 'AT',
+  Nederland: 'NL',
+  Netherlands: 'NL',
+  'Pays-Bas': 'NL',
+  España: 'ES',
+  Spain: 'ES',
+  Spanien: 'ES',
+  Espagne: 'ES',
+  Italia: 'IT',
+  Italy: 'IT',
+  Italien: 'IT',
+  Italie: 'IT',
+  France: 'FR',
+  Frankreich: 'FR',
+  Francia: 'FR',
 };
 
 export function countryToIso(country: string): string | null {

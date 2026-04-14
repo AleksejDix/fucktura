@@ -31,7 +31,14 @@ function makeDoc(overrides: Partial<Document>): Document {
     subtitle: '',
     customerNumber: '0001',
     sender: fakeSenderSnap,
-    recipient: { company: 'Acme', name: 'John', street: 'St. 1', zip: '1000', city: 'Bern', country: 'Schweiz' },
+    recipient: {
+      company: 'Acme',
+      name: 'John',
+      street: 'St. 1',
+      zip: '1000',
+      city: 'Bern',
+      country: 'Schweiz',
+    },
     meta: { date: '2026-01-01T00:00:00.000Z', contactPerson: 'Test', customerNumber: '0001' },
     lineItems: [{ pos: 1, description: 'Work', code: '', quantity: 10, unit: 'h', unitPrice: 100 }],
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -52,7 +59,13 @@ describe('useDocumentsStore', () => {
         makeDoc({ number: 'R-1', type: 'invoice' }),
         makeDoc({ number: 'R-2', type: 'invoice' }),
         makeDoc({ number: 'O-1', type: 'offerte' }),
-        makeDoc({ number: 'M-1', type: 'mahnung', offenerBetrag: 0, mahngebuehr: 0, verzugszins: 0 }),
+        makeDoc({
+          number: 'M-1',
+          type: 'mahnung',
+          offenerBetrag: 0,
+          mahngebuehr: 0,
+          verzugszins: 0,
+        }),
       ];
 
       expect(store.grouped.invoice).toHaveLength(2);
@@ -236,49 +249,86 @@ describe('useDocumentsStore', () => {
 
     it('returns false for paid invoices regardless of date', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'invoice', status: 'paid', meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday } });
+      const doc = makeDoc({
+        type: 'invoice',
+        status: 'paid',
+        meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday },
+      });
       expect(store.isOverdue(doc)).toBe(false);
     });
 
     it('returns true for unpaid invoice past its due date', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'invoice', status: 'sent', meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday } });
+      const doc = makeDoc({
+        type: 'invoice',
+        status: 'sent',
+        meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday },
+      });
       expect(store.isOverdue(doc)).toBe(true);
     });
 
     it('returns false for unpaid invoice with future due date', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'invoice', status: 'sent', meta: { date: today.toISOString(), contactPerson: '', customerNumber: '', dueDate: tomorrow } });
+      const doc = makeDoc({
+        type: 'invoice',
+        status: 'sent',
+        meta: {
+          date: today.toISOString(),
+          contactPerson: '',
+          customerNumber: '',
+          dueDate: tomorrow,
+        },
+      });
       expect(store.isOverdue(doc)).toBe(false);
     });
 
     it('returns false for accepted offers past validUntil', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'offerte', status: 'accepted', meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday } });
+      const doc = makeDoc({
+        type: 'offerte',
+        status: 'accepted',
+        meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday },
+      });
       expect(store.isOverdue(doc)).toBe(false);
     });
 
     it('returns false for rejected offers past validUntil', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'offerte', status: 'rejected', meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday } });
+      const doc = makeDoc({
+        type: 'offerte',
+        status: 'rejected',
+        meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday },
+      });
       expect(store.isOverdue(doc)).toBe(false);
     });
 
     it('returns true for sent offer past validUntil', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'offerte', status: 'sent', meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday } });
+      const doc = makeDoc({
+        type: 'offerte',
+        status: 'sent',
+        meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday },
+      });
       expect(store.isOverdue(doc)).toBe(true);
     });
 
     it('returns false for mahnung with no overdueSince', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'mahnung', status: 'draft', meta: { date: yesterday, contactPerson: '', customerNumber: '' } });
+      const doc = makeDoc({
+        type: 'mahnung',
+        status: 'draft',
+        meta: { date: yesterday, contactPerson: '', customerNumber: '' },
+      });
       expect(store.isOverdue(doc)).toBe(false);
     });
 
     it('returns false when due date is malformed', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'invoice', status: 'sent', meta: { date: '', contactPerson: '', customerNumber: '', dueDate: 'not-a-date' } });
+      const doc = makeDoc({
+        type: 'invoice',
+        status: 'sent',
+        meta: { date: '', contactPerson: '', customerNumber: '', dueDate: 'not-a-date' },
+      });
       expect(store.isOverdue(doc)).toBe(false);
     });
 
@@ -291,16 +341,42 @@ describe('useDocumentsStore', () => {
 
   describe('filtered views', () => {
     function seed(store: ReturnType<typeof useDocumentsStore>) {
-      store.senders = [makeSender('dix', { company: 'Acme Consulting', uid: 'CHE-1' }), makeSender('gs', { company: 'Demo Studio', uid: 'DE-1' })];
+      store.senders = [
+        makeSender('dix', { company: 'Acme Consulting', uid: 'CHE-1' }),
+        makeSender('gs', { company: 'Demo Studio', uid: 'DE-1' }),
+      ];
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const yesterday = new Date(today.getTime() - 86400000).toISOString();
       const tomorrow = new Date(today.getTime() + 86400000).toISOString();
       store.documents = [
         makeDoc({ number: 'R-1', type: 'invoice', status: 'draft', senderKey: 'dix' }),
-        makeDoc({ number: 'R-2', type: 'invoice', status: 'sent', senderKey: 'dix', meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday } }),
-        makeDoc({ number: 'R-3', type: 'invoice', status: 'paid', senderKey: 'gs', meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday } }),
-        makeDoc({ number: 'O-1', type: 'offerte', status: 'draft', senderKey: 'gs', meta: { date: today.toISOString(), contactPerson: '', customerNumber: '', validUntil: tomorrow } }),
+        makeDoc({
+          number: 'R-2',
+          type: 'invoice',
+          status: 'sent',
+          senderKey: 'dix',
+          meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday },
+        }),
+        makeDoc({
+          number: 'R-3',
+          type: 'invoice',
+          status: 'paid',
+          senderKey: 'gs',
+          meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday },
+        }),
+        makeDoc({
+          number: 'O-1',
+          type: 'offerte',
+          status: 'draft',
+          senderKey: 'gs',
+          meta: {
+            date: today.toISOString(),
+            contactPerson: '',
+            customerNumber: '',
+            validUntil: tomorrow,
+          },
+        }),
         makeDoc({ number: 'Q-1', type: 'quittung', status: 'paid', senderKey: 'dix' }),
       ];
     }

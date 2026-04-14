@@ -5,7 +5,9 @@
       class="fixed inset-0 z-[200] bg-black/30 flex items-start justify-center pt-[15vh]"
       @click.self="close"
     >
-      <div class="w-[560px] max-w-[90vw] bg-white shadow-2xl border border-gray-200 rounded-sm overflow-hidden">
+      <div
+        class="w-[560px] max-w-[90vw] bg-white shadow-2xl border border-gray-200 rounded-sm overflow-hidden"
+      >
         <input
           ref="inputEl"
           v-model="query"
@@ -26,16 +28,26 @@
             :class="i === active ? 'bg-gray-900 text-white' : 'hover:bg-gray-50'"
           >
             <span class="flex items-baseline gap-2 min-w-0">
+              <span class="shrink-0 w-1.5 h-1.5 inline-block" :class="dotClass[doc.type]" />
               <span
-                class="shrink-0 w-1.5 h-1.5 inline-block"
-                :class="dotClass[doc.type]"
-              />
-              <span class="font-mono text-[9pt] shrink-0" :class="i === active ? 'text-gray-400' : 'text-gray-500'">{{ doc.number }}</span>
-              <span class="truncate">{{ doc.recipient.company || doc.recipient.name || $t('No client') }}</span>
+                class="font-mono text-[9pt] shrink-0"
+                :class="i === active ? 'text-gray-400' : 'text-gray-500'"
+                >{{ doc.number }}</span
+              >
+              <span class="truncate">{{
+                doc.recipient.company || doc.recipient.name || $t('No client')
+              }}</span>
             </span>
-            <span class="shrink-0 text-[9pt]" :class="i === active ? 'text-gray-400' : 'text-gray-400'">{{ doc.subtitle || '—' }}</span>
+            <span
+              class="shrink-0 text-[9pt]"
+              :class="i === active ? 'text-gray-400' : 'text-gray-400'"
+              >{{ doc.subtitle || '—' }}</span
+            >
           </li>
-          <li v-if="filtered.length === 0" class="px-4 py-6 text-[10pt] text-gray-400 italic text-center">
+          <li
+            v-if="filtered.length === 0"
+            class="px-4 py-6 text-[10pt] text-gray-400 italic text-center"
+          >
             {{ $t('No documents') }}
           </li>
         </ul>

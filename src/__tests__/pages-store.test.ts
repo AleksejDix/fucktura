@@ -65,7 +65,15 @@ describe('usePagesStore', () => {
 
   it('builds pages for a mahnung with QR bill', () => {
     const docsStore = useDocumentsStore();
-    docsStore.documents = [makeDoc({ number: 'M-1', type: 'mahnung', offenerBetrag: 100, mahngebuehr: 20, verzugszins: 5 })];
+    docsStore.documents = [
+      makeDoc({
+        number: 'M-1',
+        type: 'mahnung',
+        offenerBetrag: 100,
+        mahngebuehr: 20,
+        verzugszins: 5,
+      }),
+    ];
     docsStore.activeDocumentNumber = 'M-1';
 
     const pagesStore = usePagesStore();

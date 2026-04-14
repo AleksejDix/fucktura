@@ -7,10 +7,7 @@ import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite';
 const _dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  plugins: [
-    vue({ include: [/\.vue$/] }),
-    VueI18nPlugin({}),
-  ],
+  plugins: [vue({ include: [/\.vue$/] }), VueI18nPlugin({})],
   define: {
     __VUE_OPTIONS_API__: true,
     __VUE_PROD_DEVTOOLS__: false,

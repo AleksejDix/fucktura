@@ -9,5 +9,7 @@ export function documentHaystack(d: Document): string {
     d.recipient.name,
     d.customerNumber,
     d.meta.customerNumber,
-  ].join(' ').toLowerCase();
+  ]
+    .join(' ')
+    .toLowerCase();
 }

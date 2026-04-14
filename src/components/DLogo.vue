@@ -5,10 +5,7 @@
     @mouseleave="onLeave"
     :title="'Fucktura'"
   >
-    <div
-      class="grid shrink-0"
-      :style="iconStyle"
-    >
+    <div class="grid shrink-0" :style="iconStyle">
       <span
         v-for="(on, i) in iconCells"
         :key="i"
@@ -35,25 +32,85 @@ import { computed, ref, onUnmounted } from 'vue';
 const IDLE = Array(25).fill(true);
 
 const SQUID = [
-  false, false, true,  false, false,
-  false, true,  true,  true,  false,
-  true,  true,  true,  true,  true,
-  true,  false, true,  false, true,
-  false, true,  false, true,  false,
+  false,
+  false,
+  true,
+  false,
+  false,
+  false,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  false,
+  true,
+  false,
+  true,
+  false,
+  true,
+  false,
 ];
 const CRAB = [
-  true,  false, true,  false, true,
-  true,  true,  true,  true,  true,
-  true,  true,  false, true,  true,
-  true,  true,  true,  true,  true,
-  false, true,  false, true,  false,
+  true,
+  false,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  false,
+  true,
+  false,
 ];
 const OCTOPUS = [
-  true,  true,  true,  true,  true,
-  true,  false, true,  false, true,
-  true,  true,  true,  true,  true,
-  false, true,  true,  true,  false,
-  true,  false, false, false, true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true,
+  false,
+  true,
+  false,
+  false,
+  false,
+  true,
 ];
 const CLASSICS = [SQUID, CRAB, OCTOPUS];
 
@@ -88,17 +145,25 @@ async function loop() {
     iconCells.value = noise();
     await sleep(40);
     if (token !== myToken) return;
-    iconCells.value = Math.random() < 0.25
-      ? CLASSICS[Math.floor(Math.random() * CLASSICS.length)]
-      : randomCreature();
+    iconCells.value =
+      Math.random() < 0.25
+        ? CLASSICS[Math.floor(Math.random() * CLASSICS.length)]
+        : randomCreature();
     await sleep(220);
   }
 }
 
-function onEnter() { loop(); }
-function onLeave() { token++; iconCells.value = [...IDLE]; }
+function onEnter() {
+  loop();
+}
+function onLeave() {
+  token++;
+  iconCells.value = [...IDLE];
+}
 
-onUnmounted(() => { token++; });
+onUnmounted(() => {
+  token++;
+});
 
 // ---- wordmark ----
 // Each letter is 5 cols wide × 5 rows tall; 1 gap col between letters.

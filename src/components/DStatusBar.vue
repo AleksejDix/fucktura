@@ -1,5 +1,7 @@
 <template>
-  <footer class="bg-gray-50 border-t border-gray-200 text-[11px] text-gray-500 flex items-center justify-between px-3 gap-4 print:hidden select-none">
+  <footer
+    class="bg-gray-50 border-t border-gray-200 text-[11px] text-gray-500 flex items-center justify-between px-3 gap-4 print:hidden select-none"
+  >
     <div class="flex items-center gap-3 min-w-0">
       <span v-if="folder.currentName" class="flex items-center gap-1 shrink-0">
         <span>📁</span>
@@ -13,7 +15,9 @@
           <span v-if="doc.subtitle" class="truncate">{{ doc.subtitle }}</span>
         </span>
         <span v-if="total > 0" class="text-gray-300">·</span>
-        <span v-if="total > 0" class="font-mono text-gray-700 shrink-0">{{ currency }} {{ formatChf(total) }}</span>
+        <span v-if="total > 0" class="font-mono text-gray-700 shrink-0"
+          >{{ currency }} {{ formatChf(total) }}</span
+        >
       </template>
       <template v-else>
         <span class="text-gray-300">·</span>
@@ -43,7 +47,11 @@ const doc = computed(() => store.activeDocument);
 const total = computed(() => {
   if (!doc.value) return 0;
   if (doc.value.type === 'mahnung') {
-    return sumAmounts(doc.value.offenerBetrag ?? 0, doc.value.mahngebuehr ?? 0, doc.value.verzugszins ?? 0);
+    return sumAmounts(
+      doc.value.offenerBetrag ?? 0,
+      doc.value.mahngebuehr ?? 0,
+      doc.value.verzugszins ?? 0,
+    );
   }
   return sumLineItems(doc.value.lineItems ?? []);
 });

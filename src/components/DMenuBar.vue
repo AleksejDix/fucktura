@@ -1,5 +1,7 @@
 <template>
-  <nav class="h-8 bg-white border-b border-gray-200 flex items-stretch text-[13px] z-50 select-none">
+  <nav
+    class="h-8 bg-white border-b border-gray-200 flex items-stretch text-[13px] z-50 select-none"
+  >
     <div
       v-for="menu in menus"
       :key="menu.label"
@@ -31,7 +33,11 @@
             :disabled="item.disabled"
             class="w-full flex items-center justify-between px-3 py-1.5 text-left text-[13px] transition-colors"
             :class="[
-              item.disabled ? 'text-gray-300 cursor-default' : item.destructive ? 'text-red-500 hover:bg-gray-100' : 'text-gray-800 hover:bg-black hover:text-white',
+              item.disabled
+                ? 'text-gray-300 cursor-default'
+                : item.destructive
+                  ? 'text-red-500 hover:bg-gray-100'
+                  : 'text-gray-800 hover:bg-black hover:text-white',
               item.strikethrough ? 'line-through decoration-gray-400' : '',
             ]"
           >
@@ -39,7 +45,12 @@
               <span class="w-4 text-center">{{ item.checked ? '✓' : '' }}</span>
               {{ item.label }}
             </span>
-            <span v-if="item.shortcut" class="text-[11px] ml-4" :class="item.disabled ? 'text-gray-300' : 'text-gray-400'">{{ item.shortcut }}</span>
+            <span
+              v-if="item.shortcut"
+              class="text-[11px] ml-4"
+              :class="item.disabled ? 'text-gray-300' : 'text-gray-400'"
+              >{{ item.shortcut }}</span
+            >
           </button>
         </template>
       </div>
@@ -51,13 +62,22 @@
       <DModeToggle />
     </div>
     <Teleport to="body">
-      <div v-if="showAbout" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30" @click.self="showAbout = false">
+      <div
+        v-if="showAbout"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30"
+        @click.self="showAbout = false"
+      >
         <div class="bg-white w-[300px] p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] text-center">
           <p class="text-[18pt] font-bold">Fucktura</p>
           <p class="text-[9pt] text-gray-500 mt-1">v1.0.0</p>
           <p class="text-[9pt] text-gray-600 mt-4">{{ t('About description') }}</p>
           <p class="text-[8pt] text-gray-400 mt-4">Made by Aleksej Dix</p>
-          <button @click="showAbout = false" class="mt-4 px-4 py-1.5 text-[9pt] bg-black text-white hover:bg-gray-800">OK</button>
+          <button
+            @click="showAbout = false"
+            class="mt-4 px-4 py-1.5 text-[9pt] bg-black text-white hover:bg-gray-800"
+          >
+            OK
+          </button>
         </div>
       </div>
     </Teleport>
@@ -174,7 +194,7 @@ const activeStatus = computed(() => activeDoc.value?.status);
 
 const activeClient = computed(() => {
   const cn = activeDoc.value?.customerNumber;
-  return cn ? store.clients.find(c => c.customerNumber === cn) : undefined;
+  return cn ? store.clients.find((c) => c.customerNumber === cn) : undefined;
 });
 
 function emailBody(): string {
@@ -218,7 +238,9 @@ ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
-        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        const total = formatChf(
+          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+        );
         return `Guten Tag ${name}
 
 Leider haben wir für die Rechnung ${d.number} vom ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} noch keinen Zahlungseingang feststellen können.
@@ -266,7 +288,9 @@ ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
-        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        const total = formatChf(
+          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+        );
         return `Dear ${name}
 
 We have not yet received payment for invoice ${d.number} dated ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
@@ -314,7 +338,9 @@ ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
-        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        const total = formatChf(
+          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+        );
         return `Estimado/a ${name}
 
 Lamentablemente no hemos recibido el pago de la factura ${d.number} del ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
@@ -362,7 +388,9 @@ ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
-        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        const total = formatChf(
+          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+        );
         return `Geachte ${name}
 
 Helaas hebben wij voor factuur ${d.number} van ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} nog geen betaling ontvangen.
@@ -410,7 +438,9 @@ ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
       mahnung: (d) => {
-        const total = formatChf(sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0));
+        const total = formatChf(
+          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+        );
         return `Здравствуйте, ${name}
 
 К сожалению, мы ещё не получили оплату по счёту ${d.number} от ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
@@ -444,10 +474,17 @@ function sendEmail() {
   if (!doc) return;
   const client = activeClient.value;
   const to = doc.recipient.email || client?.email || '';
-  const typeLabel = doc.type === 'invoice' ? t('Rechnungen') : doc.type === 'offerte' ? t('Offerten') : t('Mahnungen');
+  const typeLabel =
+    doc.type === 'invoice'
+      ? t('Rechnungen')
+      : doc.type === 'offerte'
+        ? t('Offerten')
+        : t('Mahnungen');
   const subject = `${typeLabel} ${doc.number}`;
   const body = emailBody();
-  window.open(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  window.open(
+    `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+  );
 }
 
 function statusItems(): MenuItem[] {
@@ -458,15 +495,27 @@ function statusItems(): MenuItem[] {
 
   if (activeType.value === 'offerte') {
     for (const status of ['draft', 'sent', 'accepted', 'rejected'] as const) {
-      items.push({ label: t(status), action: () => store.setStatus(num, status), checked: s === status });
+      items.push({
+        label: t(status),
+        action: () => store.setStatus(num, status),
+        checked: s === status,
+      });
     }
   } else if (activeType.value === 'invoice') {
     for (const status of ['draft', 'sent', 'paid'] as const) {
-      items.push({ label: t(status), action: () => store.setStatus(num, status), checked: s === status });
+      items.push({
+        label: t(status),
+        action: () => store.setStatus(num, status),
+        checked: s === status,
+      });
     }
   } else if (activeType.value === 'mahnung') {
     for (const status of ['draft', 'sent'] as const) {
-      items.push({ label: t(status), action: () => store.setStatus(num, status), checked: s === status });
+      items.push({
+        label: t(status),
+        action: () => store.setStatus(num, status),
+        checked: s === status,
+      });
     }
   }
   return items;
@@ -477,7 +526,12 @@ const menus = computed<Menu[]>(() => [
     label: 'Fucktura',
     bold: true,
     items: [
-      { label: t('About Fucktura'), action: () => { showAbout.value = true; } },
+      {
+        label: t('About Fucktura'),
+        action: () => {
+          showAbout.value = true;
+        },
+      },
       { separator: true },
       { label: t('Settings'), shortcut: '⌘,', action: () => router.push('/settings') },
       { label: t('Clients'), action: () => router.push('/clients') },
@@ -488,15 +542,20 @@ const menus = computed<Menu[]>(() => [
     label: t('File'),
     items: [
       { label: t('Open Folder…'), shortcut: '⌘O', action: () => folder.openFolder() },
-      ...(folder.recents.length > 1 ? [
-        { separator: true } as MenuItem,
-        { label: t('Recent folders'), disabled: true } as MenuItem,
-        ...folder.recents.slice(1).map((r) => ({
-          label: `📁 ${r.name}`,
-          action: () => folder.openRecent(r),
-        } as MenuItem)),
-        { label: t('Clear recent folders'), action: () => folder.clearRecents() } as MenuItem,
-      ] : []),
+      ...(folder.recents.length > 1
+        ? [
+            { separator: true } as MenuItem,
+            { label: t('Recent folders'), disabled: true } as MenuItem,
+            ...folder.recents.slice(1).map(
+              (r) =>
+                ({
+                  label: `📁 ${r.name}`,
+                  action: () => folder.openRecent(r),
+                }) as MenuItem,
+            ),
+            { label: t('Clear recent folders'), action: () => folder.clearRecents() } as MenuItem,
+          ]
+        : []),
       { separator: true },
       { label: t('New Offerte'), shortcut: '⌘N', action: () => store.createOfferte() },
       { label: t('New invoice'), action: () => store.createInvoice() },
@@ -504,7 +563,13 @@ const menus = computed<Menu[]>(() => [
       { label: t('New receipt'), action: () => store.createQuittung() },
       { separator: true },
       { label: t('Print / PDF'), shortcut: '⌘P', action: () => emit('generate-pdf') },
-      { label: t('Send email'), shortcut: '⌘⇧E', action: sendEmail, disabled: !hasActiveDoc.value, hidden: !hasActiveDoc.value },
+      {
+        label: t('Send email'),
+        shortcut: '⌘⇧E',
+        action: sendEmail,
+        disabled: !hasActiveDoc.value,
+        hidden: !hasActiveDoc.value,
+      },
     ],
   },
   {
@@ -512,44 +577,108 @@ const menus = computed<Menu[]>(() => [
     items: [
       { label: t('Find document…'), shortcut: '⌘K', action: () => palette.toggle() },
       { separator: true },
-      { label: t('Duplicate'), shortcut: '⌘D', action: () => store.activeDocument && store.duplicateDocument(store.activeDocument.number), disabled: !hasActiveDoc.value },
+      {
+        label: t('Duplicate'),
+        shortcut: '⌘D',
+        action: () => store.activeDocument && store.duplicateDocument(store.activeDocument.number),
+        disabled: !hasActiveDoc.value,
+      },
       { separator: true },
-      { label: t('Add line item'), shortcut: '⌘⇧L', action: () => store.addLineItemToActive(), disabled: !hasActiveDoc.value },
-      { label: t('Clear line items'), action: () => store.clearLineItems(), disabled: !hasActiveDoc.value },
+      {
+        label: t('Add line item'),
+        shortcut: '⌘⇧L',
+        action: () => store.addLineItemToActive(),
+        disabled: !hasActiveDoc.value,
+      },
+      {
+        label: t('Clear line items'),
+        action: () => store.clearLineItems(),
+        disabled: !hasActiveDoc.value,
+      },
       { separator: true },
-      { label: t('Reset recipient'), action: () => store.resetRecipient(), disabled: !hasActiveDoc.value },
+      {
+        label: t('Reset recipient'),
+        action: () => store.resetRecipient(),
+        disabled: !hasActiveDoc.value,
+      },
     ],
   },
   {
     label: t('Document'),
     items: [
       { label: t('All documents'), action: () => store.setActive(null) },
-      { label: t('Next document'), shortcut: '⌘]', action: () => store.nextDocument(), disabled: store.documents.length < 2 },
-      { label: t('Previous document'), shortcut: '⌘[', action: () => store.previousDocument(), disabled: store.documents.length < 2 },
+      {
+        label: t('Next document'),
+        shortcut: '⌘]',
+        action: () => store.nextDocument(),
+        disabled: store.documents.length < 2,
+      },
+      {
+        label: t('Previous document'),
+        shortcut: '⌘[',
+        action: () => store.previousDocument(),
+        disabled: store.documents.length < 2,
+      },
       { separator: true },
       ...statusItems(),
       { separator: true, hidden: !hasActiveDoc.value },
-      { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.number), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
+      {
+        label: t('Convert to invoice'),
+        shortcut: '⌘⇧I',
+        action: () => store.convertToInvoice(store.activeDocument!.number),
+        disabled: !isOfferte.value,
+        hidden: !hasActiveDoc.value,
+      },
       { separator: true, hidden: !isOfferte.value || !hasActiveDoc.value },
-      { label: t('Delete'), shortcut: '⌘⌫', action: async () => {
-        const doc = store.activeDocument;
-        if (!doc) return;
-        const ok = await confirmStore.ask({
-          message: t('Delete document confirm', { number: doc.number }),
-          confirmLabel: t('Delete'),
-          destructive: true,
-        });
-        if (ok) store.deleteDocument(doc.number);
-      }, disabled: !hasActiveDoc.value, destructive: true },
+      {
+        label: t('Delete'),
+        shortcut: '⌘⌫',
+        action: async () => {
+          const doc = store.activeDocument;
+          if (!doc) return;
+          const ok = await confirmStore.ask({
+            message: t('Delete document confirm', { number: doc.number }),
+            confirmLabel: t('Delete'),
+            destructive: true,
+          });
+          if (ok) store.deleteDocument(doc.number);
+        },
+        disabled: !hasActiveDoc.value,
+        destructive: true,
+      },
     ],
   },
   {
     label: t('View'),
     items: [
-      { label: 'SN 010130 (CH)', action: () => { normStore.norm = 'SN010130'; }, checked: normStore.norm === 'SN010130' },
-      { label: 'DIN 5008 (DE)', action: () => { normStore.norm = 'DIN5008'; }, checked: normStore.norm === 'DIN5008' },
-      { label: 'NEN 1026 (NL)', action: () => { normStore.norm = 'NEN1026'; }, checked: normStore.norm === 'NEN1026' },
-      { label: 'UNE (ES)', action: () => { normStore.norm = 'UNE'; }, checked: normStore.norm === 'UNE' },
+      {
+        label: 'SN 010130 (CH)',
+        action: () => {
+          normStore.norm = 'SN010130';
+        },
+        checked: normStore.norm === 'SN010130',
+      },
+      {
+        label: 'DIN 5008 (DE)',
+        action: () => {
+          normStore.norm = 'DIN5008';
+        },
+        checked: normStore.norm === 'DIN5008',
+      },
+      {
+        label: 'NEN 1026 (NL)',
+        action: () => {
+          normStore.norm = 'NEN1026';
+        },
+        checked: normStore.norm === 'NEN1026',
+      },
+      {
+        label: 'UNE (ES)',
+        action: () => {
+          normStore.norm = 'UNE';
+        },
+        checked: normStore.norm === 'UNE',
+      },
       { separator: true },
       { label: 'Deutsch', action: () => setLocale('de'), checked: locale.value === 'de' },
       { label: 'English', action: () => setLocale('en'), checked: locale.value === 'en' },
@@ -561,7 +690,12 @@ const menus = computed<Menu[]>(() => [
   {
     label: t('Help'),
     items: [
-      { label: t('Fucktura Help'), action: () => { window.open('https://github.com/AleksejDix/fucktura', '_blank'); } },
+      {
+        label: t('Fucktura Help'),
+        action: () => {
+          window.open('https://github.com/AleksejDix/fucktura', '_blank');
+        },
+      },
     ],
   },
 ]);

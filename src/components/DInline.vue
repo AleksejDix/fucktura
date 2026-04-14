@@ -2,7 +2,10 @@
   <component
     :is="tag"
     :contenteditable="isEdit"
-    :class="[isEdit ? 'outline-none border-b border-dashed border-gray-300 focus:border-gray-900' : '', $attrs.class]"
+    :class="[
+      isEdit ? 'outline-none border-b border-dashed border-gray-300 focus:border-gray-900' : '',
+      $attrs.class,
+    ]"
     @blur="onBlur"
     @keydown.enter.prevent="($event.target as HTMLElement).blur()"
     v-text="modelValue"

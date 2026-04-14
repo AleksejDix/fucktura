@@ -9,6 +9,28 @@ const _dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  fmt: {
+    singleQuote: true,
+    trailingComma: 'all',
+    printWidth: 100,
+    importOrder: [
+      '^@/types/(.*)$',
+      '^vue*',
+      '^@/layout/(.*)$',
+      '^@/views/(.*)$',
+      '^@/components/(.*)$',
+      '^@/machines/(.*)$',
+      '^@/store/(.*)$',
+      '^@vueuse/(.*)$',
+      '^@/use/(.*)$',
+      '^@/lib/(.*)$',
+      '^[./]',
+    ],
+    importOrderSeparation: false,
+    importOrderSortSpecifiers: true,
+    sortPackageJson: false,
+    ignorePatterns: [],
+  },
   define: {
     __VUE_OPTIONS_API__: true,
     __VUE_PROD_DEVTOOLS__: false,

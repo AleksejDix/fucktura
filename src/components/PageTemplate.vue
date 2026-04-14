@@ -7,7 +7,10 @@
       <button
         @click="pagesStore.pages[pageIndex].enabled = !pagesStore.pages[pageIndex].enabled"
         class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
-        :class="{ 'text-black': pagesStore.pages[pageIndex].enabled, 'text-gray-300': !pagesStore.pages[pageIndex].enabled }"
+        :class="{
+          'text-black': pagesStore.pages[pageIndex].enabled,
+          'text-gray-300': !pagesStore.pages[pageIndex].enabled,
+        }"
       >
         <component :is="pagesStore.pages[pageIndex].enabled ? Eye : EyeOff" :size="16" />
       </button>
@@ -16,13 +19,19 @@
     <div :class="{ 'opacity-20': !pagesStore.pages[pageIndex].enabled }">
       <slot name="header" />
 
-      <div class="pt-[var(--norm-header-h)] pb-[20mm] max-h-[var(--norm-content-h)] overflow-hidden">
+      <div
+        class="pt-[var(--norm-header-h)] pb-[20mm] max-h-[var(--norm-content-h)] overflow-hidden"
+      >
         <slot />
       </div>
 
       <slot name="footer">
-        <footer class="absolute bottom-0 left-0 right-0 w-full pb-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)]">
-          <div class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4">
+        <footer
+          class="absolute bottom-0 left-0 right-0 w-full pb-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)]"
+        >
+          <div
+            class="border-t border-gray-200 pt-[3mm] text-[8pt] text-gray-500 leading-relaxed grid grid-cols-3 gap-4"
+          >
             <div>
               <div class="font-bold text-gray-600">{{ sender?.contact || sender?.company }}</div>
               <div>{{ sender?.street }}</div>
@@ -55,5 +64,7 @@ const props = defineProps({
   pageIndex: { type: Number, default: 0 },
 });
 
-const sender = computed(() => pagesStore.pages[props.pageIndex]?.metadata?.sender as SenderSnapshot | undefined);
+const sender = computed(
+  () => pagesStore.pages[props.pageIndex]?.metadata?.sender as SenderSnapshot | undefined,
+);
 </script>

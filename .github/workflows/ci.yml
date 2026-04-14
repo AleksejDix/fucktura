@@ -22,14 +22,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm run lint
-
-      - name: Type check
-        run: pnpm exec tsc --noEmit -p tsconfig.app.json
+      - name: Check (format + lint + types)
+        run: pnpm exec vp check
 
       - name: Tests
-        run: pnpm run test:unit:ci
+        run: pnpm exec vp test --run
 
       - name: Build
-        run: pnpm run build
+        run: pnpm exec vp build

@@ -21,7 +21,9 @@
             type="button"
             @click="store.resolve(true)"
             class="px-3 py-1.5 text-[9pt] text-white transition-colors"
-            :class="store.destructive ? 'bg-red-600 hover:bg-red-700' : 'bg-black hover:bg-gray-800'"
+            :class="
+              store.destructive ? 'bg-red-600 hover:bg-red-700' : 'bg-black hover:bg-gray-800'
+            "
           >
             {{ store.confirmLabel }}
           </button>
@@ -38,10 +40,13 @@ import { useConfirmStore } from '@/stores/confirm';
 const store = useConfirmStore();
 const cancelBtn = ref<HTMLButtonElement | null>(null);
 
-watch(() => store.open, async (open) => {
-  if (open) {
-    await nextTick();
-    cancelBtn.value?.focus();
-  }
-});
+watch(
+  () => store.open,
+  async (open) => {
+    if (open) {
+      await nextTick();
+      cancelBtn.value?.focus();
+    }
+  },
+);
 </script>

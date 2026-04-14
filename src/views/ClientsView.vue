@@ -1,5 +1,7 @@
 <template>
-  <div class="w-[210mm] mx-auto py-8 px-[26mm] bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none my-4">
+  <div
+    class="w-[210mm] mx-auto py-8 px-[26mm] bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none my-4"
+  >
     <p class="text-[14pt] font-bold text-gray-900 mb-6">{{ $t('Clients') }}</p>
 
     <div class="space-y-8">
@@ -9,8 +11,15 @@
         class="border border-gray-300 p-4"
       >
         <div class="flex items-start justify-between mb-3">
-          <p class="text-[10pt] font-bold text-gray-900">{{ client.company || client.name || $t('New client') }}</p>
-          <button @click="deleteClient(client.customerNumber)" class="text-gray-300 hover:text-red-500 text-[9pt]">&times;</button>
+          <p class="text-[10pt] font-bold text-gray-900">
+            {{ client.company || client.name || $t('New client') }}
+          </p>
+          <button
+            @click="deleteClient(client.customerNumber)"
+            class="text-gray-300 hover:text-red-500 text-[9pt]"
+          >
+            &times;
+          </button>
         </div>
         <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-[9pt]">
           <div class="col-span-2">
@@ -83,18 +92,22 @@
           <p class="text-[9pt] font-bold text-gray-900 mb-2">{{ $t('Positions') }}</p>
           <div class="space-y-2">
             <div
-              v-for="(cp, i) in (client.positions ?? [])"
+              v-for="(cp, i) in client.positions ?? []"
               :key="i"
               class="grid grid-cols-[1fr_80px_24px] gap-2 items-end text-[9pt]"
             >
               <div>
-                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Position') }}</label>
+                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
+                  $t('Position')
+                }}</label>
                 <div class="border border-gray-300 px-2 py-1 text-gray-900">
                   {{ positionLabel(cp.positionId) }}
                 </div>
               </div>
               <div>
-                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Price') }}</label>
+                <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
+                  $t('Price')
+                }}</label>
                 <input
                   :value="cp.price"
                   @blur="updatePositionPrice(client, i, ($event.target as HTMLInputElement).value)"
@@ -103,14 +116,21 @@
                   class="w-full border border-gray-300 px-2 py-1 text-gray-900 font-mono text-right focus:outline-none focus:border-gray-900"
                 />
               </div>
-              <button @click="removePosition(client, i)" class="text-gray-300 hover:text-red-500 pb-1">&times;</button>
+              <button
+                @click="removePosition(client, i)"
+                class="text-gray-300 hover:text-red-500 pb-1"
+              >
+                &times;
+              </button>
             </div>
           </div>
           <div class="relative mt-2">
             <button
               @click="togglePositionPicker(client.customerNumber)"
               class="text-[8pt] text-gray-400 hover:text-black"
-            >+ {{ $t('Add position') }}</button>
+            >
+              + {{ $t('Add position') }}
+            </button>
             <ul
               v-if="pickerOpenFor === client.customerNumber"
               class="absolute left-0 top-full mt-1 w-80 bg-white border border-gray-300 shadow-lg z-20 max-h-48 overflow-y-auto"
@@ -121,10 +141,16 @@
                 @click="assignPosition(client, pos)"
                 class="px-3 py-2 text-[9pt] cursor-pointer hover:bg-gray-100 border-b border-gray-50 last:border-0 flex justify-between"
               >
-                <span>{{ pos.description }} <span v-if="pos.code" class="text-gray-400">{{ pos.code }}</span></span>
+                <span
+                  >{{ pos.description }}
+                  <span v-if="pos.code" class="text-gray-400">{{ pos.code }}</span></span
+                >
                 <span class="text-gray-400 font-mono">{{ pos.defaultPrice.toFixed(2) }}</span>
               </li>
-              <li v-if="availablePositions(client).length === 0" class="px-3 py-2 text-[9pt] text-gray-400 italic">
+              <li
+                v-if="availablePositions(client).length === 0"
+                class="px-3 py-2 text-[9pt] text-gray-400 italic"
+              >
                 {{ $t('All positions assigned') }}
               </li>
             </ul>
@@ -136,7 +162,9 @@
     <button
       @click="addClient"
       class="mt-6 px-4 py-2 text-[9pt] bg-black text-white hover:bg-gray-800 transition-colors"
-    >+ {{ $t('New client') }}</button>
+    >
+      + {{ $t('New client') }}
+    </button>
   </div>
 </template>
 
@@ -166,14 +194,14 @@ function onClickOutside(e: MouseEvent) {
 }
 
 function positionLabel(positionId: string): string {
-  const pos = allPositions.value.find(p => p.id === positionId);
+  const pos = allPositions.value.find((p) => p.id === positionId);
   if (!pos) return '—';
   return pos.code ? `${pos.description} (${pos.code})` : pos.description;
 }
 
 function availablePositions(client: Client): Position[] {
-  const assigned = new Set((client.positions ?? []).map(cp => cp.positionId));
-  return allPositions.value.filter(p => !assigned.has(p.id));
+  const assigned = new Set((client.positions ?? []).map((cp) => cp.positionId));
+  return allPositions.value.filter((p) => !assigned.has(p.id));
 }
 
 function togglePositionPicker(customerNumber: string) {
@@ -188,7 +216,7 @@ function assignPosition(client: Client, pos: Position) {
 }
 
 function nextCustomerNumber(): string {
-  const nums = clients.value.map(c => parseInt(c.customerNumber, 10)).filter(n => !isNaN(n));
+  const nums = clients.value.map((c) => parseInt(c.customerNumber, 10)).filter((n) => !isNaN(n));
   const max = nums.length ? Math.max(...nums) : 0;
   return String(max + 1).padStart(4, '0');
 }

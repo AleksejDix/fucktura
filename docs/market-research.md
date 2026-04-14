@@ -147,22 +147,22 @@ _Date: 2026-03-08_
 
 ## Summary by Price Point
 
-| Price range (CHF/mo) | Products                                                  |
-| -------------------- | --------------------------------------------------------- |
-| Free / freemium      | Swiss21, KLARA (core), smallinvoice (up to 70K), qr-rechnung.net |
-| 12–25                | HelvetiBill, ToBill, Swiss21 paid, Cresus rental, Infinity.swiss |
+| Price range (CHF/mo) | Products                                                            |
+| -------------------- | ------------------------------------------------------------------- |
+| Free / freemium      | Swiss21, KLARA (core), smallinvoice (up to 70K), qr-rechnung.net    |
+| 12–25                | HelvetiBill, ToBill, Swiss21 paid, Cresus rental, Infinity.swiss    |
 | 25–35                | Magic Heidi, bexio Basic, KLARA Business+, MILKEE, smallinvoice Pro |
-| 35–70                | bexio Advanced/Optima, Infinity Pro, smallinvoice Business |
-| 70+                  | bexio Ultimate                                            |
+| 35–70                | bexio Advanced/Optima, Infinity Pro, smallinvoice Business          |
+| 70+                  | bexio Ultimate                                                      |
 
 ## Summary by Language Support
 
-| Languages      | Products                                      |
-| -------------- | --------------------------------------------- |
+| Languages      | Products                                       |
+| -------------- | ---------------------------------------------- |
 | DE only        | HelvetiBill, Infinity.swiss, MILKEE, pebe Live |
-| DE/FR          | ToBill, Swiss21, Cresus                       |
-| DE/FR/IT/EN    | Magic Heidi, bexio, KLARA                     |
-| DE/FR/IT/EN/ES | smallinvoice                                  |
+| DE/FR          | ToBill, Swiss21, Cresus                        |
+| DE/FR/IT/EN    | Magic Heidi, bexio, KLARA                      |
+| DE/FR/IT/EN/ES | smallinvoice                                   |
 
 ---
 
@@ -186,10 +186,10 @@ _Date: 2026-03-08_
 
 ## Recommended Pricing Strategy
 
-| Tier     | Price (CHF/mo) | Included                                                      |
-| -------- | -------------- | ------------------------------------------------------------- |
-| **Free** | 0              | 3 invoices/month, 1 client, QR bill, watermark                |
-| **Solo** | 9–12           | Unlimited invoices, 20 clients, all doc types, multi-language |
+| Tier     | Price (CHF/mo) | Included                                                               |
+| -------- | -------------- | ---------------------------------------------------------------------- |
+| **Free** | 0              | 3 invoices/month, 1 client, QR bill, watermark                         |
+| **Solo** | 9–12           | Unlimited invoices, 20 clients, all doc types, multi-language          |
 | **Pro**  | 19–24          | Unlimited everything, custom branding, recurring invoices, bank import |
 
 ### Positioning

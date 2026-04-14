@@ -140,16 +140,20 @@ describe('isDocument', () => {
   });
 
   it('accepts valid lineItems', () => {
-    expect(isDocument({
-      ...validDoc,
-      lineItems: [{ pos: 1, description: 'x', code: '', quantity: 1, unit: 'h', unitPrice: 100 }],
-    })).toBe(true);
+    expect(
+      isDocument({
+        ...validDoc,
+        lineItems: [{ pos: 1, description: 'x', code: '', quantity: 1, unit: 'h', unitPrice: 100 }],
+      }),
+    ).toBe(true);
   });
 
   it('rejects invalid lineItem shape', () => {
-    expect(isDocument({
-      ...validDoc,
-      lineItems: [{ pos: 1, description: 'x' }],
-    })).toBe(false);
+    expect(
+      isDocument({
+        ...validDoc,
+        lineItems: [{ pos: 1, description: 'x' }],
+      }),
+    ).toBe(false);
   });
 });

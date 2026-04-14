@@ -3,19 +3,40 @@ import { documentHaystack } from '@/lib/search';
 import type { Document, SenderSnapshot } from '@/fs/types';
 
 const sender: SenderSnapshot = {
-  company: 'Test', street: '', zip: '', city: '', country: '',
-  email: '', website: '', uid: '', contact: '', contactEmail: '',
-  accounts: [], invoiceDueDays: 14, quoteValidDays: 14,
+  company: 'Test',
+  street: '',
+  zip: '',
+  city: '',
+  country: '',
+  email: '',
+  website: '',
+  uid: '',
+  contact: '',
+  contactEmail: '',
+  accounts: [],
+  invoiceDueDays: 14,
+  quoteValidDays: 14,
 };
 
 function doc(overrides: Partial<Document> = {}): Document {
   return {
-    type: 'invoice', status: 'draft', number: 'R-42', subtitle: 'Accessibility Testing',
+    type: 'invoice',
+    status: 'draft',
+    number: 'R-42',
+    subtitle: 'Accessibility Testing',
     customerNumber: '0076',
     sender,
-    recipient: { company: 'Example Corp', name: 'Jane Example', street: '', zip: '', city: '', country: '' },
+    recipient: {
+      company: 'Example Corp',
+      name: 'Jane Example',
+      street: '',
+      zip: '',
+      city: '',
+      country: '',
+    },
     meta: { date: '', contactPerson: '', customerNumber: '0076' },
-    createdAt: '', updatedAt: '',
+    createdAt: '',
+    updatedAt: '',
     ...overrides,
   };
 }

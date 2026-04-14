@@ -3,15 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "test": "vitest",
-    "test:unit": "vitest --environment jsdom --root src/",
-    "test:unit:ci": "vitest --watch false --environment jsdom --root src/",
-    "coverage": "vitest run --coverage",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "oxlint -c oxlintrc.json src/",
-    "lint:fix": "oxlint -c oxlintrc.json --fix src/"
+    "dev": "vp dev",
+    "test": "vp test --watch",
+    "test:unit": "vp test",
+    "test:unit:ci": "vp test --run",
+    "coverage": "vp test --run --coverage",
+    "build": "vp build",
+    "preview": "vp preview",
+    "check": "vp check",
+    "check:fix": "vp check --fix",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
+    "fmt": "vp fmt",
+    "fmt:fix": "vp fmt --fix"
   },
   "dependencies": {
     "@vueuse/core": "^14.2.1",
@@ -37,11 +41,11 @@
     "jsdom": "^28.1.0",
     "oxlint": "^1.51.0",
     "postcss-html": "^1.8.1",
-    "prettier": "^3.8.1",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "vite": "^8.0.8",
+    "vite-plus": "^0.1.16",
+    "vitest": "^4.1.4"
   },
   "engines": {
     "node": ">=18"
