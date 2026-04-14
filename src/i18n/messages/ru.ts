@@ -114,6 +114,8 @@ export default {
   'Total': 'Итого',
   'on': 'на',
   'Exempt': 'Без НДС',
+  'Amount (tax exempt)': 'Сумма (без НДС)',
+  'Quote amount (tax exempt)': 'Сумма предложения (без НДС)',
   'VAT registered': 'Плательщик НДС',
   'VAT registered hint': 'Показывать столбец НДС и разбивку на счетах.',
   'VAT %': 'НДС %',

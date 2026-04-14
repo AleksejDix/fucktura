@@ -114,6 +114,8 @@ export default {
   'Total': 'Total',
   'on': 'auf',
   'Exempt': 'Steuerfrei',
+  'Amount (tax exempt)': 'Betrag (von Steuer befreit)',
+  'Quote amount (tax exempt)': 'Offertbetrag (von Steuer befreit)',
   'VAT registered': 'MwSt-pflichtig',
   'VAT registered hint': 'MwSt-Spalte und Aufstellung auf Rechnungen anzeigen.',
   'VAT %': 'MwSt %',

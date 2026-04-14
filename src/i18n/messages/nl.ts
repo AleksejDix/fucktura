@@ -114,6 +114,8 @@ export default {
   'Total': 'Totaal',
   'on': 'over',
   'Exempt': 'Vrijgesteld',
+  'Amount (tax exempt)': 'Bedrag (vrijgesteld van BTW)',
+  'Quote amount (tax exempt)': 'Offertebedrag (vrijgesteld van BTW)',
   'VAT registered': 'BTW-plichtig',
   'VAT registered hint': 'BTW-kolom en overzicht op facturen tonen.',
   'VAT %': 'BTW %',

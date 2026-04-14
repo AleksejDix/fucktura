@@ -114,6 +114,8 @@ export default {
   'Total': 'Total',
   'on': 'sobre',
   'Exempt': 'Exento',
+  'Amount (tax exempt)': 'Importe (exento de impuestos)',
+  'Quote amount (tax exempt)': 'Importe del presupuesto (exento de impuestos)',
   'VAT registered': 'Sujeto a IVA',
   'VAT registered hint': 'Mostrar columna de IVA y desglose en facturas.',
   'VAT %': 'IVA %',

@@ -114,6 +114,8 @@ export default {
   'Total': 'Total',
   'on': 'on',
   'Exempt': 'Exempt',
+  'Amount (tax exempt)': 'Amount (tax exempt)',
+  'Quote amount (tax exempt)': 'Quote amount (tax exempt)',
   'VAT registered': 'VAT registered',
   'VAT registered hint': 'Show VAT column and breakdown on invoices.',
   'VAT %': 'VAT %',
