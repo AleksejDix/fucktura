@@ -4,6 +4,7 @@ import {
   ensurePermission,
   ensurePersistentStorage,
   forgetFolder,
+  hasPermission,
   isFileSystemAccessSupported,
   loadRecents,
   pickDirectory,
@@ -52,8 +53,11 @@ export const useFolderStore = defineStore('folder', () => {
     // Ask the browser not to evict our config IDB. Fire-and-forget.
     void ensurePersistentStorage();
     recents.value = await loadRecents();
+    // Boot is silent — only auto-activate handles whose permission is already
+    // granted (no requestPermission, that needs a user gesture). Otherwise
+    // fall through to the picker; openRecent / openFolder run in a click.
     for (const entry of [...recents.value]) {
-      if (!(await ensurePermission(entry.handle))) continue;
+      if (!(await hasPermission(entry.handle))) continue;
       try {
         await activate(entry.handle);
         return;

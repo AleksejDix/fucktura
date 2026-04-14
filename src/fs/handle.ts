@@ -99,11 +99,15 @@ export async function pickDirectory(): Promise<FileSystemDirectoryHandle> {
   return await window.showDirectoryPicker({ mode: 'readwrite' });
 }
 
-/** Verify we still have rw permission; prompt on user gesture if not. */
+const RW = { mode: 'readwrite' as const };
+
+/** Read-only check — safe to call without user activation. */
+export async function hasPermission(handle: FileSystemDirectoryHandle): Promise<boolean> {
+  return (await handle.queryPermission(RW)) === 'granted';
+}
+
+/** Verify or prompt for rw permission. MUST be called from a user gesture. */
 export async function ensurePermission(handle: FileSystemDirectoryHandle): Promise<boolean> {
-  const opts = { mode: 'readwrite' as const };
-  const current = await handle.queryPermission(opts);
-  if (current === 'granted') return true;
-  const requested = await handle.requestPermission(opts);
-  return requested === 'granted';
+  if (await hasPermission(handle)) return true;
+  return (await handle.requestPermission(RW)) === 'granted';
 }
