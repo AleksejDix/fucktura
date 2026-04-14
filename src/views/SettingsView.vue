@@ -1,14 +1,26 @@
 <template>
   <div class="w-[210mm] mx-auto py-8 px-[26mm] bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none my-4">
+    <div v-if="folder.currentName" class="flex items-center justify-between text-[9pt] text-gray-500 mb-6 pb-3 border-b border-gray-200">
+      <span>
+        {{ $t('Current folder') }}:
+        <span class="font-mono text-gray-900">📁 {{ folder.currentName }}</span>
+      </span>
+      <button
+        type="button"
+        @click="folder.openFolder()"
+        class="text-[9pt] text-gray-600 hover:text-black underline"
+      >{{ $t('Change…') }}</button>
+    </div>
+
     <p class="text-[14pt] font-bold text-gray-900 mb-6">{{ $t('Company settings') }}</p>
 
     <div class="flex gap-2 mb-6">
       <button
         v-for="s in senderList"
-        :key="s.id"
+        :key="s.key"
         @click="selectSender(s)"
         class="text-[9pt] px-3 py-1.5 border transition-colors"
-        :class="form?.id === s.id ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 text-gray-600 hover:border-gray-400'"
+        :class="form?.key === s.key ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 text-gray-600 hover:border-gray-400'"
       >{{ s.company || $t('New sender') }}</button>
       <button
         @click="addSender"
@@ -77,7 +89,7 @@
 
       <div class="flex items-center gap-3 pt-2 border-t border-gray-200">
         <button
-          v-if="form.id && senderList.length > 1"
+          v-if="form.key && senderList.length > 1"
           type="button"
           @click="deleteSender"
           class="text-red-500 text-[9pt] font-medium px-5 py-1.5 hover:bg-red-50 transition-colors"
@@ -90,17 +102,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { db } from '@/db';
-import type { Sender } from '@/db';
+import { ref, computed, onMounted } from 'vue';
+import { nanoid } from 'nanoid';
+import * as repo from '@/fs/repo';
+import type { Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
+import { useFolderStore } from '@/stores/folder';
 
 const documentsStore = useDocumentsStore();
-const senderList = ref<Sender[]>([]);
+const folder = useFolderStore();
+const senderList = computed<Sender[]>(() => documentsStore.senders);
 const form = ref<Sender | null>(null);
 
 function emptySender(): Sender {
   return {
+    key: '',
     company: '', street: '', zip: '', city: '', country: 'Schweiz',
     email: '', website: '', uid: '',
     contact: '', contactEmail: '',
@@ -114,12 +130,7 @@ function cloneSender(s: Sender): Sender {
   return { ...s, accounts: s.accounts.map((a) => ({ ...a })) };
 }
 
-async function loadSenders() {
-  senderList.value = await db.senders.toArray();
-}
-
-onMounted(async () => {
-  await loadSenders();
+onMounted(() => {
   if (senderList.value.length > 0) {
     form.value = cloneSender(senderList.value[0]);
   } else {
@@ -146,22 +157,15 @@ function removeAccount(i: number) {
 
 async function save() {
   if (!form.value) return;
-
-  const raw = JSON.parse(JSON.stringify(form.value));
-  if (raw.id) {
-    await db.senders.update(raw.id, raw);
-  } else {
-    form.value.id = await db.senders.add(raw) as number;
-  }
-
-  await loadSenders();
+  if (!form.value.key) form.value.key = nanoid(8);
+  const raw: Sender = JSON.parse(JSON.stringify(form.value));
+  await repo.writeSender(raw);
   await documentsStore.load();
 }
 
 async function deleteSender() {
-  if (!form.value?.id) return;
-  await db.senders.delete(form.value.id);
-  await loadSenders();
+  if (!form.value?.key) return;
+  await repo.deleteSender(form.value.key);
   await documentsStore.load();
   form.value = senderList.value.length > 0 ? cloneSender(senderList.value[0]) : emptySender();
 }

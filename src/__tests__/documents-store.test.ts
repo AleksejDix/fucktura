@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useDocumentsStore } from '@/stores/documents';
-import type { Document, SenderSnapshot } from '@/db';
+import type { Document, Sender, SenderSnapshot } from '@/fs/types';
 
-const fakeSender: SenderSnapshot = {
+const fakeSenderSnap: SenderSnapshot = {
   company: 'Test GmbH',
   street: 'Teststr. 1',
   zip: '8000',
@@ -19,14 +19,18 @@ const fakeSender: SenderSnapshot = {
   quoteValidDays: 14,
 };
 
+function makeSender(key: string, overrides: Partial<Sender> = {}): Sender {
+  return { key, ...fakeSenderSnap, ...overrides };
+}
+
 function makeDoc(overrides: Partial<Document>): Document {
   return {
-    id: 1,
     type: 'invoice',
     status: 'draft',
     number: 'R-001',
     subtitle: '',
-    sender: fakeSender,
+    customerNumber: '0001',
+    sender: fakeSenderSnap,
     recipient: { company: 'Acme', name: 'John', street: 'St. 1', zip: '1000', city: 'Bern', country: 'Schweiz' },
     meta: { date: '2026-01-01T00:00:00.000Z', contactPerson: 'Test', customerNumber: '0001' },
     lineItems: [{ pos: 1, description: 'Work', code: '', quantity: 10, unit: 'h', unitPrice: 100 }],
@@ -45,10 +49,10 @@ describe('useDocumentsStore', () => {
     it('groups documents by type', () => {
       const store = useDocumentsStore();
       store.documents = [
-        makeDoc({ id: 1, type: 'invoice' }),
-        makeDoc({ id: 2, type: 'invoice' }),
-        makeDoc({ id: 3, type: 'offerte' }),
-        makeDoc({ id: 4, type: 'mahnung', offenerBetrag: 0, mahngebuehr: 0, verzugszins: 0 }),
+        makeDoc({ number: 'R-1', type: 'invoice' }),
+        makeDoc({ number: 'R-2', type: 'invoice' }),
+        makeDoc({ number: 'O-1', type: 'offerte' }),
+        makeDoc({ number: 'M-1', type: 'mahnung', offenerBetrag: 0, mahngebuehr: 0, verzugszins: 0 }),
       ];
 
       expect(store.grouped.invoice).toHaveLength(2);
@@ -72,16 +76,16 @@ describe('useDocumentsStore', () => {
 
     it('returns the active document', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ id: 42 });
+      const doc = makeDoc({ number: 'R-42' });
       store.documents = [doc];
-      store.activeDocumentId = 42;
+      store.activeDocumentNumber = 'R-42';
       expect(store.activeDocument).toEqual(doc);
     });
 
-    it('returns null if active ID does not match any document', () => {
+    it('returns null if active number does not match any document', () => {
       const store = useDocumentsStore();
-      store.documents = [makeDoc({ id: 1 })];
-      store.activeDocumentId = 999;
+      store.documents = [makeDoc({ number: 'R-1' })];
+      store.activeDocumentNumber = 'R-999';
       expect(store.activeDocument).toBeNull();
     });
   });
@@ -89,41 +93,41 @@ describe('useDocumentsStore', () => {
   describe('visibleDocuments', () => {
     it('returns all documents when no active', () => {
       const store = useDocumentsStore();
-      store.documents = [makeDoc({ id: 1 }), makeDoc({ id: 2 })];
-      store.activeDocumentId = null;
+      store.documents = [makeDoc({ number: 'R-1' }), makeDoc({ number: 'R-2' })];
+      store.activeDocumentNumber = null;
       expect(store.visibleDocuments).toHaveLength(2);
     });
 
     it('returns only active document when one is selected', () => {
       const store = useDocumentsStore();
-      store.documents = [makeDoc({ id: 1 }), makeDoc({ id: 2 })];
-      store.activeDocumentId = 2;
+      store.documents = [makeDoc({ number: 'R-1' }), makeDoc({ number: 'R-2' })];
+      store.activeDocumentNumber = 'R-2';
       expect(store.visibleDocuments).toHaveLength(1);
-      expect(store.visibleDocuments[0].id).toBe(2);
+      expect(store.visibleDocuments[0].number).toBe('R-2');
     });
   });
 
   describe('setActive', () => {
-    it('sets active document ID', () => {
+    it('sets active document number', () => {
       const store = useDocumentsStore();
-      store.setActive(5);
-      expect(store.activeDocumentId).toBe(5);
+      store.setActive('R-5');
+      expect(store.activeDocumentNumber).toBe('R-5');
     });
 
-    it('clears active document ID', () => {
+    it('clears active document number', () => {
       const store = useDocumentsStore();
-      store.activeDocumentId = 5;
+      store.activeDocumentNumber = 'R-5';
       store.setActive(null);
-      expect(store.activeDocumentId).toBeNull();
+      expect(store.activeDocumentNumber).toBeNull();
     });
 
     it('calls navigator when set', () => {
       const store = useDocumentsStore();
-      const navigated: (number | null)[] = [];
-      store.setNavigator((id) => navigated.push(id));
-      store.setActive(1);
+      const navigated: (string | null)[] = [];
+      store.setNavigator((num) => navigated.push(num));
+      store.setActive('R-1');
       store.setActive(null);
-      expect(navigated).toEqual([1, null]);
+      expect(navigated).toEqual(['R-1', null]);
     });
   });
 
@@ -138,25 +142,24 @@ describe('useDocumentsStore', () => {
       const store = useDocumentsStore();
       const a = store.generateNumber('O');
       const b = store.generateNumber('O');
-      // Could be same if called in same second, but prefix should match
       expect(a).toMatch(/^O-\d+$/);
       expect(b).toMatch(/^O-\d+$/);
     });
   });
 
   describe('activeSender', () => {
-    it('returns first sender when no activeSenderId', () => {
+    it('returns first sender when no activeSenderKey', () => {
       const store = useDocumentsStore();
-      store.senders = [{ id: 1, ...fakeSender }, { id: 2, ...fakeSender, name: 'Other' }];
-      store.activeSenderId = null;
-      expect(store.activeSender?.id).toBe(1);
+      store.senders = [makeSender('a'), makeSender('b', { company: 'Other' })];
+      store.activeSenderKey = null;
+      expect(store.activeSender?.key).toBe('a');
     });
 
     it('returns selected sender', () => {
       const store = useDocumentsStore();
-      store.senders = [{ id: 1, ...fakeSender }, { id: 2, ...fakeSender, name: 'Other' }];
-      store.activeSenderId = 2;
-      expect(store.activeSender?.name).toBe('Other');
+      store.senders = [makeSender('a'), makeSender('b', { company: 'Other' })];
+      store.activeSenderKey = 'b';
+      expect(store.activeSender?.company).toBe('Other');
     });
 
     it('returns null when no senders', () => {

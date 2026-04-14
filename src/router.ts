@@ -9,7 +9,7 @@ const router = createRouter({
       component: () => import('@/views/DocumentView.vue'),
     },
     {
-      path: '/:id(\\d+)',
+      path: '/:number([A-Z]-\\d+)',
       name: 'document',
       component: () => import('@/views/DocumentView.vue'),
     },

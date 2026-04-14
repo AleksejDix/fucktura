@@ -46,11 +46,11 @@
     <div class="flex items-center gap-2 px-3">
       <select
         v-if="store.senders.length > 1"
-        :value="store.activeSenderId"
-        @change="store.activeSenderId = Number(($event.target as HTMLSelectElement).value)"
+        :value="store.activeSenderKey"
+        @change="store.activeSenderKey = ($event.target as HTMLSelectElement).value"
         class="bg-transparent text-[12px] text-gray-600 border-none focus:outline-none cursor-pointer"
       >
-        <option v-for="s in store.senders" :key="s.id" :value="s.id">{{ s.company }}</option>
+        <option v-for="s in store.senders" :key="s.key" :value="s.key">{{ s.company }}</option>
       </select>
       <span v-else-if="store.activeSender" class="text-[12px] text-gray-500">{{ store.activeSender.company }}</span>
     </div>
@@ -73,6 +73,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useDocumentsStore } from '@/stores/documents';
+import { useFolderStore } from '@/stores/folder';
 import { useModeStore } from '@/stores/mode';
 import { useLetterNormStore } from '@/stores/letterNorm';
 import { useMoney } from '@/composables/useMoney';
@@ -98,6 +99,7 @@ interface Menu {
 
 const { t, locale } = useI18n();
 const store = useDocumentsStore();
+const folder = useFolderStore();
 const modeStore = useModeStore();
 const normStore = useLetterNormStore();
 const router = useRouter();
@@ -135,8 +137,8 @@ const activeType = computed(() => activeDoc.value?.type);
 const activeStatus = computed(() => activeDoc.value?.status);
 
 const activeClient = computed(() => {
-  const cid = activeDoc.value?.clientId;
-  return cid ? store.clients.find(c => c.id === cid) : undefined;
+  const cn = activeDoc.value?.customerNumber;
+  return cn ? store.clients.find(c => c.customerNumber === cn) : undefined;
 });
 
 function emailBody(): string {
@@ -414,21 +416,21 @@ function sendEmail() {
 
 function statusItems(): MenuItem[] {
   if (!activeDoc.value) return [];
-  const id = activeDoc.value.id!;
+  const num = activeDoc.value.number;
   const s = activeStatus.value;
   const items: MenuItem[] = [];
 
   if (activeType.value === 'offerte') {
     for (const status of ['draft', 'sent', 'accepted', 'rejected'] as const) {
-      items.push({ label: t(status), action: () => store.setStatus(id, status), checked: s === status });
+      items.push({ label: t(status), action: () => store.setStatus(num, status), checked: s === status });
     }
   } else if (activeType.value === 'invoice') {
     for (const status of ['draft', 'sent', 'paid'] as const) {
-      items.push({ label: t(status), action: () => store.setStatus(id, status), checked: s === status });
+      items.push({ label: t(status), action: () => store.setStatus(num, status), checked: s === status });
     }
   } else if (activeType.value === 'mahnung') {
     for (const status of ['draft', 'sent'] as const) {
-      items.push({ label: t(status), action: () => store.setStatus(id, status), checked: s === status });
+      items.push({ label: t(status), action: () => store.setStatus(num, status), checked: s === status });
     }
   }
   return items;
@@ -447,12 +449,22 @@ const menus = computed<Menu[]>(() => [
   {
     label: t('File'),
     items: [
+      { label: t('Open Folder…'), shortcut: '⌘O', action: () => folder.openFolder() },
+      ...(folder.recents.length > 1 ? [
+        { separator: true } as MenuItem,
+        { label: t('Recent folders'), disabled: true } as MenuItem,
+        ...folder.recents.slice(1).map((r) => ({
+          label: `📁 ${r.name}`,
+          action: () => folder.openRecent(r),
+        } as MenuItem)),
+      ] : []),
+      { separator: true },
       { label: t('New Offerte'), shortcut: '⌘N', action: () => store.createOfferte() },
       { label: t('New invoice'), action: () => store.createInvoice() },
       { label: t('New reminder'), action: () => store.createMahnung() },
       { label: t('New receipt'), action: () => store.createQuittung() },
       { separator: true },
-      { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.id!), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
+      { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.number), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
       { separator: true, hidden: !hasActiveDoc.value },
       { label: t('Clients'), action: () => router.push('/clients') },
       { label: t('Positions'), action: () => router.push('/positions') },
@@ -481,7 +493,7 @@ const menus = computed<Menu[]>(() => [
       { separator: true },
       ...statusItems(),
       { separator: true, hidden: !hasActiveDoc.value },
-      { label: t('Delete'), shortcut: '⌘⌫', action: () => store.activeDocument && store.deleteDocument(store.activeDocument.id!), disabled: !hasActiveDoc.value, destructive: true },
+      { label: t('Delete'), shortcut: '⌘⌫', action: () => store.activeDocument && store.deleteDocument(store.activeDocument.number), disabled: !hasActiveDoc.value, destructive: true },
     ],
   },
   {

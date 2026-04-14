@@ -18,7 +18,7 @@
     <section>
       <div class="pt-[var(--norm-addr-offset)]">
         <div class="w-[var(--norm-addr-w)]">
-          <DClientPicker :doc-id="doc.id!" :has-client="!!recipient.company || !!recipient.name" />
+          <DClientPicker :doc-number="doc.number" :has-client="!!recipient.company || !!recipient.name" />
           <address v-if="recipient.company || recipient.name" class="not-italic text-[9pt] leading-relaxed">
             <DInline v-model="recipient.company" tag="div" @update:model-value="v => update({ 'recipient.company': v })" />
             <DInline v-model="recipient.name" tag="div" @update:model-value="v => update({ 'recipient.name': v })" />
@@ -125,7 +125,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { Document, Sender } from '@/db';
+import type { Document, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import { useMoney } from '@/composables/useMoney';
 import { getMahnungDefaults } from '@/data/mahnung-defaults';
@@ -155,8 +155,8 @@ const countryDefaults = computed(() => getMahnungDefaults(recipient.value.countr
 const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, verzugszins.value));
 
 function update(changes: Record<string, unknown>) {
-  if (!props.doc.id) return;
-  store.updateDocument(props.doc.id, changes);
+  if (!props.doc.number) return;
+  store.updateDocument(props.doc.number, changes);
 }
 
 function updateStufe(value: string) {

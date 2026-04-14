@@ -13,7 +13,7 @@
     >
       <li
         v-for="client in clients"
-        :key="client.id"
+        :key="client.customerNumber"
         @click="select(client)"
         class="px-3 py-2 text-[9pt] cursor-pointer hover:bg-gray-100 transition-colors border-b border-gray-50 last:border-0"
       >
@@ -29,11 +29,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import type { Client } from '@/db';
+import type { Client } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 
 const props = defineProps<{
-  docId: number;
+  docNumber: string;
   hasClient: boolean;
 }>();
 
@@ -43,7 +43,7 @@ const open = ref(false);
 
 function select(client: Client) {
   open.value = false;
-  store.assignClient(props.docId, client.id!);
+  store.assignClient(props.docNumber, client.customerNumber);
 }
 
 function onClickOutside(e: MouseEvent) {

@@ -45,7 +45,7 @@ import { computed } from 'vue';
 import { usePagesStore } from '@/stores/pages';
 import { useLetterNormStore } from '@/stores/letterNorm';
 import { Eye, EyeOff } from 'lucide-vue-next';
-import type { SenderSnapshot } from '@/db';
+import type { SenderSnapshot } from '@/fs/types';
 
 const pagesStore = usePagesStore();
 const letterNorm = useLetterNormStore();

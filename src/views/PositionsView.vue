@@ -12,7 +12,7 @@
           <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Description') }}</label>
           <input
             v-model="pos.description"
-            @blur="savePosition(pos)"
+            @blur="save"
             class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 focus:outline-none focus:border-gray-900"
           />
         </div>
@@ -20,7 +20,7 @@
           <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Product code') }}</label>
           <input
             v-model="pos.code"
-            @blur="savePosition(pos)"
+            @blur="save"
             class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 font-mono focus:outline-none focus:border-gray-900"
           />
         </div>
@@ -28,7 +28,7 @@
           <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Unit') }}</label>
           <input
             v-model="pos.unit"
-            @blur="savePosition(pos)"
+            @blur="save"
             placeholder="h"
             class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 text-center focus:outline-none focus:border-gray-900"
           />
@@ -43,7 +43,7 @@
             class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 font-mono text-right focus:outline-none focus:border-gray-900"
           />
         </div>
-        <button @click="deletePosition(pos.id!)" class="text-gray-300 hover:text-red-500 pb-1.5">&times;</button>
+        <button @click="deletePosition(pos.id)" class="text-gray-300 hover:text-red-500 pb-1.5">&times;</button>
       </div>
     </div>
 
@@ -56,39 +56,37 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { db } from '@/db';
-import type { Position } from '@/db';
+import { nanoid } from 'nanoid';
+import * as repo from '@/fs/repo';
+import type { Position } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 
 const documentsStore = useDocumentsStore();
 const positions = ref<Position[]>([]);
 
-async function loadPositions() {
-  positions.value = await db.positions.toArray();
+function reload() {
+  positions.value = documentsStore.positions.map(p => ({ ...p }));
 }
 
-onMounted(loadPositions);
+onMounted(reload);
+
+async function save() {
+  await repo.writePositions(JSON.parse(JSON.stringify(positions.value)));
+  await documentsStore.load();
+}
 
 async function addPosition() {
-  await db.positions.add({ description: '', code: '', unit: 'h', defaultPrice: 0 });
-  await loadPositions();
-  await documentsStore.load();
-}
-
-async function savePosition(pos: Position) {
-  if (!pos.id) return;
-  await db.positions.update(pos.id, { ...pos });
-  await documentsStore.load();
+  positions.value.push({ id: nanoid(8), description: '', code: '', unit: 'h', defaultPrice: 0 });
+  await save();
 }
 
 function updatePrice(pos: Position, value: string) {
   pos.defaultPrice = parseFloat(value) || 0;
-  savePosition(pos);
+  save();
 }
 
-async function deletePosition(id: number) {
-  await db.positions.delete(id);
-  await loadPositions();
-  await documentsStore.load();
+async function deletePosition(id: string) {
+  positions.value = positions.value.filter(p => p.id !== id);
+  await save();
 }
 </script>

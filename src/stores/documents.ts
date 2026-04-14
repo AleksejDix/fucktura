@@ -1,5 +1,5 @@
-import { db } from '@/db';
-import type { Client, Document, DocumentStatus, Position, Sender, SenderSnapshot } from '@/db';
+import * as repo from '@/fs/repo';
+import type { Client, Document, DocumentStatus, Position, Sender, SenderSnapshot } from '@/fs/types';
 import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
@@ -9,17 +9,19 @@ export const useDocumentsStore = defineStore('documents', () => {
   const clients = ref<Client[]>([]);
   const senders = ref<Sender[]>([]);
   const positions = ref<Position[]>([]);
-  const activeSenderId = ref<number | null>(null);
+  const activeSenderKey = ref<string | null>(null);
   const loading = ref(true);
-  const activeDocumentId = ref<number | null>(null);
+  const activeDocumentNumber = ref<string | null>(null);
 
   const activeDocument = computed(() =>
-    activeDocumentId.value ? documents.value.find((d) => d.id === activeDocumentId.value) ?? null : null,
+    activeDocumentNumber.value
+      ? documents.value.find((d) => d.number === activeDocumentNumber.value) ?? null
+      : null,
   );
 
   const visibleDocuments = computed(() =>
-    activeDocumentId.value
-      ? documents.value.filter((d) => d.id === activeDocumentId.value)
+    activeDocumentNumber.value
+      ? documents.value.filter((d) => d.number === activeDocumentNumber.value)
       : documents.value,
   );
 
@@ -31,51 +33,49 @@ export const useDocumentsStore = defineStore('documents', () => {
   }));
 
   const activeSender = computed(() =>
-    activeSenderId.value ? senders.value.find((s) => s.id === activeSenderId.value) ?? senders.value[0] ?? null : senders.value[0] ?? null,
+    activeSenderKey.value
+      ? senders.value.find((s) => s.key === activeSenderKey.value) ?? senders.value[0] ?? null
+      : senders.value[0] ?? null,
   );
 
   async function load() {
     loading.value = true;
-    senders.value = await db.senders.toArray();
-    if (!activeSenderId.value && senders.value.length > 0) {
-      activeSenderId.value = senders.value[0].id!;
+    const snap = await repo.loadAll();
+    senders.value = snap.senders;
+    clients.value = snap.clients;
+    positions.value = snap.positions;
+    // newest first, by createdAt
+    documents.value = [...snap.documents].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    if (!activeSenderKey.value && senders.value.length > 0) {
+      activeSenderKey.value = senders.value[0].key;
     }
-    clients.value = await db.clients.toArray();
-    positions.value = await db.positions.toArray();
-    documents.value = await db.documents.orderBy('createdAt').reverse().toArray();
     loading.value = false;
   }
 
-  let navigate: ((id: number | null) => void) | null = null;
+  let navigate: ((number: string | null) => void) | null = null;
 
-  function setNavigator(fn: (id: number | null) => void) {
+  function setNavigator(fn: (number: string | null) => void) {
     navigate = fn;
   }
 
-  function setActive(id: number | null) {
-    activeDocumentId.value = id;
-    navigate?.(id);
+  function setActive(number: string | null) {
+    activeDocumentNumber.value = number;
+    navigate?.(number);
   }
 
-  async function addDocument(doc: Omit<Document, 'id' | 'createdAt' | 'updatedAt'>) {
+  async function addDocument(doc: Omit<Document, 'createdAt' | 'updatedAt'>) {
     const now = new Date().toISOString();
-    const raw = JSON.parse(JSON.stringify(doc));
-    const id = await db.documents.add({
-      ...raw,
-      createdAt: now,
-      updatedAt: now,
-    } as Document);
-    await load();
-    setActive(id as number);
-    return id;
+    const full: Document = { ...doc, createdAt: now, updatedAt: now };
+    await repo.writeDocument(full);
+    documents.value = [full, ...documents.value];
+    setActive(full.number);
+    return full.number;
   }
 
-  async function deleteDocument(id: number) {
-    await db.documents.delete(id);
-    if (activeDocumentId.value === id) {
-      setActive(null);
-    }
-    await load();
+  async function deleteDocument(number: string) {
+    await repo.deleteDocument(number);
+    documents.value = documents.value.filter((d) => d.number !== number);
+    if (activeDocumentNumber.value === number) setActive(null);
   }
 
   function generateNumber(prefix: string): string {
@@ -83,8 +83,8 @@ export const useDocumentsStore = defineStore('documents', () => {
   }
 
   function senderSnapshot(s: Sender): SenderSnapshot {
-    const { id: _, ...snapshot } = s;
-    return snapshot;
+    const { key: _, ...snap } = s;
+    return snap;
   }
 
   function addDays(date: Date, days: number): string {
@@ -93,22 +93,27 @@ export const useDocumentsStore = defineStore('documents', () => {
     return result.toISOString();
   }
 
-  async function createOfferte(clientId?: number, senderId?: number) {
-    const s = senderId
-      ? await db.senders.get(senderId)
-      : activeSender.value;
+  function findSender(senderKey?: string): Sender | null {
+    if (senderKey) return senders.value.find((s) => s.key === senderKey) ?? null;
+    return activeSender.value;
+  }
+
+  function findClient(customerNumber?: string): Client | undefined {
+    if (!customerNumber) return undefined;
+    return clients.value.find((c) => c.customerNumber === customerNumber);
+  }
+
+  async function createOfferte(customerNumber?: string, senderKey?: string) {
+    const s = findSender(senderKey);
     if (!s) return;
-
-    const number = generateNumber('O');
-    const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
+    const client = findClient(customerNumber);
     const today = new Date();
-
     return addDocument({
       type: 'offerte',
       status: 'draft',
-      number,
+      number: generateNumber('O'),
       subtitle: '',
-      clientId,
+      customerNumber: customerNumber ?? '',
       sender: senderSnapshot(s),
       recipient: {
         company: client?.company ?? '',
@@ -128,22 +133,17 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
-  async function createInvoice(clientId?: number, senderId?: number) {
-    const s = senderId
-      ? await db.senders.get(senderId)
-      : activeSender.value;
+  async function createInvoice(customerNumber?: string, senderKey?: string) {
+    const s = findSender(senderKey);
     if (!s) return;
-
-    const number = generateNumber('R');
-    const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
+    const client = findClient(customerNumber);
     const today = new Date();
-
     return addDocument({
       type: 'invoice',
       status: 'draft',
-      number,
+      number: generateNumber('R'),
       subtitle: '',
-      clientId,
+      customerNumber: customerNumber ?? '',
       sender: senderSnapshot(s),
       recipient: {
         company: client?.company ?? '',
@@ -163,22 +163,17 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
-  async function createQuittung(clientId?: number, senderId?: number) {
-    const s = senderId
-      ? await db.senders.get(senderId)
-      : activeSender.value;
+  async function createQuittung(customerNumber?: string, senderKey?: string) {
+    const s = findSender(senderKey);
     if (!s) return;
-
-    const number = generateNumber('Q');
-    const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
+    const client = findClient(customerNumber);
     const today = new Date();
-
     return addDocument({
       type: 'quittung',
       status: 'paid',
-      number,
+      number: generateNumber('Q'),
       subtitle: '',
-      clientId,
+      customerNumber: customerNumber ?? '',
       sender: senderSnapshot(s),
       recipient: {
         company: client?.company ?? '',
@@ -197,24 +192,19 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
-  async function createMahnung(clientId?: number, senderId?: number) {
-    const s = senderId
-      ? await db.senders.get(senderId)
-      : activeSender.value;
+  async function createMahnung(customerNumber?: string, senderKey?: string) {
+    const s = findSender(senderKey);
     if (!s) return;
-
-    const number = generateNumber('M');
-    const client = clientId ? clients.value.find((c) => c.id === clientId) : undefined;
+    const client = findClient(customerNumber);
     const country = client?.country ?? 'Schweiz';
     const md = getMahnungDefaults(country);
     const today = new Date();
-
     return addDocument({
       type: 'mahnung',
       status: 'draft',
-      number,
+      number: generateNumber('M'),
       subtitle: '',
-      clientId,
+      customerNumber: customerNumber ?? '',
       sender: senderSnapshot(s),
       recipient: {
         company: client?.company ?? '',
@@ -239,20 +229,17 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
-  async function convertToInvoice(offerteId: number) {
-    const offerte = documents.value.find((d) => d.id === offerteId);
+  async function convertToInvoice(offerteNumber: string) {
+    const offerte = documents.value.find((d) => d.number === offerteNumber);
     if (!offerte || offerte.type !== 'offerte') return;
-
     const s = activeSender.value;
-    const number = generateNumber('R');
     const today = new Date();
-
     return addDocument({
       type: 'invoice',
       status: 'draft',
-      number,
+      number: generateNumber('R'),
       subtitle: offerte.subtitle,
-      clientId: offerte.clientId,
+      customerNumber: offerte.customerNumber,
       sender: { ...offerte.sender },
       recipient: { ...offerte.recipient },
       meta: {
@@ -267,7 +254,7 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   function resolveClientPositions(client: Client) {
     return (client.positions ?? []).map((cp, i) => {
-      const pos = positions.value.find(p => p.id === cp.positionId);
+      const pos = positions.value.find((p) => p.id === cp.positionId);
       return {
         pos: i + 1,
         description: pos?.description ?? '',
@@ -279,14 +266,20 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
-  async function assignClient(docId: number, clientId: number) {
-    const client = clients.value.find((c) => c.id === clientId);
+  async function writeDoc(doc: Document) {
+    await repo.writeDocument(doc);
+    const idx = documents.value.findIndex((d) => d.number === doc.number);
+    if (idx >= 0) documents.value.splice(idx, 1, doc);
+  }
+
+  async function assignClient(docNumber: string, customerNumber: string) {
+    const client = findClient(customerNumber);
     if (!client) return;
-
-    const lineItems = resolveClientPositions(client);
-
-    await db.documents.update(docId, {
-      clientId,
+    const doc = documents.value.find((d) => d.number === docNumber);
+    if (!doc) return;
+    const updated: Document = {
+      ...doc,
+      customerNumber,
       recipient: {
         company: client.company ?? '',
         name: client.name ?? '',
@@ -296,21 +289,33 @@ export const useDocumentsStore = defineStore('documents', () => {
         country: client.country,
         email: client.email ?? '',
       },
-      lineItems,
-      'meta.customerNumber': client.customerNumber ?? '',
+      lineItems: resolveClientPositions(client),
+      meta: { ...doc.meta, customerNumber: client.customerNumber ?? '' },
       updatedAt: new Date().toISOString(),
-    });
-    await load();
+    };
+    await writeDoc(updated);
   }
 
-  async function updateDocument(docId: number, changes: Record<string, unknown>) {
-    await db.documents.update(docId, { ...changes, updatedAt: new Date().toISOString() });
-    await load();
+  /** Apply a shallow patch (supports `meta.foo` dotted keys) and persist. */
+  async function updateDocument(docNumber: string, changes: Record<string, unknown>) {
+    const doc = documents.value.find((d) => d.number === docNumber);
+    if (!doc) return;
+    const next: Document = { ...doc };
+    for (const [k, v] of Object.entries(changes)) {
+      if (k.startsWith('meta.')) {
+        const field = k.slice(5);
+        next.meta = { ...next.meta, [field]: v };
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (next as any)[k] = v;
+      }
+    }
+    next.updatedAt = new Date().toISOString();
+    await writeDoc(next);
   }
 
-  async function setStatus(docId: number, status: DocumentStatus) {
-    await db.documents.update(docId, { status, updatedAt: new Date().toISOString() });
-    await load();
+  async function setStatus(docNumber: string, status: DocumentStatus) {
+    await updateDocument(docNumber, { status });
   }
 
   return {
@@ -318,10 +323,10 @@ export const useDocumentsStore = defineStore('documents', () => {
     clients,
     senders,
     positions,
-    activeSenderId,
+    activeSenderKey,
     activeSender,
     loading,
-    activeDocumentId,
+    activeDocumentNumber,
     activeDocument,
     visibleDocuments,
     grouped,

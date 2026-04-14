@@ -36,7 +36,7 @@ export const usePagesStore = defineStore('pages', () => {
       if (!component) continue;
 
       result.push({
-        id: `doc-${doc.id}`,
+        id: `doc-${doc.number}`,
         name: component.__name as PageName,
         component: markRaw(component),
         enabled: true,
@@ -46,7 +46,7 @@ export const usePagesStore = defineStore('pages', () => {
       const hasSwissIban = doc.sender?.accounts?.some((a: { iban: string }) => a.iban.startsWith('CH'));
       if ((doc.type === 'invoice' || doc.type === 'mahnung') && hasSwissIban) {
         result.push({
-          id: `doc-${doc.id}-qr`,
+          id: `doc-${doc.number}-qr`,
           name: 'QRBill' as PageName,
           component: markRaw(Pages.QRBill),
           enabled: true,
@@ -59,7 +59,7 @@ export const usePagesStore = defineStore('pages', () => {
   }
 
   watch(
-    [() => documentsStore.visibleDocuments, () => documentsStore.activeDocumentId],
+    [() => documentsStore.visibleDocuments, () => documentsStore.activeDocumentNumber],
     buildPages,
     { immediate: true },
   );

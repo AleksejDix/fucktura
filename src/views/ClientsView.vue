@@ -5,20 +5,20 @@
     <div class="space-y-8">
       <div
         v-for="client in clients"
-        :key="client.id"
+        :key="client.customerNumber"
         class="border border-gray-300 p-4"
       >
         <div class="flex items-start justify-between mb-3">
           <p class="text-[10pt] font-bold text-gray-900">{{ client.company || client.name || $t('New client') }}</p>
-          <button @click="deleteClient(client.id!)" class="text-gray-300 hover:text-red-500 text-[9pt]">&times;</button>
+          <button @click="deleteClient(client.customerNumber)" class="text-gray-300 hover:text-red-500 text-[9pt]">&times;</button>
         </div>
         <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-[9pt]">
           <div class="col-span-2">
             <label class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Client number') }}</label>
             <input
-              v-model="client.customerNumber"
-              @blur="saveClient(client)"
-              class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 font-mono"
+              :value="client.customerNumber"
+              readonly
+              class="w-full border border-gray-200 px-2 py-1.5 text-gray-400 bg-gray-50 font-mono"
             />
           </div>
           <div class="col-span-2">
@@ -108,11 +108,11 @@
           </div>
           <div class="relative mt-2">
             <button
-              @click="togglePositionPicker(client.id!)"
+              @click="togglePositionPicker(client.customerNumber)"
               class="text-[8pt] text-gray-400 hover:text-black"
             >+ {{ $t('Add position') }}</button>
             <ul
-              v-if="pickerOpenFor === client.id"
+              v-if="pickerOpenFor === client.customerNumber"
               class="absolute left-0 top-full mt-1 w-80 bg-white border border-gray-300 shadow-lg z-20 max-h-48 overflow-y-auto"
             >
               <li
@@ -141,23 +141,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { db } from '@/db';
-import type { Client, Position } from '@/db';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import * as repo from '@/fs/repo';
+import type { Client, Position } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 
 const documentsStore = useDocumentsStore();
-const clients = ref<Client[]>([]);
-const allPositions = ref<Position[]>([]);
-const pickerOpenFor = ref<number | null>(null);
-
-async function loadClients() {
-  clients.value = await db.clients.toArray();
-  allPositions.value = await db.positions.toArray();
-}
+const clients = computed<Client[]>(() => documentsStore.clients);
+const allPositions = computed<Position[]>(() => documentsStore.positions);
+const pickerOpenFor = ref<string | null>(null);
 
 onMounted(() => {
-  loadClients();
   document.addEventListener('click', onClickOutside, true);
 });
 onUnmounted(() => document.removeEventListener('click', onClickOutside, true));
@@ -168,7 +162,7 @@ function onClickOutside(e: MouseEvent) {
   }
 }
 
-function positionLabel(positionId: number): string {
+function positionLabel(positionId: string): string {
   const pos = allPositions.value.find(p => p.id === positionId);
   if (!pos) return '—';
   return pos.code ? `${pos.description} (${pos.code})` : pos.description;
@@ -176,30 +170,29 @@ function positionLabel(positionId: number): string {
 
 function availablePositions(client: Client): Position[] {
   const assigned = new Set((client.positions ?? []).map(cp => cp.positionId));
-  return allPositions.value.filter(p => !assigned.has(p.id!));
+  return allPositions.value.filter(p => !assigned.has(p.id));
 }
 
-function togglePositionPicker(clientId: number) {
-  pickerOpenFor.value = pickerOpenFor.value === clientId ? null : clientId;
+function togglePositionPicker(customerNumber: string) {
+  pickerOpenFor.value = pickerOpenFor.value === customerNumber ? null : customerNumber;
 }
 
 function assignPosition(client: Client, pos: Position) {
   if (!client.positions) client.positions = [];
-  client.positions.push({ positionId: pos.id!, price: pos.defaultPrice });
+  client.positions.push({ positionId: pos.id, price: pos.defaultPrice });
   pickerOpenFor.value = null;
   saveClient(client);
 }
 
-async function nextKundennummer(): Promise<string> {
-  const all = await db.clients.toArray();
-  const nums = all.map(c => parseInt(c.customerNumber, 10)).filter(n => !isNaN(n));
+function nextCustomerNumber(): string {
+  const nums = clients.value.map(c => parseInt(c.customerNumber, 10)).filter(n => !isNaN(n));
   const max = nums.length ? Math.max(...nums) : 0;
   return String(max + 1).padStart(4, '0');
 }
 
 async function addClient() {
-  const customerNumber = await nextKundennummer();
-  await db.clients.add({
+  const customerNumber = nextCustomerNumber();
+  await repo.writeClient({
     customerNumber,
     company: '',
     name: '',
@@ -209,19 +202,17 @@ async function addClient() {
     country: '',
     email: '',
   });
-  await loadClients();
   await documentsStore.load();
 }
 
 async function saveClient(client: Client) {
-  if (!client.id) return;
-  await db.clients.update(client.id, { ...client });
+  if (!client.customerNumber) return;
+  await repo.writeClient(JSON.parse(JSON.stringify(client)) as Client);
   await documentsStore.load();
 }
 
-async function deleteClient(id: number) {
-  await db.clients.delete(id);
-  await loadClients();
+async function deleteClient(customerNumber: string) {
+  await repo.deleteClient(customerNumber);
   await documentsStore.load();
 }
 

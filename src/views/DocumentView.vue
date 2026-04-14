@@ -12,9 +12,9 @@ const route = useRoute();
 const store = useDocumentsStore();
 
 watch(
-  () => route.params.id,
-  (id) => {
-    store.setActive(id ? Number(id) : null);
+  () => route.params.number,
+  (num) => {
+    store.setActive(typeof num === 'string' && num ? num : null);
   },
   { immediate: true },
 );

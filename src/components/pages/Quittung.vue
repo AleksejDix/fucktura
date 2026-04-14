@@ -18,7 +18,7 @@
     <section>
       <div class="pt-[var(--norm-addr-offset)]">
         <div class="w-[var(--norm-addr-w)]">
-          <DClientPicker :doc-id="doc.id!" :has-client="!!recipient.company || !!recipient.name" />
+          <DClientPicker :doc-number="doc.number" :has-client="!!recipient.company || !!recipient.name" />
           <address v-if="recipient.company || recipient.name" class="not-italic text-[9pt] leading-relaxed">
             <DInline v-model="recipient.company" tag="div" @update:model-value="v => update({ 'recipient.company': v })" />
             <DInline v-model="recipient.name" tag="div" @update:model-value="v => update({ 'recipient.name': v })" />
@@ -128,7 +128,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { Document, Sender } from '@/db';
+import type { Document, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import { useModeStore } from '@/stores/mode';
 import { useMoney } from '@/composables/useMoney';
@@ -160,28 +160,28 @@ const currency = computed(() => {
 });
 
 function update(changes: Record<string, unknown>) {
-  if (!props.doc.id) return;
-  store.updateDocument(props.doc.id, changes);
+  if (!props.doc.number) return;
+  store.updateDocument(props.doc.number, changes);
 }
 
 function updateLineItem(index: number, field: string, value: unknown) {
-  if (!props.doc.id) return;
+  if (!props.doc.number) return;
   const items = [...lineItems.value.map(item => ({ ...item }))];
   (items[index] as Record<string, unknown>)[field] = value;
-  store.updateDocument(props.doc.id, { lineItems: items });
+  store.updateDocument(props.doc.number, { lineItems: items });
 }
 
 function addLineItem() {
-  if (!props.doc.id) return;
+  if (!props.doc.number) return;
   const items = [...lineItems.value.map(item => ({ ...item }))];
   items.push({ pos: items.length + 1, description: '', code: '', quantity: 0, unit: 'Stk', unitPrice: 0 });
-  store.updateDocument(props.doc.id, { lineItems: items });
+  store.updateDocument(props.doc.number, { lineItems: items });
 }
 
 function removeLineItem(index: number) {
-  if (!props.doc.id) return;
+  if (!props.doc.number) return;
   const items = lineItems.value.filter((_, i) => i !== index).map((item, i) => ({ ...item, pos: i + 1 }));
-  store.updateDocument(props.doc.id, { lineItems: items });
+  store.updateDocument(props.doc.number, { lineItems: items });
 }
 
 function formatAmount(n: number): string {

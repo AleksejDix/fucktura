@@ -2,7 +2,6 @@ import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './App.vue';
 import './assets/main.css';
-import { seed } from './db/seed';
 import { i18n } from './i18n';
 import { router } from './router';
 
@@ -10,7 +9,4 @@ const app = createApp(App);
 app.use(createPinia());
 app.use(i18n);
 app.use(router);
-
-seed().then(() => {
-  app.mount('#app');
-});
+app.mount('#app');

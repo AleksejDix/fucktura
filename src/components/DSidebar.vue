@@ -3,19 +3,19 @@
     <div class="flex-1 overflow-y-auto">
       <div
         v-for="doc in sortedDocuments"
-        :key="doc.id"
-        @click="store.setActive(doc.id === store.activeDocumentId ? null : doc.id!)"
+        :key="doc.number"
+        @click="store.setActive(doc.number === store.activeDocumentNumber ? null : doc.number)"
         class="px-3 py-2.5 cursor-pointer border-b border-gray-100 transition-colors"
-        :class="doc.id === store.activeDocumentId ? 'bg-black text-white' : 'hover:bg-gray-50'"
+        :class="doc.number === store.activeDocumentNumber ? 'bg-black text-white' : 'hover:bg-gray-50'"
       >
         <div class="flex items-baseline justify-between text-[12px]">
-          <span class="flex items-center gap-1.5 font-medium truncate" :class="doc.id === store.activeDocumentId ? 'text-white' : isOverdue(doc) ? 'text-red-600' : 'text-gray-900'">
-            <span class="shrink-0 w-1.5 h-1.5 inline-block" :class="doc.id === store.activeDocumentId ? 'bg-white' : isOverdue(doc) ? 'bg-red-500' : dotClass[doc.type]" />
+          <span class="flex items-center gap-1.5 font-medium truncate" :class="doc.number === store.activeDocumentNumber ? 'text-white' : isOverdue(doc) ? 'text-red-600' : 'text-gray-900'">
+            <span class="shrink-0 w-1.5 h-1.5 inline-block" :class="doc.number === store.activeDocumentNumber ? 'bg-white' : isOverdue(doc) ? 'bg-red-500' : dotClass[doc.type]" />
             {{ doc.recipient.company || doc.recipient.name || $t('No client') }}
           </span>
-          <span class="shrink-0 ml-2 text-[11px]" :class="doc.id === store.activeDocumentId ? 'text-gray-400' : isOverdue(doc) ? 'text-red-400' : 'text-gray-400'">{{ formatDate(dueDateField(doc) || doc.meta.date) }}</span>
+          <span class="shrink-0 ml-2 text-[11px]" :class="doc.number === store.activeDocumentNumber ? 'text-gray-400' : isOverdue(doc) ? 'text-red-400' : 'text-gray-400'">{{ formatDate(dueDateField(doc) || doc.meta.date) }}</span>
         </div>
-        <div class="text-[11px] truncate mt-0.5 pl-[12px]" :class="doc.id === store.activeDocumentId ? 'text-gray-400' : 'text-gray-500'">{{ doc.number }} · {{ doc.subtitle || '—' }}</div>
+        <div class="text-[11px] truncate mt-0.5 pl-[12px]" :class="doc.number === store.activeDocumentNumber ? 'text-gray-400' : 'text-gray-500'">{{ doc.number }} · {{ doc.subtitle || '—' }}</div>
       </div>
 
       <p v-if="store.documents.length === 0" class="px-3 py-8 text-xs text-gray-300 text-center">
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Document } from '@/db';
+import type { Document } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import { useDate } from '@/composables/useDate';
 import { computed } from 'vue';

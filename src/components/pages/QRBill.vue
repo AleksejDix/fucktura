@@ -34,7 +34,7 @@ import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { SwissQRBill } from 'swissqrbill/svg';
 import { toDecimal } from 'dinero.js';
-import type { Document, SenderSnapshot } from '@/db';
+import type { Document, SenderSnapshot } from '@/fs/types';
 import { useMoney } from '@/composables/useMoney';
 import PageTemplate from '../PageTemplate.vue';
 
