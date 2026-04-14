@@ -44,6 +44,21 @@ export function isFileSystemAccessSupported(): boolean {
   return typeof window !== 'undefined' && 'showDirectoryPicker' in window;
 }
 
+/**
+ * Ask the browser not to evict our config IDB (which holds the folder
+ * handle). Without this, long-idle users can lose the recents list. No-op
+ * if the API is missing or permission was already granted.
+ */
+export async function ensurePersistentStorage(): Promise<boolean> {
+  if (!navigator.storage?.persist) return false;
+  try {
+    if (await navigator.storage.persisted()) return true;
+    return await navigator.storage.persist();
+  } catch {
+    return false;
+  }
+}
+
 export async function loadRecents(): Promise<RecentFolder[]> {
   const stored = (await idbGet<RecentFolder[]>(RECENTS_KEY)) ?? [];
   return stored;

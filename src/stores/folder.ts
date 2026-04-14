@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import {
   ensurePermission,
+  ensurePersistentStorage,
   forgetFolder,
   isFileSystemAccessSupported,
   loadRecents,
@@ -48,6 +49,8 @@ export const useFolderStore = defineStore('folder', () => {
       state.value = 'unsupported';
       return;
     }
+    // Ask the browser not to evict our config IDB. Fire-and-forget.
+    void ensurePersistentStorage();
     recents.value = await loadRecents();
     for (const entry of [...recents.value]) {
       if (!(await ensurePermission(entry.handle))) continue;
