@@ -25,11 +25,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { i18n } from '@/i18n';
 import { useRouter } from 'vue-router';
 import { useDocumentsStore } from '@/stores/documents';
 import { usePaletteStore } from '@/stores/palette';
+import { isDocument } from '@/fs/validate';
 import DSidebar from './components/DSidebar.vue';
 import DMenuBar from './components/DMenuBar.vue';
 import BootGate from './components/BootGate.vue';
@@ -84,6 +85,37 @@ watch(
   },
   { immediate: true },
 );
+
+// File Handling API: double-clicking a JSON in Finder launches Fucktura
+// here. Read the file, validate, and queue navigation to that doc once
+// the store has finished loading.
+type LaunchParams = { files: FileSystemFileHandle[] };
+type WindowWithLaunch = Window & {
+  launchQueue?: { setConsumer: (cb: (p: LaunchParams) => void) => void };
+};
+const pendingOpen = ref<string | null>(null);
+const winLaunch = window as WindowWithLaunch;
+winLaunch.launchQueue?.setConsumer(async ({ files }) => {
+  if (!files?.length) return;
+  for (const handle of files) {
+    try {
+      const text = await (await handle.getFile()).text();
+      const parsed: unknown = JSON.parse(text);
+      if (isDocument(parsed)) {
+        pendingOpen.value = parsed.number;
+        return;
+      }
+    } catch (e) {
+      console.warn('[file-handler] could not open', handle.name, e);
+    }
+  }
+});
+watch([() => documentsStore.documents.length, pendingOpen], ([count, target]) => {
+  if (count > 0 && target) {
+    documentsStore.setActive(target);
+    pendingOpen.value = null;
+  }
+});
 
 const supported = ['de', 'en', 'es', 'nl', 'ru'];
 const saved = localStorage.getItem('locale');
