@@ -1,5 +1,5 @@
 import * as repo from '@/fs/repo';
-import type { Client, Document, DocumentStatus, Position, Sender, SenderSnapshot } from '@/fs/types';
+import type { Client, Document, DocumentPatch, DocumentStatus, Position, Sender, SenderSnapshot } from '@/fs/types';
 import { defaultUnitForType, numberPrefix } from '@/lib/documents';
 import { defaultVatRate as countryDefaultVatRate } from '@/lib/vat';
 import { getMahnungDefaults } from '@/data/mahnung-defaults';
@@ -338,21 +338,16 @@ export const useDocumentsStore = defineStore('documents', () => {
     await writeDoc(updated);
   }
 
-  /** Apply a shallow patch (supports `meta.foo` dotted keys) and persist. */
-  async function updateDocument(docNumber: string, changes: Record<string, unknown>) {
+  async function updateDocument(docNumber: string, patch: DocumentPatch) {
     const doc = documents.value.find((d) => d.number === docNumber);
     if (!doc) return;
-    const next: Document = { ...doc };
-    for (const [k, v] of Object.entries(changes)) {
-      if (k.startsWith('meta.')) {
-        const field = k.slice(5);
-        next.meta = { ...next.meta, [field]: v };
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (next as any)[k] = v;
-      }
-    }
-    next.updatedAt = new Date().toISOString();
+    const { meta: metaPatch, ...rest } = patch;
+    const next: Document = {
+      ...doc,
+      ...rest,
+      meta: metaPatch ? { ...doc.meta, ...metaPatch } : doc.meta,
+      updatedAt: new Date().toISOString(),
+    };
     await writeDoc(next);
   }
 
@@ -431,7 +426,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     await updateDocument(doc.number, {
       customerNumber: '',
       recipient: { company: '', name: '', street: '', zip: '', city: '', country: doc.recipient.country ?? '' },
-      'meta.customerNumber': '',
+      meta: { customerNumber: '' },
     });
   }
 

@@ -44,19 +44,19 @@
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Quote date') }}:</span>
-          <DDate :value="meta.date" @update="v => update({ 'meta.date': v })" />
+          <DDate :value="meta.date" @update="v => update({ meta: { date: v } })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Your contact') }}:</span>
-          <DInline v-model="meta.contactPerson" tag="span" @update:model-value="v => update({ 'meta.contactPerson': v })" />
+          <DInline v-model="meta.contactPerson" tag="span" @update:model-value="v => update({ meta: { contactPerson: v } })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Valid until') }}:</span>
-          <DDate :value="meta.validUntil" @update="v => update({ 'meta.validUntil': v })" />
+          <DDate :value="meta.validUntil" @update="v => update({ meta: { validUntil: v } })" />
         </div>
         <div class="flex justify-between">
           <span class="text-gray-600">{{ t('Customer number') }}:</span>
-          <DInline v-model="meta.customerNumber" tag="span" class="font-mono" @update:model-value="v => update({ 'meta.customerNumber': v })" />
+          <DInline v-model="meta.customerNumber" tag="span" class="font-mono" @update:model-value="v => update({ meta: { customerNumber: v } })" />
         </div>
       </div>
 
@@ -80,7 +80,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { Document, Sender } from '@/fs/types';
+import type { Document, DocumentPatch, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import PageTemplate from '../PageTemplate.vue';
 import DClientPicker from '../DClientPicker.vue';
@@ -102,7 +102,7 @@ const props = defineProps<{
 const recipient = computed(() => props.doc.recipient);
 const meta = computed(() => props.doc.meta);
 
-function update(changes: Record<string, unknown>) {
+function update(changes: DocumentPatch) {
   if (!props.doc.number) return;
   store.updateDocument(props.doc.number, changes);
 }

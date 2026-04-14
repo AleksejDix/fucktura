@@ -118,4 +118,9 @@ export default {
   'VAT registered hint': 'Показывать столбец НДС и разбивку на счетах.',
   'VAT %': 'НДС %',
   'auto': 'авто',
+
+  // Error boundary
+  'Something went wrong': 'Что-то пошло не так',
+  'Retry': 'Повторить',
+  'Details': 'Подробности',
 };

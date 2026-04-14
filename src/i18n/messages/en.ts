@@ -118,4 +118,9 @@ export default {
   'VAT registered hint': 'Show VAT column and breakdown on invoices.',
   'VAT %': 'VAT %',
   'auto': 'auto',
+
+  // Error boundary
+  'Something went wrong': 'Something went wrong',
+  'Retry': 'Retry',
+  'Details': 'Details',
 };

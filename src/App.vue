@@ -4,7 +4,9 @@
       <DMenuBar @generate-pdf="printPage" class="col-span-2 print:hidden" />
       <DSidebar class="print:hidden" />
       <main class="overflow-auto print:bg-transparent space-y-4 print:space-y-0 p-4 print:p-0 pagination">
-        <router-view />
+        <DErrorBoundary>
+          <router-view />
+        </DErrorBoundary>
       </main>
       <DStatusBar class="col-span-2" />
     </div>
@@ -26,6 +28,7 @@ import DMenuBar from './components/DMenuBar.vue';
 import BootGate from './components/BootGate.vue';
 import DCommandPalette from './components/DCommandPalette.vue';
 import DStatusBar from './components/DStatusBar.vue';
+import DErrorBoundary from './components/DErrorBoundary.vue';
 
 const router = useRouter();
 const documentsStore = useDocumentsStore();

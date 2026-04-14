@@ -118,4 +118,9 @@ export default {
   'VAT registered hint': 'MwSt-Spalte und Aufstellung auf Rechnungen anzeigen.',
   'VAT %': 'MwSt %',
   'auto': 'auto',
+
+  // Error boundary
+  'Something went wrong': 'Etwas ist schiefgelaufen',
+  'Retry': 'Erneut versuchen',
+  'Details': 'Details',
 };

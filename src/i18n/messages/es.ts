@@ -118,4 +118,9 @@ export default {
   'VAT registered hint': 'Mostrar columna de IVA y desglose en facturas.',
   'VAT %': 'IVA %',
   'auto': 'auto',
+
+  // Error boundary
+  'Something went wrong': 'Algo salió mal',
+  'Retry': 'Reintentar',
+  'Details': 'Detalles',
 };

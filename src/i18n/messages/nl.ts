@@ -118,4 +118,9 @@ export default {
   'VAT registered hint': 'BTW-kolom en overzicht op facturen tonen.',
   'VAT %': 'BTW %',
   'auto': 'auto',
+
+  // Error boundary
+  'Something went wrong': 'Er ging iets mis',
+  'Retry': 'Opnieuw proberen',
+  'Details': 'Details',
 };
