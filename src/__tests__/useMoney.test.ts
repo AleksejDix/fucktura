@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { useMoney } from '@/composables/useMoney';
 
 describe('useMoney', () => {
-  const { chf, lineTotal, sumLineItems, sumAmounts, formatChf, formatChfFromNumber } = useMoney();
+  const { chf, lineTotal, sumLineItems, sumAmounts, formatChf, formatChfFromNumber, lineNet, lineVat, groupByVat, sumGross } = useMoney();
 
   describe('chf', () => {
     it('creates a dinero object from a number', () => {
@@ -108,6 +108,92 @@ describe('useMoney', () => {
 
     it('formats zero', () => {
       expect(formatChfFromNumber(0)).toBe('0.00');
+    });
+  });
+
+  describe('lineNet', () => {
+    it('returns qty * price', () => {
+      expect(lineNet(10, 29)).toBe(290);
+    });
+
+    it('rounds to 2 decimals', () => {
+      expect(lineNet(3, 19.999)).toBe(60);
+    });
+
+    it('handles zero', () => {
+      expect(lineNet(0, 100)).toBe(0);
+      expect(lineNet(5, 0)).toBe(0);
+    });
+  });
+
+  describe('lineVat', () => {
+    it('applies VAT at given rate', () => {
+      expect(lineVat(1, 1000, 8.1)).toBe(81);
+      expect(lineVat(1, 1000, 19)).toBe(190);
+      expect(lineVat(1, 1000, 0)).toBe(0);
+    });
+
+    it('rounds to cents', () => {
+      expect(lineVat(1, 100, 2.6)).toBe(2.6);
+    });
+  });
+
+  describe('groupByVat', () => {
+    it('groups lines by rate', () => {
+      const groups = groupByVat([
+        { quantity: 1, unitPrice: 1000, vatRate: 8.1 },
+        { quantity: 2, unitPrice: 500, vatRate: 8.1 },
+        { quantity: 1, unitPrice: 200, vatRate: 2.6 },
+      ]);
+      expect(groups).toHaveLength(2);
+      const standard = groups.find((g) => g.rate === 8.1)!;
+      expect(standard.net).toBe(2000);
+      expect(standard.vat).toBe(162);
+      expect(standard.gross).toBe(2162);
+      const reduced = groups.find((g) => g.rate === 2.6)!;
+      expect(reduced.net).toBe(200);
+      expect(reduced.vat).toBe(5.2);
+      expect(reduced.gross).toBe(205.2);
+    });
+
+    it('orders groups by rate ascending', () => {
+      const groups = groupByVat([
+        { quantity: 1, unitPrice: 100, vatRate: 19 },
+        { quantity: 1, unitPrice: 100, vatRate: 7 },
+        { quantity: 1, unitPrice: 100, vatRate: 0 },
+      ]);
+      expect(groups.map((g) => g.rate)).toEqual([0, 7, 19]);
+    });
+
+    it('treats missing vatRate as 0', () => {
+      const groups = groupByVat([{ quantity: 1, unitPrice: 100 }]);
+      expect(groups).toHaveLength(1);
+      expect(groups[0].rate).toBe(0);
+      expect(groups[0].vat).toBe(0);
+      expect(groups[0].gross).toBe(100);
+    });
+
+    it('returns empty array when no items', () => {
+      expect(groupByVat([])).toEqual([]);
+    });
+  });
+
+  describe('sumGross', () => {
+    it('returns net + vat across all rates', () => {
+      const total = sumGross([
+        { quantity: 1, unitPrice: 1000, vatRate: 8.1 },
+        { quantity: 1, unitPrice: 500, vatRate: 2.6 },
+      ]);
+      // 1000 * 1.081 + 500 * 1.026 = 1081 + 513 = 1594
+      expect(total).toBe(1594);
+    });
+
+    it('equals net when no VAT', () => {
+      expect(sumGross([{ quantity: 5, unitPrice: 100 }])).toBe(500);
+    });
+
+    it('returns 0 for empty', () => {
+      expect(sumGross([])).toBe(0);
     });
   });
 });

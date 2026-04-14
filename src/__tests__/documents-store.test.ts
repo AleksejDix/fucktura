@@ -167,4 +167,64 @@ describe('useDocumentsStore', () => {
       expect(store.activeSender).toBeNull();
     });
   });
+
+  describe('nextDocument / previousDocument', () => {
+    it('moves forward through the list', () => {
+      const store = useDocumentsStore();
+      store.documents = [
+        makeDoc({ number: 'R-1' }),
+        makeDoc({ number: 'R-2' }),
+        makeDoc({ number: 'R-3' }),
+      ];
+      store.activeDocumentNumber = 'R-1';
+      store.nextDocument();
+      expect(store.activeDocumentNumber).toBe('R-2');
+      store.nextDocument();
+      expect(store.activeDocumentNumber).toBe('R-3');
+    });
+
+    it('does not wrap past the end', () => {
+      const store = useDocumentsStore();
+      store.documents = [makeDoc({ number: 'R-1' }), makeDoc({ number: 'R-2' })];
+      store.activeDocumentNumber = 'R-2';
+      store.nextDocument();
+      expect(store.activeDocumentNumber).toBe('R-2');
+    });
+
+    it('moves backward through the list', () => {
+      const store = useDocumentsStore();
+      store.documents = [
+        makeDoc({ number: 'R-1' }),
+        makeDoc({ number: 'R-2' }),
+        makeDoc({ number: 'R-3' }),
+      ];
+      store.activeDocumentNumber = 'R-3';
+      store.previousDocument();
+      expect(store.activeDocumentNumber).toBe('R-2');
+    });
+
+    it('does not wrap past the start', () => {
+      const store = useDocumentsStore();
+      store.documents = [makeDoc({ number: 'R-1' }), makeDoc({ number: 'R-2' })];
+      store.activeDocumentNumber = 'R-1';
+      store.previousDocument();
+      expect(store.activeDocumentNumber).toBe('R-1');
+    });
+
+    it('jumps to first doc when none active', () => {
+      const store = useDocumentsStore();
+      store.documents = [makeDoc({ number: 'R-1' }), makeDoc({ number: 'R-2' })];
+      store.activeDocumentNumber = null;
+      store.nextDocument();
+      expect(store.activeDocumentNumber).toBe('R-1');
+    });
+
+    it('is a no-op when no documents', () => {
+      const store = useDocumentsStore();
+      store.documents = [];
+      store.nextDocument();
+      store.previousDocument();
+      expect(store.activeDocumentNumber).toBeNull();
+    });
+  });
 });
