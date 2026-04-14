@@ -102,4 +102,8 @@ export default {
   'Add line item': 'Añadir posición',
   'Clear line items': 'Borrar posiciones',
   'Reset recipient': 'Restablecer destinatario',
+
+  // Document menu
+  'Next document': 'Siguiente documento',
+  'Previous document': 'Documento anterior',
 };

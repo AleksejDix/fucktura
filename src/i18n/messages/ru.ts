@@ -102,4 +102,8 @@ export default {
   'Add line item': 'Добавить позицию',
   'Clear line items': 'Очистить позиции',
   'Reset recipient': 'Сбросить получателя',
+
+  // Document menu
+  'Next document': 'Следующий документ',
+  'Previous document': 'Предыдущий документ',
 };

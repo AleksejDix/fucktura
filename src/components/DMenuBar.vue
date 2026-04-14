@@ -149,6 +149,15 @@ function onKeydown(e: KeyboardEvent) {
   } else if (e.shiftKey && k === 'l' && store.activeDocument) {
     e.preventDefault();
     store.addLineItemToActive();
+  } else if (!e.shiftKey && e.key === ']') {
+    e.preventDefault();
+    store.nextDocument();
+  } else if (!e.shiftKey && e.key === '[') {
+    e.preventDefault();
+    store.previousDocument();
+  } else if (e.shiftKey && k === 'i' && isOfferte.value && store.activeDocument) {
+    e.preventDefault();
+    store.convertToInvoice(store.activeDocument.number);
   }
 }
 
@@ -496,11 +505,6 @@ const menus = computed<Menu[]>(() => [
       { label: t('New reminder'), action: () => store.createMahnung() },
       { label: t('New receipt'), action: () => store.createQuittung() },
       { separator: true },
-      { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.number), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
-      { separator: true, hidden: !hasActiveDoc.value },
-      { label: t('Clients'), action: () => router.push('/clients') },
-      { label: t('Positions'), action: () => router.push('/positions') },
-      { separator: true },
       { label: t('Print / PDF'), shortcut: '⌘P', action: () => emit('generate-pdf') },
       { label: t('Send email'), shortcut: '⌘⇧E', action: sendEmail, disabled: !hasActiveDoc.value, hidden: !hasActiveDoc.value },
     ],
@@ -522,9 +526,13 @@ const menus = computed<Menu[]>(() => [
     label: t('Document'),
     items: [
       { label: t('All documents'), action: () => store.setActive(null) },
+      { label: t('Next document'), shortcut: '⌘]', action: () => store.nextDocument(), disabled: store.documents.length < 2 },
+      { label: t('Previous document'), shortcut: '⌘[', action: () => store.previousDocument(), disabled: store.documents.length < 2 },
       { separator: true },
       ...statusItems(),
       { separator: true, hidden: !hasActiveDoc.value },
+      { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.number), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
+      { separator: true, hidden: !isOfferte.value || !hasActiveDoc.value },
       { label: t('Delete'), shortcut: '⌘⌫', action: () => store.activeDocument && store.deleteDocument(store.activeDocument.number), disabled: !hasActiveDoc.value, destructive: true },
     ],
   },
@@ -541,13 +549,6 @@ const menus = computed<Menu[]>(() => [
       { label: 'Español', action: () => setLocale('es'), checked: locale.value === 'es' },
       { label: 'Nederlands', action: () => setLocale('nl'), checked: locale.value === 'nl' },
       { label: 'Русский', action: () => setLocale('ru'), checked: locale.value === 'ru' },
-    ],
-  },
-  {
-    label: t('Window'),
-    items: [
-      { label: t('Minimize'), shortcut: '⌘M', action: () => { window.blur(); }, strikethrough: true },
-      { label: t('Full screen'), action: () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }, checked: !!document.fullscreenElement },
     ],
   },
   {

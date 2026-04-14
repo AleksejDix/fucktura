@@ -45,8 +45,12 @@ export const useDocumentsStore = defineStore('documents', () => {
     senders.value = snap.senders;
     clients.value = snap.clients;
     positions.value = snap.positions;
-    // newest first, by createdAt
-    documents.value = [...snap.documents].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    // newest first, by business date (meta.date)
+    documents.value = [...snap.documents].sort((a, b) => {
+      const da = new Date(a.meta.date).getTime();
+      const db = new Date(b.meta.date).getTime();
+      return db - da;
+    });
     if (!activeSenderKey.value && senders.value.length > 0) {
       activeSenderKey.value = senders.value[0].key;
     }
@@ -349,6 +353,28 @@ export const useDocumentsStore = defineStore('documents', () => {
     await updateDocument(doc.number, { lineItems: [] });
   }
 
+  function adjacentDocument(delta: 1 | -1): Document | null {
+    const docs = documents.value;
+    if (docs.length === 0) return null;
+    const current = activeDocumentNumber.value;
+    if (!current) return docs[0];
+    const i = docs.findIndex((d) => d.number === current);
+    if (i === -1) return docs[0];
+    const next = i + delta;
+    if (next < 0 || next >= docs.length) return null;
+    return docs[next];
+  }
+
+  function nextDocument() {
+    const doc = adjacentDocument(1);
+    if (doc) setActive(doc.number);
+  }
+
+  function previousDocument() {
+    const doc = adjacentDocument(-1);
+    if (doc) setActive(doc.number);
+  }
+
   async function resetRecipient() {
     const doc = activeDocument.value;
     if (!doc) return;
@@ -388,6 +414,8 @@ export const useDocumentsStore = defineStore('documents', () => {
     addLineItemToActive,
     clearLineItems,
     resetRecipient,
+    nextDocument,
+    previousDocument,
     setNavigator,
   };
 });

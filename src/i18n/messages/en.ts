@@ -102,4 +102,8 @@ export default {
   'Add line item': 'Add line item',
   'Clear line items': 'Clear line items',
   'Reset recipient': 'Reset recipient',
+
+  // Document menu
+  'Next document': 'Next document',
+  'Previous document': 'Previous document',
 };
