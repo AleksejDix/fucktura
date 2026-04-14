@@ -45,7 +45,6 @@
 
     <div class="flex items-center gap-2 px-3">
       <DModeToggle />
-      <DSaveIndicator />
       <select
         v-if="store.senders.length > 1"
         :value="store.activeSenderKey"
@@ -74,7 +73,6 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import DSaveIndicator from './DSaveIndicator.vue';
 import DModeToggle from './DModeToggle.vue';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
@@ -484,6 +482,8 @@ const menus = computed<Menu[]>(() => [
       { label: t('About Fucktura'), action: () => { showAbout.value = true; } },
       { separator: true },
       { label: t('Settings'), shortcut: '⌘,', action: () => router.push('/settings') },
+      { label: t('Clients'), action: () => router.push('/clients') },
+      { label: t('Positions'), action: () => router.push('/positions') },
     ],
   },
   {

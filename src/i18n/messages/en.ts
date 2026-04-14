@@ -106,4 +106,5 @@ export default {
   // Document menu
   'Next document': 'Next document',
   'Previous document': 'Previous document',
+  'documents': 'documents',
 };

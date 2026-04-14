@@ -23,15 +23,10 @@
       </p>
     </div>
 
-    <nav class="border-t border-gray-200 px-3 py-2 flex gap-4 text-[11px] text-gray-600">
-      <RouterLink to="/clients" class="hover:text-black" active-class="text-black font-medium">{{ $t('Clients') }}</RouterLink>
-      <RouterLink to="/positions" class="hover:text-black" active-class="text-black font-medium">{{ $t('Positions') }}</RouterLink>
-    </nav>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
 import type { Document } from '@/fs/types';
 import { DOC_TYPE_DOT_CLASS as dotClass } from '@/lib/documents';
 import { useDocumentsStore } from '@/stores/documents';
