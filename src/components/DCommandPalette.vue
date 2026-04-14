@@ -47,6 +47,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
 import { DOC_TYPE_DOT_CLASS as dotClass } from '@/lib/documents';
+import { documentHaystack } from '@/lib/search';
 import { useDocumentsStore } from '@/stores/documents';
 
 const store = useDocumentsStore();
@@ -59,17 +60,7 @@ const filtered = computed(() => {
   const q = query.value.trim().toLowerCase();
   const docs = store.documents;
   if (!q) return docs.slice(0, 20);
-  return docs.filter((d) => {
-    const hay = [
-      d.number,
-      d.subtitle,
-      d.recipient.company,
-      d.recipient.name,
-      d.customerNumber,
-      d.meta.customerNumber,
-    ].join(' ').toLowerCase();
-    return hay.includes(q);
-  }).slice(0, 50);
+  return docs.filter((d) => documentHaystack(d).includes(q)).slice(0, 50);
 });
 
 watch(open, async (v) => {

@@ -89,6 +89,8 @@ export interface Document {
   subtitle: string;
   /** Foreign key to Client.customerNumber (empty string if unassigned) */
   customerNumber: string;
+  /** Foreign key to Sender.key; optional for backward compat with pre-filter docs. */
+  senderKey?: string;
   sender: SenderSnapshot;
   recipient: Recipient;
   meta: DocumentMeta;
@@ -112,3 +114,12 @@ export interface RepoSnapshot {
 export type DocumentPatch = Partial<Omit<Document, 'meta' | 'number' | 'createdAt' | 'updatedAt'>> & {
   meta?: Partial<DocumentMeta>;
 };
+
+/** Smart views exposed in the collections sidebar. */
+export type ViewId =
+  | 'all'
+  | 'drafts'
+  | 'overdue'
+  | 'unpaid'
+  | `type:${DocumentType}`
+  | `sender:${string}`;

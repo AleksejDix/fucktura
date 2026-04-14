@@ -227,4 +227,207 @@ describe('useDocumentsStore', () => {
       expect(store.activeDocumentNumber).toBeNull();
     });
   });
+
+  describe('isOverdue', () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today.getTime() - 86400000).toISOString();
+    const tomorrow = new Date(today.getTime() + 86400000).toISOString();
+
+    it('returns false for paid invoices regardless of date', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'invoice', status: 'paid', meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday } });
+      expect(store.isOverdue(doc)).toBe(false);
+    });
+
+    it('returns true for unpaid invoice past its due date', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'invoice', status: 'sent', meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday } });
+      expect(store.isOverdue(doc)).toBe(true);
+    });
+
+    it('returns false for unpaid invoice with future due date', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'invoice', status: 'sent', meta: { date: today.toISOString(), contactPerson: '', customerNumber: '', dueDate: tomorrow } });
+      expect(store.isOverdue(doc)).toBe(false);
+    });
+
+    it('returns false for accepted offers past validUntil', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'offerte', status: 'accepted', meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday } });
+      expect(store.isOverdue(doc)).toBe(false);
+    });
+
+    it('returns false for rejected offers past validUntil', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'offerte', status: 'rejected', meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday } });
+      expect(store.isOverdue(doc)).toBe(false);
+    });
+
+    it('returns true for sent offer past validUntil', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'offerte', status: 'sent', meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday } });
+      expect(store.isOverdue(doc)).toBe(true);
+    });
+
+    it('returns false for mahnung with no overdueSince', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'mahnung', status: 'draft', meta: { date: yesterday, contactPerson: '', customerNumber: '' } });
+      expect(store.isOverdue(doc)).toBe(false);
+    });
+
+    it('returns false when due date is malformed', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'invoice', status: 'sent', meta: { date: '', contactPerson: '', customerNumber: '', dueDate: 'not-a-date' } });
+      expect(store.isOverdue(doc)).toBe(false);
+    });
+
+    it('returns false for quittung (no due concept)', () => {
+      const store = useDocumentsStore();
+      const doc = makeDoc({ type: 'quittung', status: 'paid' });
+      expect(store.isOverdue(doc)).toBe(false);
+    });
+  });
+
+  describe('filtered views', () => {
+    function seed(store: ReturnType<typeof useDocumentsStore>) {
+      store.senders = [makeSender('dix', { company: 'Acme Consulting', uid: 'CHE-1' }), makeSender('gs', { company: 'Demo Studio', uid: 'DE-1' })];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today.getTime() - 86400000).toISOString();
+      const tomorrow = new Date(today.getTime() + 86400000).toISOString();
+      store.documents = [
+        makeDoc({ number: 'R-1', type: 'invoice', status: 'draft', senderKey: 'dix' }),
+        makeDoc({ number: 'R-2', type: 'invoice', status: 'sent', senderKey: 'dix', meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday } }),
+        makeDoc({ number: 'R-3', type: 'invoice', status: 'paid', senderKey: 'gs', meta: { date: yesterday, contactPerson: '', customerNumber: '', dueDate: yesterday } }),
+        makeDoc({ number: 'O-1', type: 'offerte', status: 'draft', senderKey: 'gs', meta: { date: today.toISOString(), contactPerson: '', customerNumber: '', validUntil: tomorrow } }),
+        makeDoc({ number: 'Q-1', type: 'quittung', status: 'paid', senderKey: 'dix' }),
+      ];
+    }
+
+    it('"all" view returns every document', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      store.setView('all');
+      expect(store.filteredDocuments.map((d) => d.number)).toHaveLength(5);
+    });
+
+    it('"drafts" view returns only draft-status docs', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      store.setView('drafts');
+      expect(store.filteredDocuments.map((d) => d.number).sort()).toEqual(['O-1', 'R-1']);
+    });
+
+    it('"overdue" view returns unpaid invoice past its due date', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      store.setView('overdue');
+      expect(store.filteredDocuments.map((d) => d.number)).toEqual(['R-2']);
+    });
+
+    it('"unpaid" view returns non-paid invoices only', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      store.setView('unpaid');
+      expect(store.filteredDocuments.map((d) => d.number).sort()).toEqual(['R-1', 'R-2']);
+    });
+
+    it('type view returns docs of that type', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      store.setView('type:offerte');
+      expect(store.filteredDocuments.map((d) => d.number)).toEqual(['O-1']);
+    });
+
+    it('sender view returns docs for that sender key', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      store.setView('sender:gs');
+      expect(store.filteredDocuments.map((d) => d.number).sort()).toEqual(['O-1', 'R-3']);
+    });
+
+    it('status pill narrows the view further', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      store.setView('type:invoice');
+      store.activeStatusPill = 'paid';
+      expect(store.filteredDocuments.map((d) => d.number)).toEqual(['R-3']);
+    });
+
+    it('quick search filters by subtitle / number / recipient', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      store.documents = store.documents.map((d) =>
+        d.number === 'R-1' ? { ...d, subtitle: 'Accessibility Testing' } : d,
+      );
+      store.setView('all');
+      store.quickSearch = 'vpat';
+      expect(store.filteredDocuments.map((d) => d.number)).toEqual(['R-1']);
+    });
+
+    it('viewCount reports correct totals', () => {
+      const store = useDocumentsStore();
+      seed(store);
+      expect(store.viewCount('all')).toBe(5);
+      expect(store.viewCount('drafts')).toBe(2);
+      expect(store.viewCount('unpaid')).toBe(2);
+      expect(store.viewCount('overdue')).toBe(1);
+      expect(store.viewCount('type:invoice')).toBe(3);
+      expect(store.viewCount('sender:dix')).toBe(3);
+    });
+  });
+
+  describe('setView', () => {
+    it('selecting a sender view sets activeSenderKey', () => {
+      const store = useDocumentsStore();
+      store.senders = [makeSender('dix'), makeSender('gs')];
+      store.setView('sender:gs');
+      expect(store.activeSenderKey).toBe('gs');
+    });
+
+    it('selecting a non-sender view does not reset activeSenderKey', () => {
+      const store = useDocumentsStore();
+      store.activeSenderKey = 'dix';
+      store.setView('drafts');
+      expect(store.activeSenderKey).toBe('dix');
+    });
+
+    it('clears any active status pill', () => {
+      const store = useDocumentsStore();
+      store.activeStatusPill = 'paid';
+      store.setView('type:invoice');
+      expect(store.activeStatusPill).toBeNull();
+    });
+  });
+
+  describe('resolveSenderKey', () => {
+    it('returns stored senderKey when present', () => {
+      const store = useDocumentsStore();
+      store.senders = [makeSender('dix')];
+      const doc = makeDoc({ senderKey: 'dix' });
+      expect(store.resolveSenderKey(doc)).toBe('dix');
+    });
+
+    it('falls back to matching company + uid on legacy docs without senderKey', () => {
+      const store = useDocumentsStore();
+      store.senders = [
+        makeSender('dix', { company: 'Acme Consulting', uid: 'CHE-1' }),
+        makeSender('gs', { company: 'Demo Studio', uid: 'DE-1' }),
+      ];
+      const legacy = makeDoc({
+        sender: { ...fakeSenderSnap, company: 'Demo Studio', uid: 'DE-1' },
+      });
+      delete (legacy as Partial<Document>).senderKey;
+      expect(store.resolveSenderKey(legacy)).toBe('gs');
+    });
+
+    it('returns null when no sender matches', () => {
+      const store = useDocumentsStore();
+      store.senders = [makeSender('dix', { company: 'Dix', uid: 'A' })];
+      const doc = makeDoc({ sender: { ...fakeSenderSnap, company: 'Unknown', uid: 'Z' } });
+      delete (doc as Partial<Document>).senderKey;
+      expect(store.resolveSenderKey(doc)).toBeNull();
+    });
+  });
 });

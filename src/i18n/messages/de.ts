@@ -125,4 +125,21 @@ export default {
   'Something went wrong': 'Etwas ist schiefgelaufen',
   'Retry': 'Erneut versuchen',
   'Details': 'Details',
+
+  // Filtering
+  'Sender': 'Absender',
+  'All senders': 'Alle Absender',
+  'Recipient': 'Empfänger',
+  'All recipients': 'Alle Empfänger',
+  'Type': 'Typ',
+  'All types': 'Alle Typen',
+  'Status': 'Status',
+  'Any status': 'Jeder Status',
+
+  // Collections sidebar
+  'Types': 'Typen',
+  'Senders': 'Absender',
+  'Overdue': 'Überfällig',
+  'Unpaid': 'Unbezahlt',
+  'Quick search': 'Schnellsuche',
 };

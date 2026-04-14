@@ -1,7 +1,8 @@
 import * as repo from '@/fs/repo';
-import type { Client, Document, DocumentPatch, DocumentStatus, Position, Sender, SenderSnapshot } from '@/fs/types';
+import type { Client, Document, DocumentPatch, DocumentStatus, Position, Sender, SenderSnapshot, ViewId } from '@/fs/types';
 import { defaultUnitForType, numberPrefix } from '@/lib/documents';
 import { defaultVatRate as countryDefaultVatRate } from '@/lib/vat';
+import { documentHaystack } from '@/lib/search';
 import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
@@ -11,9 +12,42 @@ export const useDocumentsStore = defineStore('documents', () => {
   const clients = ref<Client[]>([]);
   const senders = ref<Sender[]>([]);
   const positions = ref<Position[]>([]);
+  /** Creation default — which sender a new doc should use. */
   const activeSenderKey = ref<string | null>(null);
+  /** Mail-style smart view for the document list. */
+  const activeView = ref<ViewId>('all');
+  /** Status sub-filter applied within the current view. null = all. */
+  const activeStatusPill = ref<DocumentStatus | null>(null);
+  /** Quick-search text filtered against the current view. */
+  const quickSearch = ref('');
   const loading = ref(true);
   const activeDocumentNumber = ref<string | null>(null);
+
+  function isOverdue(doc: Document): boolean {
+    if (doc.type === 'invoice' && doc.status === 'paid') return false;
+    if (doc.type === 'offerte' && (doc.status === 'accepted' || doc.status === 'rejected')) return false;
+    const due =
+      doc.type === 'invoice' ? doc.meta.dueDate
+      : doc.type === 'offerte' ? doc.meta.validUntil
+      : doc.type === 'mahnung' ? doc.meta.overdueSince
+      : null;
+    if (!due) return false;
+    const d = new Date(due);
+    if (isNaN(d.getTime())) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return d < today;
+  }
+
+  function viewMatches(doc: Document, view: ViewId): boolean {
+    if (view === 'all') return true;
+    if (view === 'drafts') return doc.status === 'draft';
+    if (view === 'overdue') return isOverdue(doc);
+    if (view === 'unpaid') return doc.type === 'invoice' && doc.status !== 'paid';
+    if (view.startsWith('type:')) return doc.type === view.slice(5);
+    if (view.startsWith('sender:')) return resolveSenderKey(doc) === view.slice(7);
+    return true;
+  }
 
   const activeDocument = computed(() =>
     activeDocumentNumber.value
@@ -21,11 +55,59 @@ export const useDocumentsStore = defineStore('documents', () => {
       : null,
   );
 
+  /** Resolves which sender owns a document — uses senderKey if set, else matches the snapshot. */
+  function resolveSenderKey(doc: Document): string | null {
+    if (doc.senderKey) return doc.senderKey;
+    const match = senders.value.find(
+      (s) => s.company === doc.sender.company && s.uid === doc.sender.uid,
+    );
+    return match?.key ?? null;
+  }
+
+  const viewFilteredDocuments = computed(() => {
+    const v = activeView.value;
+    return v === 'all' ? documents.value : documents.value.filter((d) => viewMatches(d, v));
+  });
+
+  const filteredDocuments = computed(() => {
+    const pill = activeStatusPill.value;
+    const q = quickSearch.value.trim().toLowerCase();
+    return viewFilteredDocuments.value.filter((d) => {
+      if (pill && d.status !== pill) return false;
+      if (q && !documentHaystack(d).includes(q)) return false;
+      return true;
+    });
+  });
+
   const visibleDocuments = computed(() =>
     activeDocumentNumber.value
-      ? documents.value.filter((d) => d.number === activeDocumentNumber.value)
-      : documents.value,
+      ? filteredDocuments.value.filter((d) => d.number === activeDocumentNumber.value)
+      : filteredDocuments.value,
   );
+
+  function viewCount(id: ViewId): number {
+    return documents.value.filter((d) => viewMatches(d, id)).length;
+  }
+
+  /** Status pills that make sense for the current view. */
+  const statusPillsForView = computed<DocumentStatus[]>(() => {
+    const v = activeView.value;
+    if (v === 'drafts' || v === 'overdue' || v === 'unpaid') return [];
+    if (v === 'type:offerte') return ['draft', 'sent', 'accepted', 'rejected'];
+    if (v === 'type:invoice') return ['draft', 'sent', 'paid'];
+    if (v === 'type:mahnung') return ['draft', 'sent'];
+    if (v === 'type:quittung') return [];
+    return ['draft', 'sent', 'paid', 'accepted', 'rejected'];
+  });
+
+  /** Switch view and reset the status pill and active-sender context appropriately. */
+  function setView(id: ViewId) {
+    activeView.value = id;
+    activeStatusPill.value = null;
+    if (id.startsWith('sender:')) {
+      activeSenderKey.value = id.slice(7);
+    }
+  }
 
   const grouped = computed(() => ({
     offerte: documents.value.filter((d) => d.type === 'offerte'),
@@ -51,9 +133,6 @@ export const useDocumentsStore = defineStore('documents', () => {
       if (db !== da) return db - da;
       return b.number.localeCompare(a.number);
     });
-    if (!activeSenderKey.value && senders.value.length > 0) {
-      activeSenderKey.value = senders.value[0].key;
-    }
     loading.value = false;
   }
 
@@ -119,6 +198,7 @@ export const useDocumentsStore = defineStore('documents', () => {
       number: generateNumber('O'),
       subtitle: '',
       customerNumber: customerNumber ?? '',
+      senderKey: s.key,
       sender: senderSnapshot(s),
       recipient: {
         company: client?.company ?? '',
@@ -149,6 +229,7 @@ export const useDocumentsStore = defineStore('documents', () => {
       number: generateNumber('R'),
       subtitle: '',
       customerNumber: customerNumber ?? '',
+      senderKey: s.key,
       sender: senderSnapshot(s),
       recipient: {
         company: client?.company ?? '',
@@ -179,6 +260,7 @@ export const useDocumentsStore = defineStore('documents', () => {
       number: generateNumber('Q'),
       subtitle: '',
       customerNumber: customerNumber ?? '',
+      senderKey: s.key,
       sender: senderSnapshot(s),
       recipient: {
         company: client?.company ?? '',
@@ -210,6 +292,7 @@ export const useDocumentsStore = defineStore('documents', () => {
       number: generateNumber('M'),
       subtitle: '',
       customerNumber: customerNumber ?? '',
+      senderKey: s.key,
       sender: senderSnapshot(s),
       recipient: {
         company: client?.company ?? '',
@@ -245,6 +328,7 @@ export const useDocumentsStore = defineStore('documents', () => {
       number: generateNumber('R'),
       subtitle: offerte.subtitle,
       customerNumber: offerte.customerNumber,
+      senderKey: offerte.senderKey ?? s?.key,
       sender: { ...offerte.sender },
       recipient: { ...offerte.recipient },
       meta: {
@@ -436,12 +520,21 @@ export const useDocumentsStore = defineStore('documents', () => {
     senders,
     positions,
     activeSenderKey,
+    activeView,
+    activeStatusPill,
+    quickSearch,
+    statusPillsForView,
+    setView,
+    viewCount,
+    isOverdue,
     activeSender,
     loading,
     activeDocumentNumber,
     activeDocument,
+    filteredDocuments,
     visibleDocuments,
     grouped,
+    resolveSenderKey,
     load,
     setActive,
     addDocument,

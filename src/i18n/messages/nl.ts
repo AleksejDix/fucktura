@@ -125,4 +125,21 @@ export default {
   'Something went wrong': 'Er ging iets mis',
   'Retry': 'Opnieuw proberen',
   'Details': 'Details',
+
+  // Filtering
+  'Sender': 'Afzender',
+  'All senders': 'Alle afzenders',
+  'Recipient': 'Ontvanger',
+  'All recipients': 'Alle ontvangers',
+  'Type': 'Type',
+  'All types': 'Alle types',
+  'Status': 'Status',
+  'Any status': 'Elke status',
+
+  // Collections sidebar
+  'Types': 'Types',
+  'Senders': 'Afzenders',
+  'Overdue': 'Vervallen',
+  'Unpaid': 'Onbetaald',
+  'Quick search': 'Snel zoeken',
 };

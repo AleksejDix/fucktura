@@ -125,4 +125,21 @@ export default {
   'Something went wrong': 'Что-то пошло не так',
   'Retry': 'Повторить',
   'Details': 'Подробности',
+
+  // Filtering
+  'Sender': 'Отправитель',
+  'All senders': 'Все отправители',
+  'Recipient': 'Получатель',
+  'All recipients': 'Все получатели',
+  'Type': 'Тип',
+  'All types': 'Все типы',
+  'Status': 'Статус',
+  'Any status': 'Любой статус',
+
+  // Collections sidebar
+  'Types': 'Типы',
+  'Senders': 'Отправители',
+  'Overdue': 'Просрочено',
+  'Unpaid': 'Не оплачено',
+  'Quick search': 'Быстрый поиск',
 };

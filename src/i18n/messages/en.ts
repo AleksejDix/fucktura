@@ -125,4 +125,21 @@ export default {
   'Something went wrong': 'Something went wrong',
   'Retry': 'Retry',
   'Details': 'Details',
+
+  // Filtering
+  'Sender': 'Sender',
+  'All senders': 'All senders',
+  'Recipient': 'Recipient',
+  'All recipients': 'All recipients',
+  'Type': 'Type',
+  'All types': 'All types',
+  'Status': 'Status',
+  'Any status': 'Any status',
+
+  // Collections sidebar
+  'Types': 'Types',
+  'Senders': 'Senders',
+  'Overdue': 'Overdue',
+  'Unpaid': 'Unpaid',
+  'Quick search': 'Quick search',
 };

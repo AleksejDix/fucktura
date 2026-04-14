@@ -1,14 +1,15 @@
 <template>
   <BootGate>
-    <div v-if="!documentsStore.loading" class="h-screen print:h-auto grid grid-cols-[20rem_1fr] grid-rows-[2rem_1fr_1.5rem] print:grid-cols-1 print:grid-rows-1">
-      <DMenuBar @generate-pdf="printPage" class="col-span-2 print:hidden" />
+    <div v-if="!documentsStore.loading" class="h-screen print:h-auto grid grid-cols-[11rem_20rem_1fr] grid-rows-[2rem_1fr_1.5rem] print:grid-cols-1 print:grid-rows-1">
+      <DMenuBar @generate-pdf="printPage" class="col-span-3 print:hidden" />
+      <DCollectionsSidebar class="print:hidden" />
       <DSidebar class="print:hidden" />
       <main class="overflow-auto print:bg-transparent space-y-4 print:space-y-0 p-4 print:p-0 pagination">
         <DErrorBoundary>
           <router-view />
         </DErrorBoundary>
       </main>
-      <DStatusBar class="col-span-2" />
+      <DStatusBar class="col-span-3" />
     </div>
     <main v-else>
       <h2>{{ $t('Loading') }}</h2>
@@ -29,6 +30,7 @@ import BootGate from './components/BootGate.vue';
 import DCommandPalette from './components/DCommandPalette.vue';
 import DStatusBar from './components/DStatusBar.vue';
 import DErrorBoundary from './components/DErrorBoundary.vue';
+import DCollectionsSidebar from './components/DCollectionsSidebar.vue';
 
 const router = useRouter();
 const documentsStore = useDocumentsStore();

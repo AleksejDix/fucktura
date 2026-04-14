@@ -17,7 +17,7 @@
       </template>
       <template v-else>
         <span class="text-gray-300">·</span>
-        <span class="shrink-0">{{ store.documents.length }} {{ $t('documents') }}</span>
+        <span class="shrink-0">{{ store.filteredDocuments.length }} {{ $t('documents') }}</span>
       </template>
     </div>
 

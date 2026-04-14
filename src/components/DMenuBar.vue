@@ -8,12 +8,16 @@
     >
       <button
         @click="toggleMenu(menu.label)"
-        class="h-full px-3 flex items-center transition-colors"
+        class="h-full px-4 flex items-center transition-colors"
         :class="[
+          menu.label === 'Fucktura' ? 'w-[11rem] border-r border-gray-200' : '',
           menu.bold ? 'font-bold' : '',
           openMenu === menu.label ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-100',
         ]"
-      >{{ menu.label }}</button>
+      >
+        <DLogo v-if="menu.label === 'Fucktura'" />
+        <template v-else>{{ menu.label }}</template>
+      </button>
 
       <div
         v-if="openMenu === menu.label"
@@ -45,15 +49,6 @@
 
     <div class="flex items-center gap-2 px-3">
       <DModeToggle />
-      <select
-        v-if="store.senders.length > 1"
-        :value="store.activeSenderKey"
-        @change="store.activeSenderKey = ($event.target as HTMLSelectElement).value"
-        class="bg-transparent text-[12px] text-gray-600 border-none focus:outline-none cursor-pointer"
-      >
-        <option v-for="s in store.senders" :key="s.key" :value="s.key">{{ s.company }}</option>
-      </select>
-      <span v-else-if="store.activeSender" class="text-[12px] text-gray-500">{{ store.activeSender.company }}</span>
     </div>
     <Teleport to="body">
       <div v-if="showAbout" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30" @click.self="showAbout = false">
@@ -74,6 +69,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import DModeToggle from './DModeToggle.vue';
+import DLogo from './DLogo.vue';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
 import { useModeStore } from '@/stores/mode';
