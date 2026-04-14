@@ -44,6 +44,7 @@
     <div class="flex-1" />
 
     <div class="flex items-center gap-2 px-3">
+      <DModeToggle />
       <DSaveIndicator />
       <select
         v-if="store.senders.length > 1"
@@ -74,6 +75,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import DSaveIndicator from './DSaveIndicator.vue';
+import DModeToggle from './DModeToggle.vue';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
 import { useModeStore } from '@/stores/mode';
@@ -525,8 +527,6 @@ const menus = computed<Menu[]>(() => [
       { label: 'Español', action: () => setLocale('es'), checked: locale.value === 'es' },
       { label: 'Nederlands', action: () => setLocale('nl'), checked: locale.value === 'nl' },
       { label: 'Русский', action: () => setLocale('ru'), checked: locale.value === 'ru' },
-      { separator: true },
-      { label: t('Edit mode'), action: () => { modeStore.mode = modeStore.mode === 'edit' ? 'read' : 'edit'; }, checked: modeStore.mode === 'edit' },
     ],
   },
   {
