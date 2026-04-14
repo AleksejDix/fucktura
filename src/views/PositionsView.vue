@@ -1,5 +1,7 @@
 <template>
-  <div class="w-[210mm] mx-auto py-8 px-[26mm] bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none my-4">
+  <div
+    class="w-[210mm] mx-auto py-8 px-[26mm] bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none my-4"
+  >
     <p class="text-[14pt] font-bold text-gray-900 mb-6">{{ $t('Positions') }}</p>
 
     <div class="space-y-2">
@@ -9,7 +11,9 @@
         class="grid grid-cols-[1fr_120px_50px_60px_80px_24px] gap-2 items-end text-[9pt]"
       >
         <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Description') }}</label>
+          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
+            $t('Description')
+          }}</label>
           <input
             v-model="pos.description"
             @blur="save"
@@ -17,7 +21,9 @@
           />
         </div>
         <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Product code') }}</label>
+          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
+            $t('Product code')
+          }}</label>
           <input
             v-model="pos.code"
             @blur="save"
@@ -25,7 +31,9 @@
           />
         </div>
         <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Unit') }}</label>
+          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
+            $t('Unit')
+          }}</label>
           <input
             v-model="pos.unit"
             @blur="save"
@@ -34,7 +42,9 @@
           />
         </div>
         <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('VAT %') }}</label>
+          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
+            $t('VAT %')
+          }}</label>
           <input
             :value="pos.defaultVatRate ?? ''"
             :placeholder="$t('auto')"
@@ -45,7 +55,9 @@
           />
         </div>
         <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Default price') }}</label>
+          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
+            $t('Default price')
+          }}</label>
           <input
             :value="pos.defaultPrice"
             @blur="updatePrice(pos, ($event.target as HTMLInputElement).value)"
@@ -54,14 +66,18 @@
             class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 font-mono text-right focus:outline-none focus:border-gray-900"
           />
         </div>
-        <button @click="deletePosition(pos.id)" class="text-gray-300 hover:text-red-500 pb-1.5">&times;</button>
+        <button @click="deletePosition(pos.id)" class="text-gray-300 hover:text-red-500 pb-1.5">
+          &times;
+        </button>
       </div>
     </div>
 
     <button
       @click="addPosition"
       class="mt-6 px-4 py-2 text-[9pt] bg-black text-white hover:bg-gray-800 transition-colors"
-    >+ {{ $t('Add position') }}</button>
+    >
+      + {{ $t('Add position') }}
+    </button>
   </div>
 </template>
 
@@ -79,7 +95,7 @@ const { t } = useI18n();
 const positions = ref<Position[]>([]);
 
 function reload() {
-  positions.value = documentsStore.positions.map(p => ({ ...p }));
+  positions.value = documentsStore.positions.map((p) => ({ ...p }));
 }
 
 onMounted(reload);
@@ -117,7 +133,7 @@ async function deletePosition(id: string) {
     destructive: true,
   });
   if (!ok) return;
-  positions.value = positions.value.filter(p => p.id !== id);
+  positions.value = positions.value.filter((p) => p.id !== id);
   await save();
 }
 </script>

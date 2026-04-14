@@ -7,11 +7,15 @@
         <button
           @click="retry"
           class="px-3 py-1.5 bg-black text-white hover:bg-gray-800 transition-colors"
-        >{{ $t('Retry') }}</button>
+        >
+          {{ $t('Retry') }}
+        </button>
         <button
           @click="goHome"
           class="px-3 py-1.5 border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
-        >{{ $t('All documents') }}</button>
+        >
+          {{ $t('All documents') }}
+        </button>
       </div>
       <details v-if="error.stack" class="text-gray-400 text-[8pt]">
         <summary class="cursor-pointer">{{ $t('Details') }}</summary>
@@ -38,9 +42,12 @@ onErrorCaptured((e) => {
   return false;
 });
 
-watch(() => route.fullPath, () => {
-  error.value = null;
-});
+watch(
+  () => route.fullPath,
+  () => {
+    error.value = null;
+  },
+);
 
 function retry() {
   error.value = null;

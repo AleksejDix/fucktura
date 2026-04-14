@@ -1,5 +1,14 @@
 import * as repo from '@/fs/repo';
-import type { Client, Document, DocumentPatch, DocumentStatus, Position, Sender, SenderSnapshot, ViewId } from '@/fs/types';
+import type {
+  Client,
+  Document,
+  DocumentPatch,
+  DocumentStatus,
+  Position,
+  Sender,
+  SenderSnapshot,
+  ViewId,
+} from '@/fs/types';
 import { defaultUnitForType, numberPrefix } from '@/lib/documents';
 import { defaultVatRate as countryDefaultVatRate } from '@/lib/vat';
 import { documentHaystack } from '@/lib/search';
@@ -25,12 +34,16 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   function isOverdue(doc: Document): boolean {
     if (doc.type === 'invoice' && doc.status === 'paid') return false;
-    if (doc.type === 'offerte' && (doc.status === 'accepted' || doc.status === 'rejected')) return false;
+    if (doc.type === 'offerte' && (doc.status === 'accepted' || doc.status === 'rejected'))
+      return false;
     const due =
-      doc.type === 'invoice' ? doc.meta.dueDate
-      : doc.type === 'offerte' ? doc.meta.validUntil
-      : doc.type === 'mahnung' ? doc.meta.overdueSince
-      : null;
+      doc.type === 'invoice'
+        ? doc.meta.dueDate
+        : doc.type === 'offerte'
+          ? doc.meta.validUntil
+          : doc.type === 'mahnung'
+            ? doc.meta.overdueSince
+            : null;
     if (!due) return false;
     const d = new Date(due);
     if (isNaN(d.getTime())) return false;
@@ -51,7 +64,7 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   const activeDocument = computed(() =>
     activeDocumentNumber.value
-      ? documents.value.find((d) => d.number === activeDocumentNumber.value) ?? null
+      ? (documents.value.find((d) => d.number === activeDocumentNumber.value) ?? null)
       : null,
   );
 
@@ -118,15 +131,19 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   const activeSender = computed(() =>
     activeSenderKey.value
-      ? senders.value.find((s) => s.key === activeSenderKey.value) ?? senders.value[0] ?? null
-      : senders.value[0] ?? null,
+      ? (senders.value.find((s) => s.key === activeSenderKey.value) ?? senders.value[0] ?? null)
+      : (senders.value[0] ?? null),
   );
 
   async function load() {
     const snap = await repo.loadAll();
     senders.value = [...snap.senders].sort((a, b) => a.key.localeCompare(b.key));
-    clients.value = [...snap.clients].sort((a, b) => a.customerNumber.localeCompare(b.customerNumber));
-    positions.value = [...snap.positions].sort((a, b) => a.description.localeCompare(b.description));
+    clients.value = [...snap.clients].sort((a, b) =>
+      a.customerNumber.localeCompare(b.customerNumber),
+    );
+    positions.value = [...snap.positions].sort((a, b) =>
+      a.description.localeCompare(b.description),
+    );
     documents.value = [...snap.documents].sort((a, b) => {
       const da = new Date(a.meta.date).getTime();
       const db = new Date(b.meta.date).getTime();
@@ -214,7 +231,19 @@ export const useDocumentsStore = defineStore('documents', () => {
         contactPerson: s.contact ?? '',
         customerNumber: client?.customerNumber ?? '',
       },
-      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0, vatRate: s.vatRegistered ? countryDefaultVatRate(s.country ?? '', today.toISOString()) : 0 }],
+      lineItems: [
+        {
+          pos: 1,
+          description: '',
+          code: '',
+          quantity: 1,
+          unit: 'h',
+          unitPrice: 0,
+          vatRate: s.vatRegistered
+            ? countryDefaultVatRate(s.country ?? '', today.toISOString())
+            : 0,
+        },
+      ],
     });
   }
 
@@ -245,7 +274,19 @@ export const useDocumentsStore = defineStore('documents', () => {
         contactPerson: s.contact ?? '',
         customerNumber: client?.customerNumber ?? '',
       },
-      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0, vatRate: s.vatRegistered ? countryDefaultVatRate(s.country ?? '', today.toISOString()) : 0 }],
+      lineItems: [
+        {
+          pos: 1,
+          description: '',
+          code: '',
+          quantity: 1,
+          unit: 'h',
+          unitPrice: 0,
+          vatRate: s.vatRegistered
+            ? countryDefaultVatRate(s.country ?? '', today.toISOString())
+            : 0,
+        },
+      ],
     });
   }
 
@@ -275,7 +316,19 @@ export const useDocumentsStore = defineStore('documents', () => {
         contactPerson: s.contact ?? '',
         customerNumber: client?.customerNumber ?? '',
       },
-      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'Pauschal', unitPrice: 0, vatRate: s.vatRegistered ? countryDefaultVatRate(s.country ?? '', today.toISOString()) : 0 }],
+      lineItems: [
+        {
+          pos: 1,
+          description: '',
+          code: '',
+          quantity: 1,
+          unit: 'Pauschal',
+          unitPrice: 0,
+          vatRate: s.vatRegistered
+            ? countryDefaultVatRate(s.country ?? '', today.toISOString())
+            : 0,
+        },
+      ],
     });
   }
 
@@ -509,7 +562,14 @@ export const useDocumentsStore = defineStore('documents', () => {
     if (!doc) return;
     await updateDocument(doc.number, {
       customerNumber: '',
-      recipient: { company: '', name: '', street: '', zip: '', city: '', country: doc.recipient.country ?? '' },
+      recipient: {
+        company: '',
+        name: '',
+        street: '',
+        zip: '',
+        city: '',
+        country: doc.recipient.country ?? '',
+      },
       meta: { customerNumber: '' },
     });
   }

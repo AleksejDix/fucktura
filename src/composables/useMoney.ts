@@ -1,7 +1,11 @@
 import { dinero, add, multiply, toDecimal } from 'dinero.js';
 import { CHF } from 'dinero.js';
 
-interface VatLine { quantity: number; unitPrice: number; vatRate?: number }
+interface VatLine {
+  quantity: number;
+  unitPrice: number;
+  vatRate?: number;
+}
 
 export function useMoney() {
   function chf(amount: number) {
@@ -48,12 +52,14 @@ export function useMoney() {
   }
 
   /** Group lines by VAT rate; for each rate return {net, vat, gross}. */
-  function groupByVat(items: VatLine[]): Array<{ rate: number; net: number; vat: number; gross: number }> {
+  function groupByVat(
+    items: VatLine[],
+  ): Array<{ rate: number; net: number; vat: number; gross: number }> {
     const byRate = new Map<number, { net: number; vat: number }>();
     for (const item of items) {
       const rate = item.vatRate ?? 0;
       const net = lineNet(item.quantity, item.unitPrice);
-      const vat = (rate > 0) ? Math.round(net * rate) / 100 : 0;
+      const vat = rate > 0 ? Math.round(net * rate) / 100 : 0;
       const prev = byRate.get(rate) ?? { net: 0, vat: 0 };
       byRate.set(rate, { net: prev.net + net, vat: prev.vat + vat });
     }

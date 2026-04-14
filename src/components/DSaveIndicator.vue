@@ -2,7 +2,7 @@
   <div
     class="grid gap-[1px] p-[1px] bg-black/5 rounded-[1px]"
     :class="active ? 'opacity-100' : 'opacity-40'"
-    style="grid-template-columns: repeat(4, 2px); grid-template-rows: repeat(4, 2px);"
+    style="grid-template-columns: repeat(4, 2px); grid-template-rows: repeat(4, 2px)"
     :title="active ? 'Saving…' : 'Saved'"
   >
     <span

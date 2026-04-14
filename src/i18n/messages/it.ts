@@ -1,16 +1,16 @@
 export default {
-  'Loading': 'Caricamento...',
-  'Edit': 'Modifica',
-  'Page': 'Pagina',
+  Loading: 'Caricamento...',
+  Edit: 'Modifica',
+  Page: 'Pagina',
 
   // Sidebar
-  'Offerten': 'Preventivi',
-  'Rechnungen': 'Fatture',
-  'Mahnungen': 'Solleciti',
+  Offerten: 'Preventivi',
+  Rechnungen: 'Fatture',
+  Mahnungen: 'Solleciti',
   'New Offerte': 'Nuovo preventivo',
   'Convert to invoice': 'Convertire in fattura',
   'All documents': 'Tutti i documenti',
-  'Delete': 'Elimina',
+  Delete: 'Elimina',
   'No documents': 'Nessun documento',
   'Select client': 'Seleziona cliente',
 };

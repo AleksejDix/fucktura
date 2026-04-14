@@ -42,8 +42,18 @@ const bundledDocuments = import.meta.glob('@/data/documents/*.json', {
 }) as Record<string, RawDocument>;
 
 const globalPositionsCatalog: Omit<Position, 'id'>[] = [
-  { description: 'Consulting', code: '6220', unit: 'h', defaultPrice: 29 },
-  { description: 'Consulting', code: '6221', unit: 'h', defaultPrice: 29 },
+  {
+    description: 'Consulting',
+    code: '6220',
+    unit: 'h',
+    defaultPrice: 29,
+  },
+  {
+    description: 'Consulting',
+    code: '6221',
+    unit: 'h',
+    defaultPrice: 29,
+  },
   { description: 'Consulting', code: '6222', unit: 'h', defaultPrice: 29 },
   { description: 'Consulting', code: '6223', unit: 'h', defaultPrice: 29 },
   { description: 'Consulting', code: '6224', unit: 'h', defaultPrice: 29 },
@@ -70,18 +80,20 @@ export async function seedFromBundled(): Promise<void> {
   }
 
   // 2. Positions catalog — assign nanoid
-  const positions: Position[] = globalPositionsCatalog.map(p => ({ id: nanoid(8), ...p }));
+  const positions: Position[] = globalPositionsCatalog.map((p) => ({ id: nanoid(8), ...p }));
   const positionIdByDescription = new Map<string, string>();
-  positions.forEach(p => positionIdByDescription.set(p.description, p.id));
+  positions.forEach((p) => positionIdByDescription.set(p.description, p.id));
   await repo.writePositions(positions);
 
   // 3. Clients — resolve pricedPositions to position ids
   for (const raw of Object.values(bundledClients)) {
     const { pricedPositions, ...base } = raw;
-    const clientPositions: ClientPosition[] | undefined = pricedPositions?.map(pp => {
+    const clientPositions: ClientPosition[] | undefined = pricedPositions?.map((pp) => {
       const positionId = positionIdByDescription.get(pp.description);
       if (!positionId) {
-        throw new Error(`Unknown position description "${pp.description}" on client ${base.customerNumber}`);
+        throw new Error(
+          `Unknown position description "${pp.description}" on client ${base.customerNumber}`,
+        );
       }
       return { positionId, price: pp.price };
     });
@@ -94,7 +106,7 @@ export async function seedFromBundled(): Promise<void> {
     const sender = senderByKey.get(raw.senderKey);
     if (!sender) throw new Error(`Document ${raw.number}: unknown senderKey "${raw.senderKey}"`);
     const defaultUnit = defaultUnitForType(raw.type);
-    const lineItems = raw.lineItems?.map(li => ({ ...li, unit: li.unit ?? defaultUnit }));
+    const lineItems = raw.lineItems?.map((li) => ({ ...li, unit: li.unit ?? defaultUnit }));
     const doc: Document = {
       number: raw.number,
       type: raw.type,

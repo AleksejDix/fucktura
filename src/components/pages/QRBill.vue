@@ -1,12 +1,17 @@
 <template>
   <PageTemplate :page-index="pageIndex">
     <template #header>
-      <header class="absolute top-0 left-0 right-0 pl-[var(--norm-ml)] pr-[var(--norm-mr)] pt-[10mm] max-h-[var(--norm-header-h)]">
+      <header
+        class="absolute top-0 left-0 right-0 pl-[var(--norm-ml)] pr-[var(--norm-mr)] pt-[10mm] max-h-[var(--norm-header-h)]"
+      >
         <div class="flex justify-end">
           <div class="text-[9pt] text-right leading-relaxed">
             <div class="font-bold">{{ sender.company }}</div>
             <div>{{ sender.street }}</div>
-            <div><span class="font-mono">{{ sender.zip }}</span> {{ sender.city }}, {{ sender.country }}</div>
+            <div>
+              <span class="font-mono">{{ sender.zip }}</span> {{ sender.city }},
+              {{ sender.country }}
+            </div>
             <div>{{ sender.email }}</div>
             <div>{{ sender.website }}</div>
             <div class="text-gray-500 font-mono">{{ sender.uid }}</div>
@@ -24,7 +29,9 @@
       <p class="font-bold">{{ sender.contact || sender.company }}</p>
     </section>
 
-    <div class="absolute bottom-[105mm] left-0 w-[210mm] border-t border-dashed border-gray-400"></div>
+    <div
+      class="absolute bottom-[105mm] left-0 w-[210mm] border-t border-dashed border-gray-400"
+    ></div>
     <div class="h-[105mm] w-[210mm] absolute bottom-0 left-0" v-html="qrBillSvg"></div>
   </PageTemplate>
 </template>
@@ -50,7 +57,12 @@ const props = defineProps<{
 const qrBillSvg = ref('');
 
 const qrLanguageMap: Record<string, 'DE' | 'FR' | 'IT' | 'EN'> = {
-  de: 'DE', en: 'EN', fr: 'FR', it: 'IT', es: 'EN', ru: 'EN',
+  de: 'DE',
+  en: 'EN',
+  fr: 'FR',
+  it: 'IT',
+  es: 'EN',
+  ru: 'EN',
 };
 
 watch(
@@ -58,7 +70,15 @@ watch(
   () => {
     let amount = 0;
     if (props.doc.type === 'mahnung') {
-      amount = parseFloat(toDecimal(sumAmounts(props.doc.offenerBetrag ?? 0, props.doc.mahngebuehr ?? 0, props.doc.verzugszins ?? 0)));
+      amount = parseFloat(
+        toDecimal(
+          sumAmounts(
+            props.doc.offenerBetrag ?? 0,
+            props.doc.mahngebuehr ?? 0,
+            props.doc.verzugszins ?? 0,
+          ),
+        ),
+      );
     } else {
       const items = props.doc.lineItems ?? [];
       if (items.length === 0) {
@@ -70,8 +90,12 @@ watch(
       }
     }
 
-    const account = props.sender.accounts?.find(a => a.iban.startsWith('CH')) ?? props.sender.accounts?.[0];
-    if (!account) { qrBillSvg.value = ''; return; }
+    const account =
+      props.sender.accounts?.find((a) => a.iban.startsWith('CH')) ?? props.sender.accounts?.[0];
+    if (!account) {
+      qrBillSvg.value = '';
+      return;
+    }
 
     const data = {
       currency: 'CHF' as const,
@@ -89,13 +113,18 @@ watch(
         address: props.doc.recipient.street,
         zip: props.doc.recipient.zip,
         city: props.doc.recipient.city,
-        country: props.doc.recipient.country === 'Schweiz' ? 'CH' : props.doc.recipient.country?.slice(0, 2).toUpperCase() || 'CH',
+        country:
+          props.doc.recipient.country === 'Schweiz'
+            ? 'CH'
+            : props.doc.recipient.country?.slice(0, 2).toUpperCase() || 'CH',
       },
       message: `${props.doc.number}`,
     };
 
     try {
-      qrBillSvg.value = new SwissQRBill(data, { language: qrLanguageMap[locale.value] ?? 'DE' }).toString();
+      qrBillSvg.value = new SwissQRBill(data, {
+        language: qrLanguageMap[locale.value] ?? 'DE',
+      }).toString();
     } catch {
       qrBillSvg.value = '';
     }

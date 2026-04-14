@@ -1,5 +1,7 @@
 <template>
-  <aside class="bg-gray-50 border-r border-gray-200 text-[11px] text-gray-700 overflow-y-auto py-2 select-none">
+  <aside
+    class="bg-gray-50 border-r border-gray-200 text-[11px] text-gray-700 overflow-y-auto py-2 select-none"
+  >
     <nav class="space-y-0.5">
       <DCollectionItem v-for="v in smartViews" :key="v.id" :view="v" />
     </nav>

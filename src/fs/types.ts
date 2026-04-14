@@ -111,7 +111,9 @@ export interface RepoSnapshot {
 }
 
 /** Shallow patch for a document; nested meta fields merge into existing meta. */
-export type DocumentPatch = Partial<Omit<Document, 'meta' | 'number' | 'createdAt' | 'updatedAt'>> & {
+export type DocumentPatch = Partial<
+  Omit<Document, 'meta' | 'number' | 'createdAt' | 'updatedAt'>
+> & {
   meta?: Partial<DocumentMeta>;
 };
 

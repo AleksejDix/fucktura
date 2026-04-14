@@ -46,14 +46,22 @@ async function readJson<T>(dir: FileSystemDirectoryHandle, filename: string): Pr
  * serialization / write never leaves the stream dangling or the file in a
  * half-written state.
  */
-async function writeJson(dir: FileSystemDirectoryHandle, filename: string, data: unknown): Promise<void> {
+async function writeJson(
+  dir: FileSystemDirectoryHandle,
+  filename: string,
+  data: unknown,
+): Promise<void> {
   const fh = await dir.getFileHandle(filename, { create: true });
   const writable = await fh.createWritable();
   try {
     await writable.write(JSON.stringify(data, null, 2) + '\n');
     await writable.close();
   } catch (e) {
-    try { await writable.abort(); } catch { /* stream may already be closed */ }
+    try {
+      await writable.abort();
+    } catch {
+      /* stream may already be closed */
+    }
     throw e;
   }
 }
@@ -63,7 +71,7 @@ async function listJson<T>(
   guard: (v: unknown) => v is T,
 ): Promise<T[]> {
   const out: T[] = [];
-  for await (const [name, entry] of (dir as unknown as AsyncIterable<[string, FileSystemHandle]>)) {
+  for await (const [name, entry] of dir as unknown as AsyncIterable<[string, FileSystemHandle]>) {
     if (entry.kind !== 'file' || !name.endsWith('.json')) continue;
     const file = await (entry as FileSystemFileHandle).getFile();
     const text = await file.text();
@@ -189,7 +197,7 @@ export async function loadAll(): Promise<RepoSnapshot> {
 /** True if the chosen folder is empty (no known subdirs / files). */
 export async function isEmpty(): Promise<boolean> {
   const root = getRoot();
-  for await (const _ of (root as unknown as AsyncIterable<[string, FileSystemHandle]>)) {
+  for await (const _ of root as unknown as AsyncIterable<[string, FileSystemHandle]>) {
     return false;
   }
   return true;

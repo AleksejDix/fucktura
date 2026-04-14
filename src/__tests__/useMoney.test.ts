@@ -2,7 +2,18 @@ import { describe, it, expect } from 'vitest';
 import { useMoney } from '@/composables/useMoney';
 
 describe('useMoney', () => {
-  const { chf, lineTotal, sumLineItems, sumAmounts, formatChf, formatChfFromNumber, lineNet, lineVat, groupByVat, sumGross } = useMoney();
+  const {
+    chf,
+    lineTotal,
+    sumLineItems,
+    sumAmounts,
+    formatChf,
+    formatChfFromNumber,
+    lineNet,
+    lineVat,
+    groupByVat,
+    sumGross,
+  } = useMoney();
 
   describe('chf', () => {
     it('creates a dinero object from a number', () => {
@@ -15,7 +26,7 @@ describe('useMoney', () => {
     });
 
     it('handles decimals', () => {
-      expect(formatChf(chf(29.50))).toBe('29.50');
+      expect(formatChf(chf(29.5))).toBe('29.50');
     });
   });
 
@@ -27,7 +38,7 @@ describe('useMoney', () => {
 
     it('handles fractional quantities', () => {
       const total = lineTotal(67.2, 40);
-      expect(formatChf(total)).toBe("2\u2019688.00");
+      expect(formatChf(total)).toBe('2\u2019688.00');
     });
 
     it('handles zero quantity', () => {
@@ -51,7 +62,7 @@ describe('useMoney', () => {
       ];
       const total = sumLineItems(items);
       // (12 + 6 + 117 + 8) * 29 = 143 * 29 = 4147
-      expect(formatChf(total)).toBe("4\u2019147.00");
+      expect(formatChf(total)).toBe('4\u2019147.00');
     });
 
     it('returns zero for empty array', () => {
@@ -60,22 +71,20 @@ describe('useMoney', () => {
 
     it('handles single item', () => {
       const total = sumLineItems([{ quantity: 1, unitPrice: 1200 }]);
-      expect(formatChf(total)).toBe("1\u2019200.00");
+      expect(formatChf(total)).toBe('1\u2019200.00');
     });
 
     it('handles mixed prices and quantities', () => {
-      const items = [
-        { quantity: 50.5, unitPrice: 40 },
-      ];
+      const items = [{ quantity: 50.5, unitPrice: 40 }];
       const total = sumLineItems(items);
-      expect(formatChf(total)).toBe("2\u2019020.00");
+      expect(formatChf(total)).toBe('2\u2019020.00');
     });
   });
 
   describe('sumAmounts', () => {
     it('sums multiple amounts', () => {
-      const total = sumAmounts(4147, 20, 5.50);
-      expect(formatChf(total)).toBe("4\u2019172.50");
+      const total = sumAmounts(4147, 20, 5.5);
+      expect(formatChf(total)).toBe('4\u2019172.50');
     });
 
     it('returns zero for no arguments', () => {
@@ -89,11 +98,11 @@ describe('useMoney', () => {
 
   describe('formatChf', () => {
     it('formats with thousands separator', () => {
-      expect(formatChf(chf(1000))).toBe("1\u2019000.00");
+      expect(formatChf(chf(1000))).toBe('1\u2019000.00');
     });
 
     it('formats large numbers', () => {
-      expect(formatChf(chf(1234567.89))).toBe("1\u2019234\u2019567.89");
+      expect(formatChf(chf(1234567.89))).toBe('1\u2019234\u2019567.89');
     });
 
     it('formats small numbers without separator', () => {
@@ -103,7 +112,7 @@ describe('useMoney', () => {
 
   describe('formatChfFromNumber', () => {
     it('formats a plain number as CHF', () => {
-      expect(formatChfFromNumber(2688)).toBe("2\u2019688.00");
+      expect(formatChfFromNumber(2688)).toBe('2\u2019688.00');
     });
 
     it('formats zero', () => {

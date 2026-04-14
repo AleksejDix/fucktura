@@ -14,17 +14,40 @@
       <tr v-for="(item, i) in lineItems" :key="item.pos" class="border-b border-gray-200 group">
         <td class="py-1.5 align-top font-mono">{{ item.pos }}</td>
         <td class="py-1.5 align-top">
-          <DInline v-model="item.description" tag="div" class="font-bold" @update:model-value="v => updateField(i, 'description', v)" />
-          <DInline v-if="item.code" v-model="item.code" tag="div" class="text-gray-500" @update:model-value="v => updateField(i, 'code', v)" />
+          <DInline
+            v-model="item.description"
+            tag="div"
+            class="font-bold"
+            @update:model-value="(v) => updateField(i, 'description', v)"
+          />
+          <DInline
+            v-if="item.code"
+            v-model="item.code"
+            tag="div"
+            class="text-gray-500"
+            @update:model-value="(v) => updateField(i, 'code', v)"
+          />
         </td>
         <td class="py-1.5 text-right align-top font-mono">
-          <DInline :model-value="format(item.quantity)" tag="span" @update:model-value="v => updateField(i, 'quantity', parseFloat(v) || 0)" /> <DInline :model-value="item.unit || defaultUnit" tag="span" class="text-gray-500" @update:model-value="v => updateField(i, 'unit', v)" />
+          <DInline
+            :model-value="format(item.quantity)"
+            tag="span"
+            @update:model-value="(v) => updateField(i, 'quantity', parseFloat(v) || 0)"
+          />
+          <DInline
+            :model-value="item.unit || defaultUnit"
+            tag="span"
+            class="text-gray-500"
+            @update:model-value="(v) => updateField(i, 'unit', v)"
+          />
         </td>
         <td v-if="showVat" class="py-1.5 text-right align-top font-mono">
           <select
             v-if="isEdit"
             :value="item.vatRate ?? 0"
-            @change="updateField(i, 'vatRate', parseFloat(($event.target as HTMLSelectElement).value))"
+            @change="
+              updateField(i, 'vatRate', parseFloat(($event.target as HTMLSelectElement).value))
+            "
             class="bg-transparent border-none focus:outline-none text-right"
           >
             <option v-for="r in vatRateOptions" :key="r" :value="r">{{ r }}%</option>
@@ -32,7 +55,11 @@
           <span v-else>{{ item.vatRate ?? 0 }}%</span>
         </td>
         <td class="py-1.5 text-right align-top font-mono">
-          <DInline :model-value="format(item.unitPrice)" tag="span" @update:model-value="v => updateField(i, 'unitPrice', parseFloat(v) || 0)" />
+          <DInline
+            :model-value="format(item.unitPrice)"
+            tag="span"
+            @update:model-value="(v) => updateField(i, 'unitPrice', parseFloat(v) || 0)"
+          />
         </td>
         <td class="py-1.5 text-right align-top font-mono whitespace-nowrap">
           {{ formatChf(lineTotal(item.quantity, item.unitPrice)) }}
@@ -40,7 +67,9 @@
             v-if="isEdit"
             @click="removeRow(i)"
             class="ml-1 text-gray-300 hover:text-red-500 print:hidden opacity-0 group-hover:opacity-100 transition-opacity"
-          >&times;</button>
+          >
+            &times;
+          </button>
         </td>
       </tr>
     </tbody>
@@ -55,17 +84,24 @@
         <tr v-for="group in vatBreakdown" :key="group.rate">
           <td></td>
           <td class="py-1.5 text-gray-600">
-            <template v-if="group.rate > 0">{{ $t('VAT') }} {{ group.rate }}% {{ $t('on') }} {{ formatChfFromNumber(group.net) }}</template>
+            <template v-if="group.rate > 0"
+              >{{ $t('VAT') }} {{ group.rate }}% {{ $t('on') }}
+              {{ formatChfFromNumber(group.net) }}</template
+            >
             <template v-else>{{ $t('Exempt') }}</template>
           </td>
           <td :colspan="3"></td>
-          <td class="py-1.5 text-right font-mono text-gray-600">{{ formatChfFromNumber(group.vat) }}</td>
+          <td class="py-1.5 text-right font-mono text-gray-600">
+            {{ formatChfFromNumber(group.vat) }}
+          </td>
         </tr>
         <tr class="border-t border-gray-400">
           <td></td>
           <td class="py-1.5 font-bold">{{ $t('Total') }}</td>
           <td :colspan="3"></td>
-          <td class="py-1.5 text-right font-bold font-mono">{{ formatChfFromNumber(grossTotal) }}</td>
+          <td class="py-1.5 text-right font-bold font-mono">
+            {{ formatChfFromNumber(grossTotal) }}
+          </td>
         </tr>
       </template>
       <tr v-else class="border-t border-gray-400">
@@ -81,7 +117,9 @@
     v-if="isEdit"
     @click="addRow"
     class="text-[8pt] text-gray-400 hover:text-black mt-2 print:hidden"
-  >+ {{ $t('Add line item') }}</button>
+  >
+    + {{ $t('Add line item') }}
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -101,7 +139,8 @@ const props = defineProps<{
 
 const store = useDocumentsStore();
 const modeStore = useModeStore();
-const { lineTotal, sumLineItems, formatChf, formatChfFromNumber, groupByVat, sumGross } = useMoney();
+const { lineTotal, sumLineItems, formatChf, formatChfFromNumber, groupByVat, sumGross } =
+  useMoney();
 const isEdit = computed(() => modeStore.isEditMode);
 
 const lineItems = computed(() => props.doc.lineItems ?? []);
@@ -112,7 +151,9 @@ const currency = computed(() => {
 });
 
 const showVat = computed(() => !!props.sender?.vatRegistered);
-const vatRateOptions = computed(() => availableRates(props.sender?.country ?? '', props.doc.meta.date));
+const vatRateOptions = computed(() =>
+  availableRates(props.sender?.country ?? '', props.doc.meta.date),
+);
 const vatBreakdown = computed(() => groupByVat(lineItems.value));
 const grossTotal = computed(() => sumGross(lineItems.value));
 const netTotalDinero = computed(() => sumLineItems(lineItems.value));
@@ -127,7 +168,7 @@ function format(n: number): string {
 }
 
 function updateField(index: number, field: string, value: unknown) {
-  const items = [...lineItems.value.map(item => ({ ...item }))];
+  const items = lineItems.value.map((item) => ({ ...item }));
   (items[index] as Record<string, unknown>)[field] = value;
   store.updateDocument(props.doc.number, { lineItems: items });
 }
@@ -137,7 +178,9 @@ function addRow() {
 }
 
 function removeRow(index: number) {
-  const items = lineItems.value.filter((_, i) => i !== index).map((item, i) => ({ ...item, pos: i + 1 }));
+  const items = lineItems.value
+    .filter((_, i) => i !== index)
+    .map((item, i) => ({ ...item, pos: i + 1 }));
   store.updateDocument(props.doc.number, { lineItems: items });
 }
 </script>
