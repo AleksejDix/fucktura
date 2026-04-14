@@ -81,4 +81,17 @@ export default {
   'paid': 'Paid',
   'accepted': 'Accepted',
   'rejected': 'Rejected',
+
+  // Folder gate
+  'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.': 'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.',
+  'File System Access API required': 'File System Access API required',
+  'This app stores your invoices as real files on your disk. It needs the File System Access API, which is only available in Chromium-based browsers.': 'This app stores your invoices as real files on your disk. It needs the File System Access API, which is only available in Chromium-based browsers.',
+  'Choose a folder': 'Choose a folder',
+  'Your invoices, clients, and positions will be saved as JSON files in the folder you pick. You can open them in Finder, back them up, or sync them via iCloud or Dropbox.': 'Your invoices, clients, and positions will be saved as JSON files in the folder you pick. You can open them in Finder, back them up, or sync them via iCloud or Dropbox.',
+  'Pick folder': 'Pick folder',
+  'Loading…': 'Loading…',
+  'Open Folder…': 'Open Folder…',
+  'Recent folders': 'Recent folders',
+  'Current folder': 'Current folder',
+  'Change…': 'Change…',
 };

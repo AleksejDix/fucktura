@@ -81,4 +81,17 @@ export default {
   'paid': 'Bezahlt',
   'accepted': 'Angenommen',
   'rejected': 'Abgelehnt',
+
+  // Folder gate
+  'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.': 'Browser nicht unterstützt — bitte verwenden Sie Chrome, Edge, Brave oder einen anderen Chromium-basierten Browser.',
+  'File System Access API required': 'File System Access API erforderlich',
+  'This app stores your invoices as real files on your disk. It needs the File System Access API, which is only available in Chromium-based browsers.': 'Diese App speichert Ihre Rechnungen als echte Dateien auf Ihrer Festplatte. Dafür benötigt sie die File System Access API, die nur in Chromium-basierten Browsern verfügbar ist.',
+  'Choose a folder': 'Ordner wählen',
+  'Your invoices, clients, and positions will be saved as JSON files in the folder you pick. You can open them in Finder, back them up, or sync them via iCloud or Dropbox.': 'Ihre Rechnungen, Kunden und Positionen werden als JSON-Dateien im gewählten Ordner gespeichert. Sie können sie im Finder öffnen, sichern oder über iCloud oder Dropbox synchronisieren.',
+  'Pick folder': 'Ordner auswählen',
+  'Loading…': 'Lädt…',
+  'Open Folder…': 'Ordner öffnen…',
+  'Recent folders': 'Zuletzt verwendet',
+  'Current folder': 'Aktueller Ordner',
+  'Change…': 'Ändern…',
 };

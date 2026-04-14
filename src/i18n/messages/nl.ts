@@ -81,4 +81,17 @@ export default {
   'paid': 'Betaald',
   'accepted': 'Geaccepteerd',
   'rejected': 'Afgewezen',
+
+  // Folder gate
+  'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.': 'Browser niet ondersteund — gebruik Chrome, Edge, Brave of een andere op Chromium gebaseerde browser.',
+  'File System Access API required': 'File System Access API vereist',
+  'This app stores your invoices as real files on your disk. It needs the File System Access API, which is only available in Chromium-based browsers.': 'Deze app bewaart uw facturen als echte bestanden op uw schijf. Dat vereist de File System Access API, die alleen beschikbaar is in op Chromium gebaseerde browsers.',
+  'Choose a folder': 'Map kiezen',
+  'Your invoices, clients, and positions will be saved as JSON files in the folder you pick. You can open them in Finder, back them up, or sync them via iCloud or Dropbox.': 'Uw facturen, klanten en posities worden als JSON-bestanden opgeslagen in de door u gekozen map. U kunt ze in Finder openen, back-uppen of synchroniseren via iCloud of Dropbox.',
+  'Pick folder': 'Map selecteren',
+  'Loading…': 'Laden…',
+  'Open Folder…': 'Map openen…',
+  'Recent folders': 'Recente mappen',
+  'Current folder': 'Huidige map',
+  'Change…': 'Wijzigen…',
 };
