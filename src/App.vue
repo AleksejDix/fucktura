@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, watch } from 'vue';
 import { i18n } from '@/i18n';
 import { useRouter } from 'vue-router';
 import { useDocumentsStore } from '@/stores/documents';
@@ -68,6 +68,22 @@ function onFocus() {
 
 onMounted(() => window.addEventListener('focus', onFocus));
 onUnmounted(() => window.removeEventListener('focus', onFocus));
+
+// Sync the dock/taskbar badge with the overdue count (PWA only).
+type BadgeNav = Navigator & {
+  setAppBadge?: (count?: number) => Promise<void>;
+  clearAppBadge?: () => Promise<void>;
+};
+watch(
+  () => documentsStore.viewCount('overdue'),
+  (n) => {
+    const nav = navigator as BadgeNav;
+    if (!nav.setAppBadge || !nav.clearAppBadge) return;
+    if (n > 0) nav.setAppBadge(n).catch(() => {});
+    else nav.clearAppBadge().catch(() => {});
+  },
+  { immediate: true },
+);
 
 const supported = ['de', 'en', 'es', 'nl', 'ru'];
 const saved = localStorage.getItem('locale');
