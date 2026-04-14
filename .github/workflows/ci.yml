@@ -15,17 +15,15 @@ jobs:
         with:
           node-version: 20
 
-      - name: Activate pnpm from packageManager field
-        run: corepack enable
+      - run: corepack enable
 
-      - name: Install deps
-        run: pnpm install --frozen-lockfile
+      - run: npm ci
 
       - name: Check (format + lint + types)
-        run: pnpm exec vp check
+        run: npx vp check
 
       - name: Tests
-        run: pnpm exec vp test --run
+        run: npx vp test --run
 
       - name: Build
-        run: pnpm exec vp build
+        run: npx vp build

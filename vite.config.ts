@@ -49,4 +49,8 @@ export default defineConfig({
       '~': resolve(_dirname, './'),
     },
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+  },
 });
