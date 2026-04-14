@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
 import type { Document } from '@/fs/types';
+import { DOC_TYPE_DOT_CLASS as dotClass } from '@/lib/documents';
 import { useDocumentsStore } from '@/stores/documents';
 import { useDate } from '@/composables/useDate';
 import { computed } from 'vue';
@@ -42,13 +43,6 @@ const sortedDocuments = computed(() =>
     return db - da;
   }),
 );
-
-const dotClass: Record<string, string> = {
-  offerte: 'bg-amber-500',
-  invoice: 'bg-emerald-500',
-  mahnung: 'bg-red-500',
-  quittung: 'bg-blue-500',
-};
 
 function dueDateField(doc: Document): string | null {
   if (doc.type === 'invoice') return doc.meta.dueDate ?? null;

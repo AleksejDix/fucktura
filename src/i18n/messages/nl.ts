@@ -95,4 +95,11 @@ export default {
   'Clear recent folders': 'Recente mappen wissen',
   'Current folder': 'Huidige map',
   'Change…': 'Wijzigen…',
+
+  // Edit menu
+  'Find document…': 'Document zoeken…',
+  'Duplicate': 'Dupliceren',
+  'Add line item': 'Positie toevoegen',
+  'Clear line items': 'Posities wissen',
+  'Reset recipient': 'Ontvanger resetten',
 };

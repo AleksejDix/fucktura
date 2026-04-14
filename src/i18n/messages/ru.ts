@@ -95,4 +95,11 @@ export default {
   'Clear recent folders': 'Очистить список папок',
   'Current folder': 'Текущая папка',
   'Change…': 'Изменить…',
+
+  // Edit menu
+  'Find document…': 'Найти документ…',
+  'Duplicate': 'Дублировать',
+  'Add line item': 'Добавить позицию',
+  'Clear line items': 'Очистить позиции',
+  'Reset recipient': 'Сбросить получателя',
 };

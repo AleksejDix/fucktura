@@ -79,6 +79,7 @@ import DModeToggle from './DModeToggle.vue';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
 import { useModeStore } from '@/stores/mode';
+import { usePaletteStore } from '@/stores/palette';
 import { useLetterNormStore } from '@/stores/letterNorm';
 import { useMoney } from '@/composables/useMoney';
 import { useDate } from '@/composables/useDate';
@@ -105,6 +106,7 @@ const { t, locale } = useI18n();
 const store = useDocumentsStore();
 const folder = useFolderStore();
 const modeStore = useModeStore();
+const palette = usePaletteStore();
 const normStore = useLetterNormStore();
 const router = useRouter();
 const { sumLineItems, formatChf, sumAmounts } = useMoney();
@@ -132,9 +134,21 @@ function closeMenus(e: MouseEvent) {
 }
 
 function onKeydown(e: KeyboardEvent) {
-  if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'o') {
+  const mod = e.metaKey || e.ctrlKey;
+  if (!mod || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (!e.shiftKey && k === 'o') {
     e.preventDefault();
     folder.openFolder();
+  } else if (!e.shiftKey && k === 'k') {
+    e.preventDefault();
+    palette.toggle();
+  } else if (!e.shiftKey && k === 'd' && store.activeDocument) {
+    e.preventDefault();
+    store.duplicateDocument(store.activeDocument.number);
+  } else if (e.shiftKey && k === 'l' && store.activeDocument) {
+    e.preventDefault();
+    store.addLineItemToActive();
   }
 }
 
@@ -494,14 +508,14 @@ const menus = computed<Menu[]>(() => [
   {
     label: t('Edit'),
     items: [
-      { label: t('Undo'), shortcut: '⌘Z', action: () => document.execCommand('undo'), strikethrough: true },
-      { label: t('Redo'), shortcut: '⌘⇧Z', action: () => document.execCommand('redo'), strikethrough: true },
+      { label: t('Find document…'), shortcut: '⌘K', action: () => palette.toggle() },
       { separator: true },
-      { label: t('Cut'), shortcut: '⌘X', action: () => document.execCommand('cut'), strikethrough: true },
-      { label: t('Copy'), shortcut: '⌘C', action: () => document.execCommand('copy'), strikethrough: true },
-      { label: t('Paste'), shortcut: '⌘V', action: () => document.execCommand('paste'), strikethrough: true },
+      { label: t('Duplicate'), shortcut: '⌘D', action: () => store.activeDocument && store.duplicateDocument(store.activeDocument.number), disabled: !hasActiveDoc.value },
       { separator: true },
-      { label: t('Select all'), shortcut: '⌘A', action: () => document.execCommand('selectAll'), strikethrough: true },
+      { label: t('Add line item'), shortcut: '⌘⇧L', action: () => store.addLineItemToActive(), disabled: !hasActiveDoc.value },
+      { label: t('Clear line items'), action: () => store.clearLineItems(), disabled: !hasActiveDoc.value },
+      { separator: true },
+      { label: t('Reset recipient'), action: () => store.resetRecipient(), disabled: !hasActiveDoc.value },
     ],
   },
   {

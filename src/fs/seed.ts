@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import * as repo from './repo';
 import type { Client, ClientPosition, Document, Position, Sender, SenderSnapshot } from './types';
+import { defaultUnitForType } from '@/lib/documents';
 
 interface RawSender extends Sender {}
 
@@ -51,11 +52,6 @@ const globalPositionsCatalog: Omit<Position, 'id'>[] = [
   { description: 'Website creation', code: '', unit: 'Stk', defaultPrice: 1500 },
   { description: 'Demo E2E Consulting', code: '', unit: 'h', defaultPrice: 40 },
 ];
-
-function defaultUnitForType(type: Document['type']): string {
-  if (type === 'quittung') return 'Pauschal';
-  return 'h';
-}
 
 function toSnapshot(s: Sender): SenderSnapshot {
   const { key: _, ...snap } = s;

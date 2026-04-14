@@ -95,4 +95,11 @@ export default {
   'Clear recent folders': 'Borrar carpetas recientes',
   'Current folder': 'Carpeta actual',
   'Change…': 'Cambiar…',
+
+  // Edit menu
+  'Find document…': 'Buscar documento…',
+  'Duplicate': 'Duplicar',
+  'Add line item': 'Añadir posición',
+  'Clear line items': 'Borrar posiciones',
+  'Reset recipient': 'Restablecer destinatario',
 };

@@ -1,5 +1,6 @@
 import * as repo from '@/fs/repo';
 import type { Client, Document, DocumentStatus, Position, Sender, SenderSnapshot } from '@/fs/types';
+import { defaultUnitForType, numberPrefix } from '@/lib/documents';
 import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
@@ -318,6 +319,46 @@ export const useDocumentsStore = defineStore('documents', () => {
     await updateDocument(docNumber, { status });
   }
 
+  async function duplicateDocument(docNumber: string) {
+    const src = documents.value.find((d) => d.number === docNumber);
+    if (!src) return;
+    const clone = structuredClone(src);
+    clone.number = generateNumber(numberPrefix(src.type));
+    clone.status = src.type === 'quittung' ? 'paid' : 'draft';
+    const today = new Date();
+    clone.meta = { ...clone.meta, date: today.toISOString() };
+    if (src.type === 'invoice' && src.sender.invoiceDueDays)
+      clone.meta.dueDate = addDays(today, src.sender.invoiceDueDays);
+    if (src.type === 'offerte' && src.sender.quoteValidDays)
+      clone.meta.validUntil = addDays(today, src.sender.quoteValidDays);
+    const { createdAt: _c, updatedAt: _u, ...rest } = clone;
+    return addDocument(rest);
+  }
+
+  async function addLineItemToActive() {
+    const doc = activeDocument.value;
+    if (!doc) return;
+    const items = [...(doc.lineItems ?? [])];
+    items.push({ pos: items.length + 1, description: '', code: '', quantity: 1, unit: defaultUnitForType(doc.type), unitPrice: 0 });
+    await updateDocument(doc.number, { lineItems: items });
+  }
+
+  async function clearLineItems() {
+    const doc = activeDocument.value;
+    if (!doc) return;
+    await updateDocument(doc.number, { lineItems: [] });
+  }
+
+  async function resetRecipient() {
+    const doc = activeDocument.value;
+    if (!doc) return;
+    await updateDocument(doc.number, {
+      customerNumber: '',
+      recipient: { company: '', name: '', street: '', zip: '', city: '', country: doc.recipient.country ?? '' },
+      'meta.customerNumber': '',
+    });
+  }
+
   return {
     documents,
     clients,
@@ -343,6 +384,10 @@ export const useDocumentsStore = defineStore('documents', () => {
     assignClient,
     updateDocument,
     setStatus,
+    duplicateDocument,
+    addLineItemToActive,
+    clearLineItems,
+    resetRecipient,
     setNavigator,
   };
 });

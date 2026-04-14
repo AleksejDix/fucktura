@@ -95,4 +95,11 @@ export default {
   'Clear recent folders': 'Zuletzt verwendet leeren',
   'Current folder': 'Aktueller Ordner',
   'Change…': 'Ändern…',
+
+  // Edit menu
+  'Find document…': 'Dokument suchen…',
+  'Duplicate': 'Duplizieren',
+  'Add line item': 'Position hinzufügen',
+  'Clear line items': 'Positionen löschen',
+  'Reset recipient': 'Empfänger zurücksetzen',
 };

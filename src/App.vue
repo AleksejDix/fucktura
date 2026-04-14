@@ -10,6 +10,7 @@
     <main v-else>
       <h2>{{ $t('Loading') }}</h2>
     </main>
+    <DCommandPalette v-model:open="palette.open" />
   </BootGate>
 </template>
 
@@ -18,12 +19,15 @@ import { onMounted, onUnmounted } from 'vue';
 import { i18n } from '@/i18n';
 import { useRouter } from 'vue-router';
 import { useDocumentsStore } from '@/stores/documents';
+import { usePaletteStore } from '@/stores/palette';
 import DSidebar from './components/DSidebar.vue';
 import DMenuBar from './components/DMenuBar.vue';
 import BootGate from './components/BootGate.vue';
+import DCommandPalette from './components/DCommandPalette.vue';
 
 const router = useRouter();
 const documentsStore = useDocumentsStore();
+const palette = usePaletteStore();
 
 documentsStore.setNavigator((number) => {
   const target = number ? `/${number}` : '/';
