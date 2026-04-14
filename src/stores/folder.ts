@@ -42,23 +42,30 @@ export const useFolderStore = defineStore('folder', () => {
     state.value = 'ready';
   }
 
-  /** Called once on app boot. */
+  /** Called once on app boot. Cascades through recents, pruning broken ones. */
   async function init() {
     if (!isFileSystemAccessSupported()) {
       state.value = 'unsupported';
       return;
     }
     recents.value = await loadRecents();
-    const first = recents.value[0];
-    if (first && (await ensurePermission(first.handle))) {
+    for (const entry of [...recents.value]) {
+      if (!(await ensurePermission(entry.handle))) continue;
       try {
-        await activate(first.handle);
+        await activate(entry.handle);
         return;
       } catch (e) {
-        console.warn('Stored handle failed, re-prompting', e);
+        console.warn(`Recent folder "${entry.name}" failed, pruning`, e);
+        recents.value = await forgetFolder(entry.handle);
       }
     }
     state.value = 'needs-pick';
+  }
+
+  async function clearRecents() {
+    for (const entry of [...recents.value]) {
+      recents.value = await forgetFolder(entry.handle);
+    }
   }
 
   /** Prompt the OS picker and switch to the chosen folder. */
@@ -101,5 +108,6 @@ export const useFolderStore = defineStore('folder', () => {
     init,
     openFolder,
     openRecent,
+    clearRecents,
   };
 });

@@ -92,6 +92,7 @@ export default {
   'Loading…': 'Cargando…',
   'Open Folder…': 'Abrir carpeta…',
   'Recent folders': 'Carpetas recientes',
+  'Clear recent folders': 'Borrar carpetas recientes',
   'Current folder': 'Carpeta actual',
   'Change…': 'Cambiar…',
 };

@@ -92,6 +92,7 @@ export default {
   'Loading…': 'Загрузка…',
   'Open Folder…': 'Открыть папку…',
   'Recent folders': 'Недавние папки',
+  'Clear recent folders': 'Очистить список папок',
   'Current folder': 'Текущая папка',
   'Change…': 'Изменить…',
 };

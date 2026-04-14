@@ -92,6 +92,7 @@ export default {
   'Loading…': 'Laden…',
   'Open Folder…': 'Map openen…',
   'Recent folders': 'Recente mappen',
+  'Clear recent folders': 'Recente mappen wissen',
   'Current folder': 'Huidige map',
   'Change…': 'Wijzigen…',
 };

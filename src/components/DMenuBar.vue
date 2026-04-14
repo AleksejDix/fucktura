@@ -459,6 +459,7 @@ const menus = computed<Menu[]>(() => [
           label: `📁 ${r.name}`,
           action: () => folder.openRecent(r),
         } as MenuItem)),
+        { label: t('Clear recent folders'), action: () => folder.clearRecents() } as MenuItem,
       ] : []),
       { separator: true },
       { label: t('New Offerte'), shortcut: '⌘N', action: () => store.createOfferte() },

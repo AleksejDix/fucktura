@@ -92,6 +92,7 @@ export default {
   'Loading…': 'Lädt…',
   'Open Folder…': 'Ordner öffnen…',
   'Recent folders': 'Zuletzt verwendet',
+  'Clear recent folders': 'Zuletzt verwendet leeren',
   'Current folder': 'Aktueller Ordner',
   'Change…': 'Ändern…',
 };
