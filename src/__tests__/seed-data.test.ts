@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import senderData from '@/data/sender.json';
+import senderData from '@/data/senders/default.json';
 import example from '@/data/clients/example.json';
 import propertyCaptain from '@/data/clients/sample-ag.json';
 import demo from '@/data/clients/demo.json';
 import demo-salon from '@/data/clients/demo-salon.json';
 import demo-three from '@/data/clients/demo-three.json';
-import invoiceDoc from '@/data/documents/RE-00110.json';
-import offerteDoc from '@/data/documents/OF-00042.json';
-import mahnungDoc from '@/data/documents/MH-00001.json';
+import invoiceDoc from '@/data/documents/R-1764806400.json';
+import offerteDoc from '@/data/documents/O-1773100800.json';
+import mahnungDoc from '@/data/documents/M-1773100800.json';
 
 describe('sender data', () => {
   it('has required fields', () => {
@@ -62,20 +62,20 @@ describe('client data', () => {
   }
 });
 
-describe('document templates', () => {
-  it('RE-00110 is an invoice', () => {
+describe('document data', () => {
+  it('R-1764806400 is an invoice', () => {
     expect(invoiceDoc.type).toBe('invoice');
-    expect(invoiceDoc.number).toBe('RE-00110');
+    expect(invoiceDoc.number).toBe('R-1764806400');
     expect(invoiceDoc.lineItems.length).toBeGreaterThan(0);
   });
 
-  it('OF-00042 is an offerte', () => {
+  it('O-1773100800 is an offerte', () => {
     expect(offerteDoc.type).toBe('offerte');
-    expect(offerteDoc.number).toBe('OF-00042');
+    expect(offerteDoc.number).toBe('O-1773100800');
     expect(offerteDoc.lineItems.length).toBeGreaterThan(0);
   });
 
-  it('MH-00001 is a mahnung', () => {
+  it('M-1773100800 is a mahnung', () => {
     expect(mahnungDoc.type).toBe('mahnung');
     expect(mahnungDoc.stufe).toBeGreaterThanOrEqual(1);
   });
@@ -91,5 +91,14 @@ describe('document templates', () => {
     expect(invoiceDoc.recipient.email).toBeTruthy();
     expect(offerteDoc.recipient.email).toBeTruthy();
     expect(mahnungDoc.recipient.email).toBeTruthy();
+  });
+
+  it('all documents have clientNumber and senderKey', () => {
+    expect(invoiceDoc.clientNumber).toBeTruthy();
+    expect(invoiceDoc.senderKey).toBeTruthy();
+    expect(offerteDoc.clientNumber).toBeTruthy();
+    expect(offerteDoc.senderKey).toBeTruthy();
+    expect(mahnungDoc.clientNumber).toBeTruthy();
+    expect(mahnungDoc.senderKey).toBeTruthy();
   });
 });
