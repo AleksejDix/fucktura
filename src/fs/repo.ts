@@ -1,4 +1,5 @@
 import type { Client, Document, Position, RepoSnapshot, Sender } from './types';
+import { isClient, isDocument, isPosition, isSender } from './validate';
 
 /** Dispatches 'save-start' and 'save-end' whenever the repo writes a file. */
 export const saveEvents = new EventTarget();
@@ -46,17 +47,27 @@ async function writeJson(dir: FileSystemDirectoryHandle, filename: string, data:
   await writable.close();
 }
 
-async function listJson<T>(dir: FileSystemDirectoryHandle): Promise<T[]> {
+async function listJson<T>(
+  dir: FileSystemDirectoryHandle,
+  guard: (v: unknown) => v is T,
+): Promise<T[]> {
   const out: T[] = [];
   for await (const [name, entry] of (dir as unknown as AsyncIterable<[string, FileSystemHandle]>)) {
     if (entry.kind !== 'file' || !name.endsWith('.json')) continue;
     const file = await (entry as FileSystemFileHandle).getFile();
     const text = await file.text();
+    let parsed: unknown;
     try {
-      out.push(JSON.parse(text) as T);
+      parsed = JSON.parse(text);
     } catch {
-      console.warn(`Skipping invalid JSON: ${name}`);
+      console.warn(`[fs/repo] Skipping unparseable JSON: ${name}`);
+      continue;
     }
+    if (!guard(parsed)) {
+      console.warn(`[fs/repo] Skipping invalid shape: ${name}`);
+      continue;
+    }
+    out.push(parsed);
   }
   return out;
 }
@@ -74,7 +85,7 @@ async function removeFile(dir: FileSystemDirectoryHandle, filename: string): Pro
 
 export async function listSenders(): Promise<Sender[]> {
   const dir = await getDir('senders');
-  return listJson<Sender>(dir);
+  return listJson(dir, isSender);
 }
 
 export async function writeSender(s: Sender): Promise<void> {
@@ -96,7 +107,7 @@ export async function deleteSender(key: string): Promise<void> {
 
 export async function listClients(): Promise<Client[]> {
   const dir = await getDir('clients');
-  return listJson<Client>(dir);
+  return listJson(dir, isClient);
 }
 
 export async function writeClient(c: Client): Promise<void> {
@@ -117,8 +128,13 @@ export async function deleteClient(customerNumber: string): Promise<void> {
 // ---------- positions (single flat file) ----------
 
 export async function listPositions(): Promise<Position[]> {
-  const data = await readJson<Position[]>(getRoot(), 'positions.json');
-  return data ?? [];
+  const data = await readJson<unknown>(getRoot(), 'positions.json');
+  if (!Array.isArray(data)) return [];
+  return data.filter((p): p is Position => {
+    const ok = isPosition(p);
+    if (!ok) console.warn(`[fs/repo] Skipping invalid position entry`, p);
+    return ok;
+  });
 }
 
 export async function writePositions(list: Position[]): Promise<void> {
@@ -129,7 +145,7 @@ export async function writePositions(list: Position[]): Promise<void> {
 
 export async function listDocuments(): Promise<Document[]> {
   const dir = await getDir('documents');
-  return listJson<Document>(dir);
+  return listJson(dir, isDocument);
 }
 
 export async function writeDocument(d: Document): Promise<void> {
