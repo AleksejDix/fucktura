@@ -41,16 +41,15 @@ export const useDocumentsStore = defineStore('documents', () => {
   );
 
   async function load() {
-    loading.value = true;
     const snap = await repo.loadAll();
-    senders.value = snap.senders;
-    clients.value = snap.clients;
-    positions.value = snap.positions;
-    // newest first, by business date (meta.date)
+    senders.value = [...snap.senders].sort((a, b) => a.key.localeCompare(b.key));
+    clients.value = [...snap.clients].sort((a, b) => a.customerNumber.localeCompare(b.customerNumber));
+    positions.value = [...snap.positions].sort((a, b) => a.description.localeCompare(b.description));
     documents.value = [...snap.documents].sort((a, b) => {
       const da = new Date(a.meta.date).getTime();
       const db = new Date(b.meta.date).getTime();
-      return db - da;
+      if (db !== da) return db - da;
+      return b.number.localeCompare(a.number);
     });
     if (!activeSenderKey.value && senders.value.length > 0) {
       activeSenderKey.value = senders.value[0].key;
@@ -280,6 +279,41 @@ export const useDocumentsStore = defineStore('documents', () => {
     if (idx >= 0) documents.value.splice(idx, 1, doc);
   }
 
+  async function saveSender(s: Sender) {
+    await repo.writeSender(s);
+    const idx = senders.value.findIndex((x) => x.key === s.key);
+    if (idx >= 0) senders.value.splice(idx, 1, s);
+    else {
+      senders.value.push(s);
+      senders.value.sort((a, b) => a.key.localeCompare(b.key));
+    }
+  }
+
+  async function removeSender(key: string) {
+    await repo.deleteSender(key);
+    senders.value = senders.value.filter((s) => s.key !== key);
+  }
+
+  async function saveClient(c: Client) {
+    await repo.writeClient(c);
+    const idx = clients.value.findIndex((x) => x.customerNumber === c.customerNumber);
+    if (idx >= 0) clients.value.splice(idx, 1, c);
+    else {
+      clients.value.push(c);
+      clients.value.sort((a, b) => a.customerNumber.localeCompare(b.customerNumber));
+    }
+  }
+
+  async function removeClient(customerNumber: string) {
+    await repo.deleteClient(customerNumber);
+    clients.value = clients.value.filter((c) => c.customerNumber !== customerNumber);
+  }
+
+  async function savePositions(list: Position[]) {
+    await repo.writePositions(list);
+    positions.value = [...list].sort((a, b) => a.description.localeCompare(b.description));
+  }
+
   async function assignClient(docNumber: string, customerNumber: string) {
     const client = findClient(customerNumber);
     if (!client) return;
@@ -432,6 +466,11 @@ export const useDocumentsStore = defineStore('documents', () => {
     resetRecipient,
     nextDocument,
     previousDocument,
+    saveSender,
+    removeSender,
+    saveClient,
+    removeClient,
+    savePositions,
     setNavigator,
   };
 });

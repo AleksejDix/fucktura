@@ -113,7 +113,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { nanoid } from 'nanoid';
-import * as repo from '@/fs/repo';
 import type { Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
@@ -174,14 +173,12 @@ async function save() {
   if (!form.value) return;
   if (!form.value.key) form.value.key = nanoid(8);
   const raw: Sender = JSON.parse(JSON.stringify(form.value));
-  await repo.writeSender(raw);
-  await documentsStore.load();
+  await documentsStore.saveSender(raw);
 }
 
 async function deleteSender() {
   if (!form.value?.key) return;
-  await repo.deleteSender(form.value.key);
-  await documentsStore.load();
+  await documentsStore.removeSender(form.value.key);
   form.value = senderList.value.length > 0 ? cloneSender(senderList.value[0]) : emptySender();
 }
 </script>

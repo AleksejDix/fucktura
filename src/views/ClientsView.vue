@@ -142,7 +142,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import * as repo from '@/fs/repo';
 import type { Client, Position } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 
@@ -192,7 +191,7 @@ function nextCustomerNumber(): string {
 
 async function addClient() {
   const customerNumber = nextCustomerNumber();
-  await repo.writeClient({
+  await documentsStore.saveClient({
     customerNumber,
     company: '',
     name: '',
@@ -202,18 +201,15 @@ async function addClient() {
     country: '',
     email: '',
   });
-  await documentsStore.load();
 }
 
 async function saveClient(client: Client) {
   if (!client.customerNumber) return;
-  await repo.writeClient(JSON.parse(JSON.stringify(client)) as Client);
-  await documentsStore.load();
+  await documentsStore.saveClient(JSON.parse(JSON.stringify(client)) as Client);
 }
 
 async function deleteClient(customerNumber: string) {
-  await repo.deleteClient(customerNumber);
-  await documentsStore.load();
+  await documentsStore.removeClient(customerNumber);
 }
 
 function removePosition(client: Client, index: number) {

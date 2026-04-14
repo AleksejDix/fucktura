@@ -68,7 +68,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { nanoid } from 'nanoid';
-import * as repo from '@/fs/repo';
 import type { Position } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 
@@ -82,8 +81,7 @@ function reload() {
 onMounted(reload);
 
 async function save() {
-  await repo.writePositions(JSON.parse(JSON.stringify(positions.value)));
-  await documentsStore.load();
+  await documentsStore.savePositions(JSON.parse(JSON.stringify(positions.value)));
 }
 
 async function addPosition() {
