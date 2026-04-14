@@ -129,8 +129,21 @@ function closeMenus(e: MouseEvent) {
   }
 }
 
-onMounted(() => document.addEventListener('click', closeMenus));
-onUnmounted(() => document.removeEventListener('click', closeMenus));
+function onKeydown(e: KeyboardEvent) {
+  if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'o') {
+    e.preventDefault();
+    folder.openFolder();
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', closeMenus);
+  document.addEventListener('keydown', onKeydown);
+});
+onUnmounted(() => {
+  document.removeEventListener('click', closeMenus);
+  document.removeEventListener('keydown', onKeydown);
+});
 
 const hasActiveDoc = computed(() => !!store.activeDocument);
 const isOfferte = computed(() => store.activeDocument?.type === 'offerte');
