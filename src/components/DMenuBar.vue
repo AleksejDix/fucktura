@@ -44,6 +44,7 @@
     <div class="flex-1" />
 
     <div class="flex items-center gap-2 px-3">
+      <DSaveIndicator />
       <select
         v-if="store.senders.length > 1"
         :value="store.activeSenderKey"
@@ -72,6 +73,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import DSaveIndicator from './DSaveIndicator.vue';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
 import { useModeStore } from '@/stores/mode';

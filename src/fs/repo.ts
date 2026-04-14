@@ -1,5 +1,17 @@
 import type { Client, Document, Position, RepoSnapshot, Sender } from './types';
 
+/** Dispatches 'save-start' and 'save-end' whenever the repo writes a file. */
+export const saveEvents = new EventTarget();
+
+async function tracked<T>(fn: () => Promise<T>): Promise<T> {
+  saveEvents.dispatchEvent(new Event('save-start'));
+  try {
+    return await fn();
+  } finally {
+    saveEvents.dispatchEvent(new Event('save-end'));
+  }
+}
+
 let rootHandle: FileSystemDirectoryHandle | null = null;
 
 export function setRoot(handle: FileSystemDirectoryHandle): void {
@@ -67,13 +79,17 @@ export async function listSenders(): Promise<Sender[]> {
 
 export async function writeSender(s: Sender): Promise<void> {
   if (!s.key) throw new Error('Sender.key required');
-  const dir = await getDir('senders');
-  await writeJson(dir, `${s.key}.json`, s);
+  await tracked(async () => {
+    const dir = await getDir('senders');
+    await writeJson(dir, `${s.key}.json`, s);
+  });
 }
 
 export async function deleteSender(key: string): Promise<void> {
-  const dir = await getDir('senders');
-  await removeFile(dir, `${key}.json`);
+  await tracked(async () => {
+    const dir = await getDir('senders');
+    await removeFile(dir, `${key}.json`);
+  });
 }
 
 // ---------- clients ----------
@@ -85,13 +101,17 @@ export async function listClients(): Promise<Client[]> {
 
 export async function writeClient(c: Client): Promise<void> {
   if (!c.customerNumber) throw new Error('Client.customerNumber required');
-  const dir = await getDir('clients');
-  await writeJson(dir, `${c.customerNumber}.json`, c);
+  await tracked(async () => {
+    const dir = await getDir('clients');
+    await writeJson(dir, `${c.customerNumber}.json`, c);
+  });
 }
 
 export async function deleteClient(customerNumber: string): Promise<void> {
-  const dir = await getDir('clients');
-  await removeFile(dir, `${customerNumber}.json`);
+  await tracked(async () => {
+    const dir = await getDir('clients');
+    await removeFile(dir, `${customerNumber}.json`);
+  });
 }
 
 // ---------- positions (single flat file) ----------
@@ -102,7 +122,7 @@ export async function listPositions(): Promise<Position[]> {
 }
 
 export async function writePositions(list: Position[]): Promise<void> {
-  await writeJson(getRoot(), 'positions.json', list);
+  await tracked(() => writeJson(getRoot(), 'positions.json', list));
 }
 
 // ---------- documents ----------
@@ -114,13 +134,17 @@ export async function listDocuments(): Promise<Document[]> {
 
 export async function writeDocument(d: Document): Promise<void> {
   if (!d.number) throw new Error('Document.number required');
-  const dir = await getDir('documents');
-  await writeJson(dir, `${d.number}.json`, d);
+  await tracked(async () => {
+    const dir = await getDir('documents');
+    await writeJson(dir, `${d.number}.json`, d);
+  });
 }
 
 export async function deleteDocument(number: string): Promise<void> {
-  const dir = await getDir('documents');
-  await removeFile(dir, `${number}.json`);
+  await tracked(async () => {
+    const dir = await getDir('documents');
+    await removeFile(dir, `${number}.json`);
+  });
 }
 
 // ---------- snapshot ----------
