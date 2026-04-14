@@ -74,6 +74,7 @@ import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
 import { useModeStore } from '@/stores/mode';
 import { usePaletteStore } from '@/stores/palette';
+import { useConfirmStore } from '@/stores/confirm';
 import { useLetterNormStore } from '@/stores/letterNorm';
 import { useMoney } from '@/composables/useMoney';
 import { useDate } from '@/composables/useDate';
@@ -101,6 +102,7 @@ const store = useDocumentsStore();
 const folder = useFolderStore();
 const modeStore = useModeStore();
 const palette = usePaletteStore();
+const confirmStore = useConfirmStore();
 const normStore = useLetterNormStore();
 const router = useRouter();
 const { sumLineItems, formatChf, sumAmounts } = useMoney();
@@ -529,7 +531,16 @@ const menus = computed<Menu[]>(() => [
       { separator: true, hidden: !hasActiveDoc.value },
       { label: t('Convert to invoice'), shortcut: '⌘⇧I', action: () => store.convertToInvoice(store.activeDocument!.number), disabled: !isOfferte.value, hidden: !hasActiveDoc.value },
       { separator: true, hidden: !isOfferte.value || !hasActiveDoc.value },
-      { label: t('Delete'), shortcut: '⌘⌫', action: () => store.activeDocument && store.deleteDocument(store.activeDocument.number), disabled: !hasActiveDoc.value, destructive: true },
+      { label: t('Delete'), shortcut: '⌘⌫', action: async () => {
+        const doc = store.activeDocument;
+        if (!doc) return;
+        const ok = await confirmStore.ask({
+          message: t('Delete document confirm', { number: doc.number }),
+          confirmLabel: t('Delete'),
+          destructive: true,
+        });
+        if (ok) store.deleteDocument(doc.number);
+      }, disabled: !hasActiveDoc.value, destructive: true },
     ],
   },
   {

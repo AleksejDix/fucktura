@@ -142,10 +142,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Client, Position } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
+import { useConfirmStore } from '@/stores/confirm';
 
 const documentsStore = useDocumentsStore();
+const confirmStore = useConfirmStore();
+const { t } = useI18n();
 const clients = computed<Client[]>(() => documentsStore.clients);
 const allPositions = computed<Position[]>(() => documentsStore.positions);
 const pickerOpenFor = ref<string | null>(null);
@@ -209,7 +213,14 @@ async function saveClient(client: Client) {
 }
 
 async function deleteClient(customerNumber: string) {
-  await documentsStore.removeClient(customerNumber);
+  const client = clients.value.find((c) => c.customerNumber === customerNumber);
+  const label = client?.company || client?.name || customerNumber;
+  const ok = await confirmStore.ask({
+    message: t('Delete client confirm', { name: label }),
+    confirmLabel: t('Delete'),
+    destructive: true,
+  });
+  if (ok) await documentsStore.removeClient(customerNumber);
 }
 
 function removePosition(client: Client, index: number) {

@@ -142,4 +142,11 @@ export default {
   'Overdue': 'Просрочено',
   'Unpaid': 'Не оплачено',
   'Quick search': 'Быстрый поиск',
+
+  // Confirmations
+  'Cancel': 'Отмена',
+  'Delete document confirm': 'Удалить документ {number}? Файл будет удалён с диска.',
+  'Delete client confirm': 'Удалить клиента {name}? Существующие документы сохранятся.',
+  'Delete sender confirm': 'Удалить отправителя {name}?',
+  'Delete position confirm': 'Удалить позицию {name}?',
 };

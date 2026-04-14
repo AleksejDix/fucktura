@@ -142,4 +142,11 @@ export default {
   'Overdue': 'Overdue',
   'Unpaid': 'Unpaid',
   'Quick search': 'Quick search',
+
+  // Confirmations
+  'Cancel': 'Cancel',
+  'Delete document confirm': 'Delete document {number}? This removes the file from disk.',
+  'Delete client confirm': 'Delete client {name}? Existing documents are kept.',
+  'Delete sender confirm': 'Delete sender {name}?',
+  'Delete position confirm': 'Delete position {name}?',
 };

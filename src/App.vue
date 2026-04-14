@@ -15,6 +15,7 @@
       <h2>{{ $t('Loading') }}</h2>
     </main>
     <DCommandPalette v-model:open="palette.open" />
+    <DConfirmDialog />
   </BootGate>
 </template>
 
@@ -31,6 +32,7 @@ import DCommandPalette from './components/DCommandPalette.vue';
 import DStatusBar from './components/DStatusBar.vue';
 import DErrorBoundary from './components/DErrorBoundary.vue';
 import DCollectionsSidebar from './components/DCollectionsSidebar.vue';
+import DConfirmDialog from './components/DConfirmDialog.vue';
 
 const router = useRouter();
 const documentsStore = useDocumentsStore();

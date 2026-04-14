@@ -142,4 +142,11 @@ export default {
   'Overdue': 'Vervallen',
   'Unpaid': 'Onbetaald',
   'Quick search': 'Snel zoeken',
+
+  // Confirmations
+  'Cancel': 'Annuleren',
+  'Delete document confirm': 'Document {number} verwijderen? Het bestand wordt van de schijf verwijderd.',
+  'Delete client confirm': 'Klant {name} verwijderen? Bestaande documenten blijven behouden.',
+  'Delete sender confirm': 'Afzender {name} verwijderen?',
+  'Delete position confirm': 'Positie {name} verwijderen?',
 };

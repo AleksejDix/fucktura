@@ -142,4 +142,11 @@ export default {
   'Overdue': 'Überfällig',
   'Unpaid': 'Unbezahlt',
   'Quick search': 'Schnellsuche',
+
+  // Confirmations
+  'Cancel': 'Abbrechen',
+  'Delete document confirm': 'Dokument {number} löschen? Die Datei wird von der Festplatte entfernt.',
+  'Delete client confirm': 'Kunde {name} löschen? Bestehende Dokumente bleiben erhalten.',
+  'Delete sender confirm': 'Absender {name} löschen?',
+  'Delete position confirm': 'Position {name} löschen?',
 };

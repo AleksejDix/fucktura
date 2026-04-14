@@ -114,11 +114,15 @@
 import { ref, computed, onMounted } from 'vue';
 import { nanoid } from 'nanoid';
 import type { Sender } from '@/fs/types';
+import { useI18n } from 'vue-i18n';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
+import { useConfirmStore } from '@/stores/confirm';
 
 const documentsStore = useDocumentsStore();
 const folder = useFolderStore();
+const confirmStore = useConfirmStore();
+const { t } = useI18n();
 const senderList = computed<Sender[]>(() => documentsStore.senders);
 const form = ref<Sender | null>(null);
 
@@ -178,6 +182,13 @@ async function save() {
 
 async function deleteSender() {
   if (!form.value?.key) return;
+  const label = form.value.company || form.value.key;
+  const ok = await confirmStore.ask({
+    message: t('Delete sender confirm', { name: label }),
+    confirmLabel: t('Delete'),
+    destructive: true,
+  });
+  if (!ok) return;
   await documentsStore.removeSender(form.value.key);
   form.value = senderList.value.length > 0 ? cloneSender(senderList.value[0]) : emptySender();
 }

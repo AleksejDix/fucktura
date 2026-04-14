@@ -40,11 +40,22 @@ async function readJson<T>(dir: FileSystemDirectoryHandle, filename: string): Pr
   }
 }
 
+/**
+ * Writes JSON atomically. createWritable + close() already commits via a
+ * browser-internal temp file, but we abort explicitly on errors so a failed
+ * serialization / write never leaves the stream dangling or the file in a
+ * half-written state.
+ */
 async function writeJson(dir: FileSystemDirectoryHandle, filename: string, data: unknown): Promise<void> {
   const fh = await dir.getFileHandle(filename, { create: true });
   const writable = await fh.createWritable();
-  await writable.write(JSON.stringify(data, null, 2) + '\n');
-  await writable.close();
+  try {
+    await writable.write(JSON.stringify(data, null, 2) + '\n');
+    await writable.close();
+  } catch (e) {
+    try { await writable.abort(); } catch { /* stream may already be closed */ }
+    throw e;
+  }
 }
 
 async function listJson<T>(

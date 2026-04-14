@@ -67,11 +67,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid';
 import type { Position } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
+import { useConfirmStore } from '@/stores/confirm';
 
 const documentsStore = useDocumentsStore();
+const confirmStore = useConfirmStore();
+const { t } = useI18n();
 const positions = ref<Position[]>([]);
 
 function reload() {
@@ -105,6 +109,14 @@ function updateVat(pos: Position, value: string) {
 }
 
 async function deletePosition(id: string) {
+  const target = positions.value.find((p) => p.id === id);
+  const label = target?.description || id;
+  const ok = await confirmStore.ask({
+    message: t('Delete position confirm', { name: label }),
+    confirmLabel: t('Delete'),
+    destructive: true,
+  });
+  if (!ok) return;
   positions.value = positions.value.filter(p => p.id !== id);
   await save();
 }

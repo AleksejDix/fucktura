@@ -142,4 +142,11 @@ export default {
   'Overdue': 'Vencido',
   'Unpaid': 'Impago',
   'Quick search': 'Búsqueda rápida',
+
+  // Confirmations
+  'Cancel': 'Cancelar',
+  'Delete document confirm': '¿Eliminar el documento {number}? Se borrará el archivo del disco.',
+  'Delete client confirm': '¿Eliminar al cliente {name}? Los documentos existentes se conservarán.',
+  'Delete sender confirm': '¿Eliminar al remitente {name}?',
+  'Delete position confirm': '¿Eliminar la posición {name}?',
 };
