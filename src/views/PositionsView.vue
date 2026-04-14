@@ -6,7 +6,7 @@
       <div
         v-for="(pos, i) in positions"
         :key="pos.id"
-        class="grid grid-cols-[1fr_120px_50px_80px_24px] gap-2 items-end text-[9pt]"
+        class="grid grid-cols-[1fr_120px_50px_60px_80px_24px] gap-2 items-end text-[9pt]"
       >
         <div>
           <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Description') }}</label>
@@ -31,6 +31,17 @@
             @blur="save"
             placeholder="h"
             class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 text-center focus:outline-none focus:border-gray-900"
+          />
+        </div>
+        <div>
+          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('VAT %') }}</label>
+          <input
+            :value="pos.defaultVatRate ?? ''"
+            :placeholder="$t('auto')"
+            @blur="updateVat(pos, ($event.target as HTMLInputElement).value)"
+            type="number"
+            step="0.1"
+            class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 font-mono text-right focus:outline-none focus:border-gray-900"
           />
         </div>
         <div>
@@ -82,6 +93,16 @@ async function addPosition() {
 
 function updatePrice(pos: Position, value: string) {
   pos.defaultPrice = parseFloat(value) || 0;
+  save();
+}
+
+function updateVat(pos: Position, value: string) {
+  const trimmed = value.trim();
+  if (trimmed === '') {
+    delete pos.defaultVatRate;
+  } else {
+    pos.defaultVatRate = parseFloat(trimmed) || 0;
+  }
   save();
 }
 

@@ -107,4 +107,15 @@ export default {
   'Next document': 'Next document',
   'Previous document': 'Previous document',
   'documents': 'documents',
+
+  // VAT
+  'VAT': 'VAT',
+  'Subtotal (net)': 'Subtotal (net)',
+  'Total': 'Total',
+  'on': 'on',
+  'Exempt': 'Exempt',
+  'VAT registered': 'VAT registered',
+  'VAT registered hint': 'Show VAT column and breakdown on invoices.',
+  'VAT %': 'VAT %',
+  'auto': 'auto',
 };

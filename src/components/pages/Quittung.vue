@@ -71,6 +71,7 @@
             <th class="py-1.5 w-[35px] font-bold">{{ t('Pos') }}</th>
             <th class="py-1.5 font-bold">{{ t('Description') }}</th>
             <th class="py-1.5 text-right font-bold">{{ t('Quantity') }}</th>
+            <th v-if="showVat" class="py-1.5 text-right font-bold">{{ t('VAT') }}</th>
             <th class="py-1.5 text-right font-bold">{{ t('Unit price') }}</th>
             <th class="py-1.5 text-right font-bold">{{ t('Price in') }} {{ currency }}</th>
           </tr>
@@ -84,6 +85,17 @@
             </td>
             <td class="py-1.5 text-right align-top font-mono">
               <DInline :model-value="formatAmount(item.quantity)" tag="span" @update:model-value="v => updateLineItem(i, 'quantity', parseFloat(v) || 0)" /> <DInline :model-value="item.unit || 'Stk'" tag="span" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'unit', v)" />
+            </td>
+            <td v-if="showVat" class="py-1.5 text-right align-top font-mono">
+              <select
+                v-if="isEdit"
+                :value="item.vatRate ?? 0"
+                @change="updateLineItem(i, 'vatRate', parseFloat(($event.target as HTMLSelectElement).value))"
+                class="bg-transparent border-none focus:outline-none text-right"
+              >
+                <option v-for="r in vatRateOptions" :key="r" :value="r">{{ r }}%</option>
+              </select>
+              <span v-else>{{ item.vatRate ?? 0 }}%</span>
             </td>
             <td class="py-1.5 text-right align-top font-mono">
               <DInline :model-value="formatAmount(item.unitPrice)" tag="span" @update:model-value="v => updateLineItem(i, 'unitPrice', parseFloat(v) || 0)" />
@@ -99,11 +111,33 @@
           </tr>
         </tbody>
         <tfoot>
-          <tr class="border-t border-gray-400">
+          <template v-if="showVat">
+            <tr class="border-t border-gray-400">
+              <td></td>
+              <td class="py-1.5">{{ t('Subtotal (net)') }}</td>
+              <td :colspan="3"></td>
+              <td class="py-1.5 text-right font-mono">{{ formatChfFromNumber(vatBreakdown.reduce((s, g) => s + g.net, 0)) }}</td>
+            </tr>
+            <tr v-for="group in vatBreakdown" :key="group.rate">
+              <td></td>
+              <td class="py-1.5 text-gray-600">
+                <template v-if="group.rate > 0">{{ t('VAT') }} {{ group.rate }}% {{ t('on') }} {{ formatChfFromNumber(group.net) }}</template>
+                <template v-else>{{ t('Exempt') }}</template>
+              </td>
+              <td :colspan="3"></td>
+              <td class="py-1.5 text-right font-mono text-gray-600">{{ formatChfFromNumber(group.vat) }}</td>
+            </tr>
+            <tr class="border-t border-gray-400">
+              <td></td>
+              <td class="py-1.5 font-bold">{{ t('Total') }}</td>
+              <td :colspan="3"></td>
+              <td class="py-1.5 text-right font-bold font-mono">{{ formatChfFromNumber(grossTotal) }}</td>
+            </tr>
+          </template>
+          <tr v-else class="border-t border-gray-400">
             <td></td>
             <td class="py-1.5 font-bold">{{ t('Amount (tax exempt)') }}</td>
-            <td></td>
-            <td></td>
+            <td :colspan="2"></td>
             <td class="py-1.5 text-right font-bold font-mono">{{ formatChf(total) }}</td>
           </tr>
         </tfoot>
@@ -136,11 +170,12 @@ import PageTemplate from '../PageTemplate.vue';
 import DClientPicker from '../DClientPicker.vue';
 import DInline from '../DInline.vue';
 import DDate from '../DDate.vue';
+import { availableRates } from '@/lib/vat';
 
 const { t } = useI18n({ useScope: 'local' });
 const store = useDocumentsStore();
 const modeStore = useModeStore();
-const { lineTotal, sumLineItems, formatChf } = useMoney();
+const { lineTotal, sumLineItems, formatChf, formatChfFromNumber, groupByVat, sumGross } = useMoney();
 const isEdit = computed(() => modeStore.isEditMode);
 
 const props = defineProps<{
@@ -159,6 +194,11 @@ const currency = computed(() => {
   return iban.startsWith('CH') ? 'CHF' : 'EUR';
 });
 
+const showVat = computed(() => !!props.sender?.vatRegistered);
+const vatRateOptions = computed(() => availableRates(props.sender?.country ?? '', meta.value.date));
+const vatBreakdown = computed(() => groupByVat(lineItems.value));
+const grossTotal = computed(() => sumGross(lineItems.value));
+
 function update(changes: Record<string, unknown>) {
   if (!props.doc.number) return;
   store.updateDocument(props.doc.number, changes);
@@ -172,10 +212,7 @@ function updateLineItem(index: number, field: string, value: unknown) {
 }
 
 function addLineItem() {
-  if (!props.doc.number) return;
-  const items = [...lineItems.value.map(item => ({ ...item }))];
-  items.push({ pos: items.length + 1, description: '', code: '', quantity: 0, unit: 'Stk', unitPrice: 0 });
-  store.updateDocument(props.doc.number, { lineItems: items });
+  store.addLineItemToActive();
 }
 
 function removeLineItem(index: number) {

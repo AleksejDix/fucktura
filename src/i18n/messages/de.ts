@@ -107,4 +107,15 @@ export default {
   'Next document': 'Nächstes Dokument',
   'Previous document': 'Vorheriges Dokument',
   'documents': 'Dokumente',
+
+  // VAT
+  'VAT': 'MwSt',
+  'Subtotal (net)': 'Zwischensumme (netto)',
+  'Total': 'Total',
+  'on': 'auf',
+  'Exempt': 'Steuerfrei',
+  'VAT registered': 'MwSt-pflichtig',
+  'VAT registered hint': 'MwSt-Spalte und Aufstellung auf Rechnungen anzeigen.',
+  'VAT %': 'MwSt %',
+  'auto': 'auto',
 };

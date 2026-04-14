@@ -107,4 +107,15 @@ export default {
   'Next document': 'Следующий документ',
   'Previous document': 'Предыдущий документ',
   'documents': 'документов',
+
+  // VAT
+  'VAT': 'НДС',
+  'Subtotal (net)': 'Промежуточный итог (нетто)',
+  'Total': 'Итого',
+  'on': 'на',
+  'Exempt': 'Без НДС',
+  'VAT registered': 'Плательщик НДС',
+  'VAT registered hint': 'Показывать столбец НДС и разбивку на счетах.',
+  'VAT %': 'НДС %',
+  'auto': 'авто',
 };

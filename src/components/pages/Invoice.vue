@@ -71,6 +71,7 @@
             <th class="py-1.5 w-[35px] font-bold">{{ t('Pos') }}</th>
             <th class="py-1.5 font-bold">{{ t('Description') }}</th>
             <th class="py-1.5 text-right font-bold">{{ t('Quantity') }}</th>
+            <th v-if="showVat" class="py-1.5 text-right font-bold">{{ t('VAT') }}</th>
             <th class="py-1.5 text-right font-bold">{{ t('Unit price') }}</th>
             <th class="py-1.5 text-right font-bold">{{ t('Price in') }} {{ currency }}</th>
           </tr>
@@ -84,6 +85,17 @@
             </td>
             <td class="py-1.5 text-right align-top font-mono">
               <DInline :model-value="formatAmount(item.quantity)" tag="span" @update:model-value="v => updateLineItem(i, 'quantity', parseFloat(v) || 0)" /> <DInline :model-value="item.unit || 'h'" tag="span" class="text-gray-500" @update:model-value="v => updateLineItem(i, 'unit', v)" />
+            </td>
+            <td v-if="showVat" class="py-1.5 text-right align-top font-mono">
+              <select
+                v-if="isEdit"
+                :value="item.vatRate ?? 0"
+                @change="updateLineItem(i, 'vatRate', parseFloat(($event.target as HTMLSelectElement).value))"
+                class="bg-transparent border-none focus:outline-none text-right"
+              >
+                <option v-for="r in vatRateOptions" :key="r" :value="r">{{ r }}%</option>
+              </select>
+              <span v-else>{{ item.vatRate ?? 0 }}%</span>
             </td>
             <td class="py-1.5 text-right align-top font-mono">
               <DInline :model-value="formatAmount(item.unitPrice)" tag="span" @update:model-value="v => updateLineItem(i, 'unitPrice', parseFloat(v) || 0)" />
@@ -99,13 +111,34 @@
           </tr>
         </tbody>
         <tfoot>
-          <tr class="border-t border-gray-400">
+          <template v-if="showVat">
+            <tr class="border-t border-gray-400">
+              <td></td>
+              <td class="py-1.5">{{ t('Subtotal (net)') }}</td>
+              <td :colspan="3"></td>
+              <td class="py-1.5 text-right font-mono">{{ formatChfFromNumber(vatBreakdown.reduce((s, g) => s + g.net, 0)) }}</td>
+            </tr>
+            <tr v-for="group in vatBreakdown" :key="group.rate">
+              <td></td>
+              <td class="py-1.5 text-gray-600">
+                <template v-if="group.rate > 0">{{ t('VAT') }} {{ group.rate }}% {{ t('on') }} {{ formatChfFromNumber(group.net) }}</template>
+                <template v-else>{{ t('Exempt') }}</template>
+              </td>
+              <td :colspan="3"></td>
+              <td class="py-1.5 text-right font-mono text-gray-600">{{ formatChfFromNumber(group.vat) }}</td>
+            </tr>
+            <tr class="border-t border-gray-400">
+              <td></td>
+              <td class="py-1.5 font-bold">{{ t('Total') }}</td>
+              <td :colspan="3"></td>
+              <td class="py-1.5 text-right font-bold font-mono">{{ formatChfFromNumber(grossTotal) }}</td>
+            </tr>
+          </template>
+          <tr v-else class="border-t border-gray-400">
             <td></td>
             <td class="py-1.5 font-bold">{{ t('Amount (tax exempt)') }}</td>
-            <td></td>
-            <td></td>
+            <td :colspan="2"></td>
             <td class="py-1.5 text-right font-bold font-mono">{{ formatChf(total) }}</td>
-
           </tr>
         </tfoot>
       </table>
@@ -136,11 +169,12 @@ import PageTemplate from '../PageTemplate.vue';
 import DClientPicker from '../DClientPicker.vue';
 import DInline from '../DInline.vue';
 import DDate from '../DDate.vue';
+import { availableRates } from '@/lib/vat';
 
 const { t } = useI18n({ useScope: 'local' });
 const store = useDocumentsStore();
 const modeStore = useModeStore();
-const { lineTotal, sumLineItems, formatChf, formatChfFromNumber } = useMoney();
+const { lineTotal, sumLineItems, formatChf, formatChfFromNumber, groupByVat, sumGross } = useMoney();
 const isEdit = computed(() => modeStore.isEditMode);
 
 const props = defineProps<{
@@ -159,6 +193,11 @@ const currency = computed(() => {
   return iban.startsWith('CH') ? 'CHF' : 'EUR';
 });
 
+const showVat = computed(() => !!props.sender?.vatRegistered);
+const vatRateOptions = computed(() => availableRates(props.sender?.country ?? '', meta.value.date));
+const vatBreakdown = computed(() => groupByVat(lineItems.value));
+const grossTotal = computed(() => sumGross(lineItems.value));
+
 function update(changes: Record<string, unknown>) {
   if (!props.doc.number) return;
   store.updateDocument(props.doc.number, changes);
@@ -172,10 +211,7 @@ function updateLineItem(index: number, field: string, value: unknown) {
 }
 
 function addLineItem() {
-  if (!props.doc.number) return;
-  const items = [...lineItems.value.map(item => ({ ...item }))];
-  items.push({ pos: items.length + 1, description: '', code: '', quantity: 0, unit: 'h', unitPrice: 0 });
-  store.updateDocument(props.doc.number, { lineItems: items });
+  store.addLineItemToActive();
 }
 
 function removeLineItem(index: number) {
@@ -206,6 +242,11 @@ function formatAmount(n: number): string {
     "Price in": "Preis in",
     "Product code": "Produktcode",
     "Amount (tax exempt)": "Betrag (von Steuer befreit)",
+    "VAT": "MwSt",
+    "Subtotal (net)": "Zwischensumme (netto)",
+    "Total": "Total",
+    "on": "auf",
+    "Exempt": "Steuerfrei",
     "Questions note": "Bei Fragen stehen wir Ihnen gerne zur Verfügung.",
     "Kind regards": "Freundliche Grüsse",
     "Add line item": "Position hinzufügen"
@@ -225,6 +266,11 @@ function formatAmount(n: number): string {
     "Price in": "Price in",
     "Product code": "Product code",
     "Amount (tax exempt)": "Amount (tax exempt)",
+    "VAT": "VAT",
+    "Subtotal (net)": "Subtotal (net)",
+    "Total": "Total",
+    "on": "on",
+    "Exempt": "Exempt",
     "Questions note": "If you have any questions, please contact us.",
     "Kind regards": "Kind regards",
     "Add line item": "Add line item"
@@ -244,6 +290,11 @@ function formatAmount(n: number): string {
     "Price in": "Precio en",
     "Product code": "Código de producto",
     "Amount (tax exempt)": "Importe (exento de impuestos)",
+    "VAT": "IVA",
+    "Subtotal (net)": "Subtotal (neto)",
+    "Total": "Total",
+    "on": "sobre",
+    "Exempt": "Exento",
     "Questions note": "¿Tiene preguntas? No dude en contactarnos.",
     "Kind regards": "Atentamente",
     "Add line item": "Añadir posición"
@@ -263,6 +314,11 @@ function formatAmount(n: number): string {
     "Price in": "Prijs in",
     "Product code": "Productcode",
     "Amount (tax exempt)": "Bedrag (vrijgesteld van BTW)",
+    "VAT": "BTW",
+    "Subtotal (net)": "Subtotaal (netto)",
+    "Total": "Totaal",
+    "on": "over",
+    "Exempt": "Vrijgesteld",
     "Questions note": "Heeft u vragen? Neem gerust contact met ons op.",
     "Kind regards": "Met vriendelijke groet",
     "Add line item": "Positie toevoegen"
@@ -282,6 +338,11 @@ function formatAmount(n: number): string {
     "Price in": "Цена в",
     "Product code": "Код продукта",
     "Amount (tax exempt)": "Сумма (без НДС)",
+    "VAT": "НДС",
+    "Subtotal (net)": "Промежуточный итог (нетто)",
+    "Total": "Итого",
+    "on": "на",
+    "Exempt": "Без НДС",
     "Questions note": "При возникновении вопросов обращайтесь к нам.",
     "Kind regards": "С уважением",
     "Add line item": "Добавить позицию"

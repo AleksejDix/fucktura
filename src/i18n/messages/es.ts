@@ -107,4 +107,15 @@ export default {
   'Next document': 'Siguiente documento',
   'Previous document': 'Documento anterior',
   'documents': 'documentos',
+
+  // VAT
+  'VAT': 'IVA',
+  'Subtotal (net)': 'Subtotal (neto)',
+  'Total': 'Total',
+  'on': 'sobre',
+  'Exempt': 'Exento',
+  'VAT registered': 'Sujeto a IVA',
+  'VAT registered hint': 'Mostrar columna de IVA y desglose en facturas.',
+  'VAT %': 'IVA %',
+  'auto': 'auto',
 };

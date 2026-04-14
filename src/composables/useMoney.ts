@@ -1,6 +1,8 @@
 import { dinero, add, multiply, toDecimal } from 'dinero.js';
 import { CHF } from 'dinero.js';
 
+interface VatLine { quantity: number; unitPrice: number; vatRate?: number }
+
 export function useMoney() {
   function chf(amount: number) {
     const cents = Math.round(amount * 100);
@@ -35,5 +37,51 @@ export function useMoney() {
     return formatChf(chf(n));
   }
 
-  return { chf, lineTotal, sumLineItems, sumAmounts, formatChf, formatChfFromNumber };
+  /** Per-line net amount (quantity × unitPrice) as a plain number. */
+  function lineNet(quantity: number, unitPrice: number): number {
+    return Math.round(quantity * unitPrice * 100) / 100;
+  }
+
+  /** VAT amount for a single line. */
+  function lineVat(quantity: number, unitPrice: number, vatRate: number): number {
+    return Math.round(lineNet(quantity, unitPrice) * vatRate) / 100;
+  }
+
+  /** Group lines by VAT rate; for each rate return {net, vat, gross}. */
+  function groupByVat(items: VatLine[]): Array<{ rate: number; net: number; vat: number; gross: number }> {
+    const byRate = new Map<number, { net: number; vat: number }>();
+    for (const item of items) {
+      const rate = item.vatRate ?? 0;
+      const net = lineNet(item.quantity, item.unitPrice);
+      const vat = (rate > 0) ? Math.round(net * rate) / 100 : 0;
+      const prev = byRate.get(rate) ?? { net: 0, vat: 0 };
+      byRate.set(rate, { net: prev.net + net, vat: prev.vat + vat });
+    }
+    return [...byRate.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([rate, { net, vat }]) => ({
+        rate,
+        net: Math.round(net * 100) / 100,
+        vat: Math.round(vat * 100) / 100,
+        gross: Math.round((net + vat) * 100) / 100,
+      }));
+  }
+
+  /** Grand gross = net sum + VAT sum for all items. */
+  function sumGross(items: VatLine[]): number {
+    return groupByVat(items).reduce((s, g) => s + g.gross, 0);
+  }
+
+  return {
+    chf,
+    lineTotal,
+    sumLineItems,
+    sumAmounts,
+    formatChf,
+    formatChfFromNumber,
+    lineNet,
+    lineVat,
+    groupByVat,
+    sumGross,
+  };
 }

@@ -66,6 +66,15 @@
       </section>
 
       <section>
+        <p class="text-[8pt] text-gray-900 mb-2">{{ $t('VAT') }}</p>
+        <label class="flex items-center gap-2 text-[9pt] text-gray-700 cursor-pointer">
+          <input type="checkbox" :checked="!!form.vatRegistered" @change="onVatToggle(($event.target as HTMLInputElement).checked)" class="cursor-pointer" />
+          <span>{{ $t('VAT registered') }}</span>
+          <span class="text-gray-400 text-[8pt]">{{ $t('VAT registered hint') }}</span>
+        </label>
+      </section>
+
+      <section>
         <div class="flex items-baseline justify-between mb-2">
           <p class="text-[8pt] text-gray-900">{{ $t('Bank accounts') }}</p>
           <button type="button" @click="addAccount" class="text-[8pt] text-gray-500 hover:text-black">
@@ -152,6 +161,12 @@ function addAccount() {
 
 function removeAccount(i: number) {
   form.value?.accounts.splice(i, 1);
+  save();
+}
+
+function onVatToggle(checked: boolean) {
+  if (!form.value) return;
+  form.value.vatRegistered = checked;
   save();
 }
 

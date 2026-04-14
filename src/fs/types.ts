@@ -24,6 +24,8 @@ export interface Sender extends Address {
   accounts: Account[];
   invoiceDueDays: number;
   quoteValidDays: number;
+  /** If false, invoices render "tax exempt" and no VAT column appears. */
+  vatRegistered?: boolean;
 }
 
 export interface Position {
@@ -33,6 +35,8 @@ export interface Position {
   code: string;
   unit: string;
   defaultPrice: number;
+  /** Percentage; if omitted, line item falls back to sender's standard rate. */
+  defaultVatRate?: number;
 }
 
 export interface ClientPosition {
@@ -53,6 +57,8 @@ export interface LineItem {
   quantity: number;
   unit: string;
   unitPrice: number;
+  /** VAT percentage applied at issue time. Missing = 0 (exempt, backward compat). */
+  vatRate?: number;
 }
 
 export type Recipient = Address;

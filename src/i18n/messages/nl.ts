@@ -107,4 +107,15 @@ export default {
   'Next document': 'Volgend document',
   'Previous document': 'Vorig document',
   'documents': 'documenten',
+
+  // VAT
+  'VAT': 'BTW',
+  'Subtotal (net)': 'Subtotaal (netto)',
+  'Total': 'Totaal',
+  'on': 'over',
+  'Exempt': 'Vrijgesteld',
+  'VAT registered': 'BTW-plichtig',
+  'VAT registered hint': 'BTW-kolom en overzicht op facturen tonen.',
+  'VAT %': 'BTW %',
+  'auto': 'auto',
 };

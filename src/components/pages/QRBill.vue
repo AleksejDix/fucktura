@@ -39,7 +39,7 @@ import { useMoney } from '@/composables/useMoney';
 import PageTemplate from '../PageTemplate.vue';
 
 const { t, locale } = useI18n({ useScope: 'local' });
-const { sumLineItems, sumAmounts } = useMoney();
+const { sumLineItems, sumAmounts, sumGross } = useMoney();
 
 const props = defineProps<{
   pageIndex?: number;
@@ -61,7 +61,13 @@ watch(
       amount = parseFloat(toDecimal(sumAmounts(props.doc.offenerBetrag ?? 0, props.doc.mahngebuehr ?? 0, props.doc.verzugszins ?? 0)));
     } else {
       const items = props.doc.lineItems ?? [];
-      amount = items.length ? parseFloat(toDecimal(sumLineItems(items))) : 0;
+      if (items.length === 0) {
+        amount = 0;
+      } else if (props.sender.vatRegistered) {
+        amount = sumGross(items);
+      } else {
+        amount = parseFloat(toDecimal(sumLineItems(items)));
+      }
     }
 
     const account = props.sender.accounts?.find(a => a.iban.startsWith('CH')) ?? props.sender.accounts?.[0];

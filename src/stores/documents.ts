@@ -1,6 +1,7 @@
 import * as repo from '@/fs/repo';
 import type { Client, Document, DocumentStatus, Position, Sender, SenderSnapshot } from '@/fs/types';
 import { defaultUnitForType, numberPrefix } from '@/lib/documents';
+import { defaultVatRate as countryDefaultVatRate } from '@/lib/vat';
 import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
@@ -134,7 +135,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         contactPerson: s.contact ?? '',
         customerNumber: client?.customerNumber ?? '',
       },
-      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0 }],
+      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0, vatRate: s.vatRegistered ? countryDefaultVatRate(s.country ?? '', today.toISOString()) : 0 }],
     });
   }
 
@@ -164,7 +165,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         contactPerson: s.contact ?? '',
         customerNumber: client?.customerNumber ?? '',
       },
-      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0 }],
+      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'h', unitPrice: 0, vatRate: s.vatRegistered ? countryDefaultVatRate(s.country ?? '', today.toISOString()) : 0 }],
     });
   }
 
@@ -193,7 +194,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         contactPerson: s.contact ?? '',
         customerNumber: client?.customerNumber ?? '',
       },
-      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'Pauschal', unitPrice: 0 }],
+      lineItems: [{ pos: 1, description: '', code: '', quantity: 1, unit: 'Pauschal', unitPrice: 0, vatRate: s.vatRegistered ? countryDefaultVatRate(s.country ?? '', today.toISOString()) : 0 }],
     });
   }
 
@@ -257,7 +258,8 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
-  function resolveClientPositions(client: Client) {
+  function resolveClientPositions(client: Client, doc: Document) {
+    const fallbackVat = senderDefaultVat(doc);
     return (client.positions ?? []).map((cp, i) => {
       const pos = positions.value.find((p) => p.id === cp.positionId);
       return {
@@ -267,6 +269,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         quantity: 0,
         unit: pos?.unit ?? 'h',
         unitPrice: cp.price,
+        vatRate: pos?.defaultVatRate ?? fallbackVat,
       };
     });
   }
@@ -294,7 +297,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         country: client.country,
         email: client.email ?? '',
       },
-      lineItems: resolveClientPositions(client),
+      lineItems: resolveClientPositions(client, doc),
       meta: { ...doc.meta, customerNumber: client.customerNumber ?? '' },
       updatedAt: new Date().toISOString(),
     };
@@ -339,11 +342,24 @@ export const useDocumentsStore = defineStore('documents', () => {
     return addDocument(rest);
   }
 
+  function senderDefaultVat(doc: Document): number {
+    if (!doc.sender?.vatRegistered) return 0;
+    return countryDefaultVatRate(doc.sender.country ?? '', doc.meta.date);
+  }
+
   async function addLineItemToActive() {
     const doc = activeDocument.value;
     if (!doc) return;
     const items = [...(doc.lineItems ?? [])];
-    items.push({ pos: items.length + 1, description: '', code: '', quantity: 1, unit: defaultUnitForType(doc.type), unitPrice: 0 });
+    items.push({
+      pos: items.length + 1,
+      description: '',
+      code: '',
+      quantity: 1,
+      unit: defaultUnitForType(doc.type),
+      unitPrice: 0,
+      vatRate: senderDefaultVat(doc),
+    });
     await updateDocument(doc.number, { lineItems: items });
   }
 
