@@ -438,7 +438,7 @@ describe('useDocumentsStore', () => {
         d.number === 'R-1' ? { ...d, subtitle: 'Accessibility Testing' } : d,
       );
       store.setView('all');
-      store.quickSearch = 'vpat';
+      store.quickSearch = 'accessibility';
       expect(store.filteredDocuments.map((d) => d.number)).toEqual(['R-1']);
     });
 

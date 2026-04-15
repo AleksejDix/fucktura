@@ -45,7 +45,7 @@ describe('documentHaystack', () => {
   it('includes number / subtitle / recipient fields lowercased', () => {
     const h = documentHaystack(doc());
     expect(h).toContain('r-42');
-    expect(h).toContain('vpat testing');
+    expect(h).toContain('accessibility testing');
     expect(h).toContain('example corp');
     expect(h).toContain('jane example');
     expect(h).toContain('0076');
