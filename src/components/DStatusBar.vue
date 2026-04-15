@@ -29,10 +29,14 @@
       <button
         v-if="updateReady"
         @click="applyUpdate"
-        class="text-[11px] px-2 py-0.5 bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+        class="text-[11px] px-2 py-0.5 bg-red-600 text-white hover:bg-red-700 transition-colors"
       >
         {{ $t('Update available · Reload') }}
       </button>
+      <span v-else class="flex items-center gap-1.5 text-[11px] font-mono text-gray-500">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        <span>v{{ version }}</span>
+      </span>
       <DSaveIndicator />
     </div>
   </footer>
@@ -50,6 +54,7 @@ import DSaveIndicator from './DSaveIndicator.vue';
 const store = useDocumentsStore();
 const folder = useFolderStore();
 const { sumLineItems, sumAmounts, formatChf } = useMoney();
+const version = __APP_VERSION__;
 
 const doc = computed(() => store.activeDocument);
 const total = computed(() => {

@@ -4,6 +4,7 @@ import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
+import pkg from './package.json' with { type: 'json' };
 
 const _dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -35,6 +36,7 @@ export default defineConfig({
     __VUE_OPTIONS_API__: true,
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+    __APP_VERSION__: JSON.stringify(pkg.version),
   },
   plugins: [
     tailwindcss(),
