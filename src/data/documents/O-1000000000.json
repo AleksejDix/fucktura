@@ -1,0 +1,43 @@
+{
+  "type": "offerte",
+  "number": "O-1000000000",
+  "status": "draft",
+  "clientNumber": "0002",
+  "senderKey": "default",
+  "subtitle": "Kick-off workshop",
+  "recipient": {
+    "company": "Demo Inc",
+    "name": "Sam Demo",
+    "street": "Beispielweg 5",
+    "zip": "3000",
+    "city": "Bern",
+    "country": "Schweiz",
+    "email": "sam@demo.example"
+  },
+  "meta": {
+    "date": "2026-03-20T00:00:00.000Z",
+    "validUntil": "2026-04-20T00:00:00.000Z",
+    "contactPerson": "Alex Example",
+    "customerNumber": "0002"
+  },
+  "lineItems": [
+    {
+      "pos": 1,
+      "description": "Workshop preparation",
+      "code": "",
+      "quantity": 4,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 2,
+      "description": "Workshop delivery",
+      "code": "",
+      "quantity": 8,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    }
+  ]
+}

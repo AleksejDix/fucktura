@@ -1,0 +1,29 @@
+{
+  "type": "mahnung",
+  "number": "M-1000000000",
+  "status": "draft",
+  "clientNumber": "0001",
+  "senderKey": "default",
+  "subtitle": "1. Mahnung zur Rechnung R-1000000000",
+  "recipient": {
+    "company": "Example Corp",
+    "name": "Jane Example",
+    "street": "Musterstrasse 10",
+    "zip": "8050",
+    "city": "Zürich",
+    "country": "Schweiz",
+    "email": "jane@example.com"
+  },
+  "meta": {
+    "date": "2026-04-21T00:00:00.000Z",
+    "dueDate": "2026-05-05T00:00:00.000Z",
+    "invoiceDate": "2026-03-31T00:00:00.000Z",
+    "overdueSince": "2026-04-14T00:00:00.000Z",
+    "contactPerson": "Alex Example",
+    "customerNumber": "0001"
+  },
+  "stufe": 1,
+  "offenerBetrag": 960,
+  "mahngebuehr": 20,
+  "verzugszins": 0
+}

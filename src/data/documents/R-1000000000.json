@@ -1,0 +1,34 @@
+{
+  "type": "invoice",
+  "number": "R-1000000000",
+  "status": "sent",
+  "clientNumber": "0001",
+  "senderKey": "default",
+  "subtitle": "Consulting hours — March 2026",
+  "recipient": {
+    "company": "Example Corp",
+    "name": "Jane Example",
+    "street": "Musterstrasse 10",
+    "zip": "8050",
+    "city": "Zürich",
+    "country": "Schweiz",
+    "email": "jane@example.com"
+  },
+  "meta": {
+    "date": "2026-03-31T00:00:00.000Z",
+    "dueDate": "2026-04-14T00:00:00.000Z",
+    "contactPerson": "Alex Example",
+    "customerNumber": "0001"
+  },
+  "lineItems": [
+    {
+      "pos": 1,
+      "description": "Consulting",
+      "code": "",
+      "quantity": 8,
+      "unit": "h",
+      "unitPrice": 120,
+      "vatRate": 8.1
+    }
+  ]
+}

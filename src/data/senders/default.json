@@ -1,0 +1,23 @@
+{
+  "key": "default",
+  "company": "Acme Consulting",
+  "street": "Bahnhofstrasse 1",
+  "zip": "8001",
+  "city": "Zürich",
+  "country": "Schweiz",
+  "email": "billing@acme.example",
+  "website": "https://acme.example",
+  "uid": "CHE-000.000.001",
+  "contact": "Alex Example",
+  "contactEmail": "alex@acme.example",
+  "invoiceDueDays": 14,
+  "quoteValidDays": 14,
+  "vatRegistered": true,
+  "accounts": [
+    {
+      "iban": "CH00 0000 0000 0000 0000 0",
+      "bank": "Demo Bank",
+      "bic": "DEMOCHZZXXX"
+    }
+  ]
+}

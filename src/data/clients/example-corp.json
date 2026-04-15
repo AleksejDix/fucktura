@@ -1,0 +1,11 @@
+{
+  "customerNumber": "0001",
+  "company": "Example Corp",
+  "name": "Jane Example",
+  "email": "jane@example.com",
+  "street": "Musterstrasse 10",
+  "zip": "8050",
+  "city": "Zürich",
+  "country": "Schweiz",
+  "pricedPositions": [{ "description": "Consulting", "price": 120 }]
+}

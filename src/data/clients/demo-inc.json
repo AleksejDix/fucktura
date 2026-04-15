@@ -1,0 +1,10 @@
+{
+  "customerNumber": "0002",
+  "company": "Demo Inc",
+  "name": "Sam Demo",
+  "email": "sam@demo.example",
+  "street": "Beispielweg 5",
+  "zip": "3000",
+  "city": "Bern",
+  "country": "Schweiz"
+}
