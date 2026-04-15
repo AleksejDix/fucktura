@@ -153,4 +153,6 @@ export default {
   'Delete client confirm': 'Klant {name} verwijderen? Bestaande documenten blijven behouden.',
   'Delete sender confirm': 'Afzender {name} verwijderen?',
   'Delete position confirm': 'Positie {name} verwijderen?',
+  // Service worker
+  'Update available · Reload': 'Update beschikbaar · Herladen',
 };

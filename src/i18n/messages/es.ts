@@ -153,4 +153,6 @@ export default {
   'Delete client confirm': '¿Eliminar al cliente {name}? Los documentos existentes se conservarán.',
   'Delete sender confirm': '¿Eliminar al remitente {name}?',
   'Delete position confirm': '¿Eliminar la posición {name}?',
+  // Service worker
+  'Update available · Reload': 'Actualización disponible · Recargar',
 };

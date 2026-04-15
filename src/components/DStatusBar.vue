@@ -26,6 +26,13 @@
     </div>
 
     <div class="flex items-center gap-3 shrink-0">
+      <button
+        v-if="updateReady"
+        @click="applyUpdate"
+        class="text-[11px] px-2 py-0.5 bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+      >
+        {{ $t('Update available · Reload') }}
+      </button>
       <DSaveIndicator />
     </div>
   </footer>
@@ -37,6 +44,7 @@ import { DOC_TYPE_DOT_CLASS as dotClass } from '@/lib/documents';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
 import { useMoney } from '@/composables/useMoney';
+import { applyUpdate, updateReady } from '@/sw-register';
 import DSaveIndicator from './DSaveIndicator.vue';
 
 const store = useDocumentsStore();
