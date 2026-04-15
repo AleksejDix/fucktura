@@ -1,6 +1,11 @@
 <template>
-  <PageTemplate :page-index="pageIndex">
-    <template #header>
+  <PageTemplate
+    v-for="(page, idx) in pages"
+    :key="page.pageNum"
+    :page-index="pageIndex"
+    :class="idx > 0 ? 'mt-4 print:mt-0' : ''"
+  >
+    <template v-if="page.isFirst" #header>
       <header
         class="absolute top-0 left-0 right-0 pt-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)] max-h-[var(--norm-header-h)]"
       >
@@ -20,7 +25,16 @@
       </header>
     </template>
 
-    <section>
+    <template v-else #header>
+      <header
+        class="absolute top-0 left-0 right-0 pt-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)] flex justify-between items-baseline text-[9pt] text-gray-500"
+      >
+        <span class="font-mono text-gray-700">{{ sender.company }} · {{ doc.number }}</span>
+        <span class="font-mono">{{ t('Page') }} {{ page.pageNum }} / {{ pages.length }}</span>
+      </header>
+    </template>
+
+    <section v-if="page.isFirst">
       <div class="pt-[var(--norm-addr-offset)]">
         <div class="w-[var(--norm-addr-w)]">
           <DClientPicker
@@ -116,9 +130,31 @@
         <p class="mt-2">{{ t('Invoice intro') }}</p>
       </div>
 
-      <DLineItemsTable :doc="doc" :sender="sender" />
+      <DLineItemsTable
+        :doc="doc"
+        :sender="sender"
+        :items="page.items"
+        :show-footer="page.isLast"
+        :show-add-button="page.isLast"
+      />
 
-      <div class="text-[9pt] leading-relaxed mt-4">
+      <div v-if="page.isLast" class="text-[9pt] leading-relaxed mt-4">
+        <p>{{ t('Questions note') }}</p>
+        <p class="mt-3">{{ t('Kind regards') }}</p>
+        <p>{{ meta.contactPerson }}</p>
+      </div>
+    </section>
+
+    <section v-else>
+      <DLineItemsTable
+        :doc="doc"
+        :sender="sender"
+        :items="page.items"
+        :show-footer="page.isLast"
+        :show-add-button="page.isLast"
+      />
+
+      <div v-if="page.isLast" class="text-[9pt] leading-relaxed mt-4">
         <p>{{ t('Questions note') }}</p>
         <p class="mt-3">{{ t('Kind regards') }}</p>
         <p>{{ meta.contactPerson }}</p>
@@ -149,6 +185,48 @@ const props = defineProps<{
 
 const recipient = computed(() => props.doc.recipient);
 const meta = computed(() => props.doc.meta);
+
+// Heuristic page split: page 1 has the letterhead+recipient+meta+intro
+// taking up about half the page, so it fits ~18 items. Continuation pages
+// use almost the full A4 — about ~28 items. The last page reserves space
+// for the totals + closing block (~6 row equivalents).
+const ITEMS_FIRST = 18;
+const ITEMS_CONT = 28;
+const LAST_PAGE_RESERVE = 6;
+
+interface PageSlice {
+  items: typeof props.doc.lineItems;
+  pageNum: number;
+  isFirst: boolean;
+  isLast: boolean;
+}
+
+const pages = computed<PageSlice[]>(() => {
+  const all = props.doc.lineItems ?? [];
+  if (all.length === 0) {
+    return [{ items: [], pageNum: 1, isFirst: true, isLast: true }];
+  }
+  const slices: PageSlice[] = [];
+  let i = 0;
+  let isFirst = true;
+  let pageNum = 1;
+  while (i < all.length) {
+    const max = isFirst ? ITEMS_FIRST : ITEMS_CONT;
+    const remaining = all.length - i;
+    const fitsAsLast = remaining <= max - LAST_PAGE_RESERVE;
+    if (fitsAsLast) {
+      slices.push({ items: all.slice(i), pageNum, isFirst, isLast: true });
+      return slices;
+    }
+    slices.push({ items: all.slice(i, i + max), pageNum, isFirst, isLast: false });
+    i += max;
+    isFirst = false;
+    pageNum += 1;
+  }
+  // Edge case: items fit exactly without triggering fitsAsLast
+  if (slices.length > 0) slices[slices.length - 1].isLast = true;
+  return slices;
+});
 
 function update(changes: DocumentPatch) {
   if (!props.doc.number) return;

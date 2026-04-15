@@ -43,6 +43,13 @@
 }
 
 @media print {
+  /* Each <section class="page"> is one A4 sheet — force a page break
+     between siblings so multi-page documents print correctly. */
+  section.page + section.page {
+    page-break-before: always;
+    break-before: page;
+  }
+
   h1,
   h2,
   h3,

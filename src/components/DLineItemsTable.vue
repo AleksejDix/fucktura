@@ -73,7 +73,7 @@
         </td>
       </tr>
     </tbody>
-    <tfoot>
+    <tfoot v-if="showFooter">
       <template v-if="showVat">
         <tr class="border-t border-gray-400">
           <td></td>
@@ -114,7 +114,7 @@
   </table>
 
   <button
-    v-if="isEdit"
+    v-if="isEdit && showAddButton"
     @click="addRow"
     class="text-[8pt] text-gray-400 hover:text-black mt-2 print:hidden"
   >
@@ -124,7 +124,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Document, Sender } from '@/fs/types';
+import type { Document, LineItem, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import { useModeStore } from '@/stores/mode';
 import { useMoney } from '@/composables/useMoney';
@@ -132,10 +132,19 @@ import { defaultUnitForType } from '@/lib/documents';
 import { availableRates } from '@/lib/vat';
 import DInline from './DInline.vue';
 
-const props = defineProps<{
-  doc: Document;
-  sender: Sender;
-}>();
+const props = withDefaults(
+  defineProps<{
+    doc: Document;
+    sender: Sender;
+    /** Override to render only a subset of the doc's items (for paginated docs). */
+    items?: LineItem[];
+    /** Show the totals tfoot. Disable on non-last pages of multi-page docs. */
+    showFooter?: boolean;
+    /** Show the "+ Add line item" button. Disable on non-last pages. */
+    showAddButton?: boolean;
+  }>(),
+  { showFooter: true, showAddButton: true },
+);
 
 const store = useDocumentsStore();
 const modeStore = useModeStore();
@@ -143,7 +152,7 @@ const { lineTotal, sumLineItems, formatChf, formatChfFromNumber, groupByVat, sum
   useMoney();
 const isEdit = computed(() => modeStore.isEditMode);
 
-const lineItems = computed(() => props.doc.lineItems ?? []);
+const lineItems = computed(() => props.items ?? props.doc.lineItems ?? []);
 const defaultUnit = computed(() => defaultUnitForType(props.doc.type));
 const currency = computed(() => {
   const iban = props.sender?.accounts?.[0]?.iban ?? '';
@@ -154,9 +163,10 @@ const showVat = computed(() => !!props.sender?.vatRegistered);
 const vatRateOptions = computed(() =>
   availableRates(props.sender?.country ?? '', props.doc.meta.date),
 );
-const vatBreakdown = computed(() => groupByVat(lineItems.value));
-const grossTotal = computed(() => sumGross(lineItems.value));
-const netTotalDinero = computed(() => sumLineItems(lineItems.value));
+const allItems = computed(() => props.doc.lineItems ?? []);
+const vatBreakdown = computed(() => groupByVat(allItems.value));
+const grossTotal = computed(() => sumGross(allItems.value));
+const netTotalDinero = computed(() => sumLineItems(allItems.value));
 const netTotal = computed(() => vatBreakdown.value.reduce((s, g) => s + g.net, 0));
 
 const exemptLabel = computed(() =>
