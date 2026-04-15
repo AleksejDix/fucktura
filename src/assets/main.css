@@ -21,13 +21,21 @@
     break-after: avoid;
   }
 
-  table,
-  figure {
+  /* Keep a line-item row from splitting, and keep the total + closing
+     block together at the end. */
+  tr,
+  tfoot {
     page-break-inside: avoid;
     break-inside: avoid;
   }
 
-  section.page {
+  /* Repeat the table header on every printed page when a table spans
+     across a page break. */
+  thead {
+    display: table-header-group;
+  }
+
+  figure {
     page-break-inside: avoid;
     break-inside: avoid;
   }

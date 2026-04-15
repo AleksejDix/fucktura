@@ -1,6 +1,6 @@
 <template>
   <section
-    class="page w-[210mm] h-[297mm] print:m-0 bg-white relative mx-auto pl-[var(--norm-ml)] pr-[var(--norm-mr)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none"
+    class="page w-[210mm] min-h-[297mm] print:m-0 bg-white relative mx-auto pl-[var(--norm-ml)] pr-[var(--norm-mr)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none pb-[40mm]"
     :class="[letterNorm.normClass, { 'print:hidden': !pagesStore.pages[pageIndex].enabled }]"
   >
     <div class="absolute -right-10 top-0 flex flex-col gap-1 print:hidden">
@@ -19,9 +19,7 @@
     <div :class="{ 'opacity-20': !pagesStore.pages[pageIndex].enabled }">
       <slot name="header" />
 
-      <div
-        class="pt-[var(--norm-header-h)] pb-[20mm] max-h-[var(--norm-content-h)] overflow-hidden"
-      >
+      <div class="pt-[var(--norm-header-h)] pb-[20mm]">
         <slot />
       </div>
 
