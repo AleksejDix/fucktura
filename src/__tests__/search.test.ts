@@ -46,7 +46,7 @@ describe('documentHaystack', () => {
     const h = documentHaystack(doc());
     expect(h).toContain('r-42');
     expect(h).toContain('vpat testing');
-    expect(h).toContain('example ag');
+    expect(h).toContain('example corp');
     expect(h).toContain('jane example');
     expect(h).toContain('0076');
   });

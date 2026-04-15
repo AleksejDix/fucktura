@@ -1,13 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import senderData from '@/data/senders/default.json';
-import example from '@/data/clients/example.json';
-import propertyCaptain from '@/data/clients/sample-ag.json';
-import demo from '@/data/clients/demo.json';
-import demo-salon from '@/data/clients/demo-salon.json';
-import demo-three from '@/data/clients/demo-three.json';
-import invoiceDoc from '@/data/documents/R-1764806400.json';
-import offerteDoc from '@/data/documents/O-1773100800.json';
-import mahnungDoc from '@/data/documents/M-1773100800.json';
+import exampleCorp from '@/data/clients/example-corp.json';
+import demoInc from '@/data/clients/demo-inc.json';
+import invoiceDoc from '@/data/documents/R-1000000000.json';
+import offerteDoc from '@/data/documents/O-1000000000.json';
+import mahnungDoc from '@/data/documents/M-1000000000.json';
 
 describe('sender data', () => {
   it('has required fields', () => {
@@ -33,11 +30,8 @@ describe('sender data', () => {
 
 describe('client data', () => {
   const clients = [
-    { name: 'Example', data: example, expectedKnr: '0076' },
-    { name: 'Sample', data: propertyCaptain, expectedKnr: '0005' },
-    { name: 'Demo', data: demo, expectedKnr: '0010' },
-    { name: 'Demo Salon', data: demo-salon, expectedKnr: '0017' },
-    { name: 'Demo Three', data: demo-three, expectedKnr: '0014' },
+    { name: 'Example Corp', data: exampleCorp, expectedKnr: '0001' },
+    { name: 'Demo Inc', data: demoInc, expectedKnr: '0002' },
   ];
 
   for (const client of clients) {
@@ -63,19 +57,19 @@ describe('client data', () => {
 });
 
 describe('document data', () => {
-  it('R-1764806400 is an invoice', () => {
+  it('R-1000000000 is an invoice', () => {
     expect(invoiceDoc.type).toBe('invoice');
-    expect(invoiceDoc.number).toBe('R-1764806400');
+    expect(invoiceDoc.number).toBe('R-1000000000');
     expect(invoiceDoc.lineItems.length).toBeGreaterThan(0);
   });
 
-  it('O-1773100800 is an offerte', () => {
+  it('O-1000000000 is an offerte', () => {
     expect(offerteDoc.type).toBe('offerte');
-    expect(offerteDoc.number).toBe('O-1773100800');
+    expect(offerteDoc.number).toBe('O-1000000000');
     expect(offerteDoc.lineItems.length).toBeGreaterThan(0);
   });
 
-  it('M-1773100800 is a mahnung', () => {
+  it('M-1000000000 is a mahnung', () => {
     expect(mahnungDoc.type).toBe('mahnung');
     expect(mahnungDoc.stufe).toBeGreaterThanOrEqual(1);
   });

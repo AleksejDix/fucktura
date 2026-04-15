@@ -42,25 +42,10 @@ const bundledDocuments = import.meta.glob('@/data/documents/*.json', {
 }) as Record<string, RawDocument>;
 
 const globalPositionsCatalog: Omit<Position, 'id'>[] = [
-  {
-    description: 'Consulting',
-    code: '6220',
-    unit: 'h',
-    defaultPrice: 29,
-  },
-  {
-    description: 'Consulting',
-    code: '6221',
-    unit: 'h',
-    defaultPrice: 29,
-  },
-  { description: 'Consulting', code: '6222', unit: 'h', defaultPrice: 29 },
-  { description: 'Consulting', code: '6223', unit: 'h', defaultPrice: 29 },
-  { description: 'Consulting', code: '6224', unit: 'h', defaultPrice: 29 },
-  { description: 'Consulting', code: '6225', unit: 'h', defaultPrice: 29 },
-  { description: 'Accessibility Testing', code: '6300', unit: 'h', defaultPrice: 1200 },
-  { description: 'Website creation', code: '', unit: 'Stk', defaultPrice: 1500 },
-  { description: 'Demo E2E Consulting', code: '', unit: 'h', defaultPrice: 40 },
+  { description: 'Consulting', code: '', unit: 'h', defaultPrice: 120, defaultVatRate: 8.1 },
+  { description: 'Design work', code: '', unit: 'h', defaultPrice: 150, defaultVatRate: 8.1 },
+  { description: 'Development', code: '', unit: 'h', defaultPrice: 140, defaultVatRate: 8.1 },
+  { description: 'Workshop', code: '', unit: 'Pauschal', defaultPrice: 2400, defaultVatRate: 8.1 },
 ];
 
 function toSnapshot(s: Sender): SenderSnapshot {

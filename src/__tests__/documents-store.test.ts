@@ -343,7 +343,7 @@ describe('useDocumentsStore', () => {
     function seed(store: ReturnType<typeof useDocumentsStore>) {
       store.senders = [
         makeSender('dix', { company: 'Acme Consulting', uid: 'CHE-1' }),
-        makeSender('gs', { company: 'Demo Studio', uid: 'DE-1' }),
+        makeSender('gs', { company: 'Demo Sender', uid: 'DE-1' }),
       ];
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -489,10 +489,10 @@ describe('useDocumentsStore', () => {
       const store = useDocumentsStore();
       store.senders = [
         makeSender('dix', { company: 'Acme Consulting', uid: 'CHE-1' }),
-        makeSender('gs', { company: 'Demo Studio', uid: 'DE-1' }),
+        makeSender('gs', { company: 'Demo Sender', uid: 'DE-1' }),
       ];
       const legacy = makeDoc({
-        sender: { ...fakeSenderSnap, company: 'Demo Studio', uid: 'DE-1' },
+        sender: { ...fakeSenderSnap, company: 'Demo Sender', uid: 'DE-1' },
       });
       delete (legacy as Partial<Document>).senderKey;
       expect(store.resolveSenderKey(legacy)).toBe('gs');
@@ -500,7 +500,7 @@ describe('useDocumentsStore', () => {
 
     it('returns null when no sender matches', () => {
       const store = useDocumentsStore();
-      store.senders = [makeSender('dix', { company: 'Dix', uid: 'A' })];
+      store.senders = [makeSender('acme', { company: 'Acme', uid: 'A' })];
       const doc = makeDoc({ sender: { ...fakeSenderSnap, company: 'Unknown', uid: 'Z' } });
       delete (doc as Partial<Document>).senderKey;
       expect(store.resolveSenderKey(doc)).toBeNull();
