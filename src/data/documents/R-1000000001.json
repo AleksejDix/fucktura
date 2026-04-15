@@ -1,0 +1,295 @@
+{
+  "type": "invoice",
+  "number": "R-1000000001",
+  "status": "sent",
+  "clientNumber": "0001",
+  "senderKey": "default",
+  "subtitle": "Long invoice (multi-page demo)",
+  "recipient": {
+    "company": "Example Corp",
+    "name": "Jane Example",
+    "street": "Musterstrasse 10",
+    "zip": "8050",
+    "city": "Zürich",
+    "country": "Schweiz",
+    "email": "jane@example.com"
+  },
+  "meta": {
+    "date": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-04-15T00:00:00.000Z",
+    "contactPerson": "Alex Example",
+    "customerNumber": "0001"
+  },
+  "lineItems": [
+    {
+      "pos": 1,
+      "description": "Discovery workshop",
+      "code": "",
+      "quantity": 6,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 2,
+      "description": "Stakeholder interviews",
+      "code": "",
+      "quantity": 8,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 3,
+      "description": "Architecture review",
+      "code": "",
+      "quantity": 4,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 4,
+      "description": "Frontend prototyping",
+      "code": "",
+      "quantity": 16,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 5,
+      "description": "Backend API design",
+      "code": "",
+      "quantity": 12,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 6,
+      "description": "Database schema",
+      "code": "",
+      "quantity": 6,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 7,
+      "description": "Auth integration",
+      "code": "",
+      "quantity": 8,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 8,
+      "description": "Onboarding flow",
+      "code": "",
+      "quantity": 10,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 9,
+      "description": "Settings page",
+      "code": "",
+      "quantity": 5,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 10,
+      "description": "Billing flow",
+      "code": "",
+      "quantity": 8,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 11,
+      "description": "Email templates",
+      "code": "",
+      "quantity": 3,
+      "unit": "h",
+      "unitPrice": 120,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 12,
+      "description": "Notifications",
+      "code": "",
+      "quantity": 6,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 13,
+      "description": "Search & filters",
+      "code": "",
+      "quantity": 9,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 14,
+      "description": "Internationalization",
+      "code": "",
+      "quantity": 7,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 15,
+      "description": "Accessibility audit",
+      "code": "",
+      "quantity": 5,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 16,
+      "description": "Performance tuning",
+      "code": "",
+      "quantity": 4,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 17,
+      "description": "End-to-end tests",
+      "code": "",
+      "quantity": 12,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 18,
+      "description": "Unit test coverage",
+      "code": "",
+      "quantity": 6,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 19,
+      "description": "CI pipeline",
+      "code": "",
+      "quantity": 4,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 20,
+      "description": "Deployment automation",
+      "code": "",
+      "quantity": 3,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 21,
+      "description": "Monitoring & alerts",
+      "code": "",
+      "quantity": 4,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 22,
+      "description": "Security review",
+      "code": "",
+      "quantity": 5,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 23,
+      "description": "Documentation",
+      "code": "",
+      "quantity": 6,
+      "unit": "h",
+      "unitPrice": 120,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 24,
+      "description": "Handover workshop",
+      "code": "",
+      "quantity": 4,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 25,
+      "description": "Post-launch support — week 1",
+      "code": "",
+      "quantity": 6,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 26,
+      "description": "Post-launch support — week 2",
+      "code": "",
+      "quantity": 4,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 27,
+      "description": "Bug fixes",
+      "code": "",
+      "quantity": 5,
+      "unit": "h",
+      "unitPrice": 140,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 28,
+      "description": "Project management",
+      "code": "",
+      "quantity": 12,
+      "unit": "h",
+      "unitPrice": 120,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 29,
+      "description": "Status reports",
+      "code": "",
+      "quantity": 4,
+      "unit": "h",
+      "unitPrice": 120,
+      "vatRate": 8.1
+    },
+    {
+      "pos": 30,
+      "description": "Final retrospective",
+      "code": "",
+      "quantity": 2,
+      "unit": "h",
+      "unitPrice": 150,
+      "vatRate": 8.1
+    }
+  ]
+}

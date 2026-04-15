@@ -16,6 +16,9 @@
       </button>
     </div>
     <slot name="side-controls" />
+    <!-- Hidden text whose content is captured into the page-running header
+         string for use in @top-right margin boxes on continuation pages. -->
+    <span class="running-header-source">{{ runningHeader }}</span>
     <div :class="{ 'opacity-20': !pagesStore.pages[pageIndex].enabled }">
       <slot name="header" />
 
@@ -52,7 +55,7 @@ import { computed } from 'vue';
 import { usePagesStore } from '@/stores/pages';
 import { useLetterNormStore } from '@/stores/letterNorm';
 import { Eye, EyeOff } from 'lucide-vue-next';
-import type { SenderSnapshot } from '@/fs/types';
+import type { Document, SenderSnapshot } from '@/fs/types';
 
 const pagesStore = usePagesStore();
 const letterNorm = useLetterNormStore();
@@ -65,4 +68,14 @@ const props = defineProps({
 const sender = computed(
   () => pagesStore.pages[props.pageIndex]?.metadata?.sender as SenderSnapshot | undefined,
 );
+
+const doc = computed(
+  () => pagesStore.pages[props.pageIndex]?.metadata?.doc as Document | undefined,
+);
+
+const runningHeader = computed(() => {
+  const company = sender.value?.company ?? '';
+  const number = doc.value?.number ?? '';
+  return [company, number].filter(Boolean).join(' · ');
+});
 </script>

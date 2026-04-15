@@ -5,10 +5,41 @@
   print-color-adjust: exact !important;
 }
 
-/* size: A4 is Chromium-only; margin: 0 suppresses browser headers/footers */
+/* size: A4 is Chromium-only; margin: 0 suppresses browser headers/footers.
+   The Hauptblatt (page 1) renders edge-to-edge — letterhead is laid out
+   inside the document body. Continuation pages get a margin band with a
+   running header pulled from the .running-header-source element. */
 @page {
   size: A4 portrait;
   margin: 0;
+
+  @top-right {
+    content: string(running-header) ' · ' counter(page) ' / ' counter(pages);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 8pt;
+    color: #6b7280;
+    padding: 8mm 15mm 0 0;
+    vertical-align: top;
+  }
+}
+
+@page :first {
+  /* Page 1 is the Hauptblatt — no running header band. */
+  @top-right {
+    content: '';
+    padding: 0;
+  }
+}
+
+.running-header-source {
+  string-set: running-header content();
+  /* Capture the text into the named string but don't render in flow. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 @media print {
