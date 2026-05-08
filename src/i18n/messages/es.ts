@@ -143,6 +143,7 @@ export default {
   // Collections sidebar
   Types: 'Tipos',
   Senders: 'Remitentes',
+  Recipients: 'Destinatarios',
   Overdue: 'Vencido',
   Unpaid: 'Impago',
   'Quick search': 'Búsqueda rápida',

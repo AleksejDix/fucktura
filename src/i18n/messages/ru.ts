@@ -142,6 +142,7 @@ export default {
   // Collections sidebar
   Types: 'Типы',
   Senders: 'Отправители',
+  Recipients: 'Получатели',
   Overdue: 'Просрочено',
   Unpaid: 'Не оплачено',
   'Quick search': 'Быстрый поиск',

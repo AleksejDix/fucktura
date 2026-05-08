@@ -17,6 +17,15 @@
         <DCollectionItem v-for="v in senderViews" :key="v.id" :view="v" />
       </nav>
     </template>
+
+    <template v-if="recipientViews.length > 0">
+      <p class="mt-4 px-3 text-[10px] text-gray-400 uppercase tracking-wide">
+        {{ $t('Recipients') }}
+      </p>
+      <nav class="mt-1 space-y-0.5">
+        <DCollectionItem v-for="v in recipientViews" :key="v.id" :view="v" />
+      </nav>
+    </template>
   </aside>
 </template>
 
@@ -53,5 +62,13 @@ const typeViews = computed<ViewDef[]>(() => [
 
 const senderViews = computed<ViewDef[]>(() =>
   store.senders.map((s) => ({ id: `sender:${s.key}`, label: s.company, icon: '🏢' })),
+);
+
+const recipientViews = computed<ViewDef[]>(() =>
+  store.recipientLabels.map((label) => ({
+    id: `recipient:${label}`,
+    label,
+    icon: '👤',
+  })),
 );
 </script>

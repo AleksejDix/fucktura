@@ -52,6 +52,10 @@ export const useDocumentsStore = defineStore('documents', () => {
     return d < today;
   }
 
+  function recipientLabel(doc: Document): string {
+    return doc.recipient.company || doc.recipient.name || '';
+  }
+
   function viewMatches(doc: Document, view: ViewId): boolean {
     if (view === 'all') return true;
     if (view === 'drafts') return doc.status === 'draft';
@@ -59,6 +63,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     if (view === 'unpaid') return doc.type === 'invoice' && doc.status !== 'paid';
     if (view.startsWith('type:')) return doc.type === view.slice(5);
     if (view.startsWith('sender:')) return resolveSenderKey(doc) === view.slice(7);
+    if (view.startsWith('recipient:')) return recipientLabel(doc) === view.slice(10);
     return true;
   }
 
@@ -80,6 +85,15 @@ export const useDocumentsStore = defineStore('documents', () => {
   const viewFilteredDocuments = computed(() => {
     const v = activeView.value;
     return v === 'all' ? documents.value : documents.value.filter((d) => viewMatches(d, v));
+  });
+
+  const recipientLabels = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const d of documents.value) {
+      const label = recipientLabel(d);
+      if (label) set.add(label);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b));
   });
 
   const filteredDocuments = computed(() => {
@@ -584,6 +598,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     activeStatusPill,
     quickSearch,
     statusPillsForView,
+    recipientLabels,
     setView,
     viewCount,
     isOverdue,

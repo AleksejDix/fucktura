@@ -142,6 +142,7 @@ export default {
   // Collections sidebar
   Types: 'Types',
   Senders: 'Senders',
+  Recipients: 'Recipients',
   Overdue: 'Overdue',
   Unpaid: 'Unpaid',
   'Quick search': 'Quick search',

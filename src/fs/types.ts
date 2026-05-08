@@ -124,4 +124,5 @@ export type ViewId =
   | 'overdue'
   | 'unpaid'
   | `type:${DocumentType}`
-  | `sender:${string}`;
+  | `sender:${string}`
+  | `recipient:${string}`;
