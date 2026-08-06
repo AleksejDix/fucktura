@@ -86,6 +86,15 @@
               class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900"
             />
           </div>
+          <div class="col-span-2">
+            <label class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('UID') }}</label>
+            <input
+              v-model="client.uid"
+              @blur="saveClient(client)"
+              placeholder="CHE-123.456.789"
+              class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 font-mono"
+            />
+          </div>
         </div>
 
         <div class="mt-4 border-t border-gray-200 pt-4">

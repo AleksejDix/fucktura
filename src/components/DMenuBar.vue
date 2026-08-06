@@ -204,6 +204,7 @@ function emailBody(): string {
   const recipient = doc.recipient;
   const name = recipient.name || recipient.company;
   const lang = locale.value;
+  const currency = sender.accounts?.[0]?.iban?.startsWith('CH') ? 'CHF' : 'EUR';
 
   const bodies: Record<string, Record<string, (d: typeof doc) => string>> = {
     de: {
@@ -213,7 +214,7 @@ function emailBody(): string {
 
 Anbei erhalten Sie unsere Offerte ${d.number} vom ${fmtDate(d.meta.date)}.
 
-Offertbetrag: CHF ${total}
+Offertbetrag: ${currency} ${total}
 Gültig bis: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Betreff: ${d.subtitle}\n\n` : ''}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
@@ -228,7 +229,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Anbei erhalten Sie unsere Rechnung ${d.number} vom ${fmtDate(d.meta.date)}.
 
-Rechnungsbetrag: CHF ${total}
+Rechnungsbetrag: ${currency} ${total}
 Zahlbar bis: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Betreff: ${d.subtitle}\n\n` : ''}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
@@ -245,11 +246,25 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Leider haben wir für die Rechnung ${d.number} vom ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} noch keinen Zahlungseingang feststellen können.
 
-Offener Betrag: CHF ${total}
+Offener Betrag: ${currency} ${total}
 Fällig seit: ${fmtDate(d.meta.overdueSince)}
 Zahlbar bis: ${fmtDate(d.meta.dueDate)}
 
 Wir bitten Sie, den ausstehenden Betrag innert der genannten Frist zu überweisen.
+
+Freundliche Grüsse
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      quittung: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Guten Tag ${name}
+
+Anbei erhalten Sie die Quittung ${d.number} vom ${fmtDate(d.meta.date)}.
+
+Betrag: ${currency} ${total} (bereits bezahlt)
+
+${d.subtitle ? `Betreff: ${d.subtitle}\n\n` : ''}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
 
 Freundliche Grüsse
 ${sender.contact || sender.company}
@@ -263,7 +278,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Please find attached our quote ${d.number} dated ${fmtDate(d.meta.date)}.
 
-Quote amount: CHF ${total}
+Quote amount: ${currency} ${total}
 Valid until: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Subject: ${d.subtitle}\n\n` : ''}Please do not hesitate to contact us if you have any questions.
@@ -278,7 +293,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Please find attached our invoice ${d.number} dated ${fmtDate(d.meta.date)}.
 
-Invoice amount: CHF ${total}
+Invoice amount: ${currency} ${total}
 Due date: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Subject: ${d.subtitle}\n\n` : ''}Please do not hesitate to contact us if you have any questions.
@@ -295,11 +310,25 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 We have not yet received payment for invoice ${d.number} dated ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
 
-Outstanding amount: CHF ${total}
+Outstanding amount: ${currency} ${total}
 Overdue since: ${fmtDate(d.meta.overdueSince)}
 Due date: ${fmtDate(d.meta.dueDate)}
 
 We kindly ask you to settle the outstanding amount within the stated deadline.
+
+Kind regards
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      quittung: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Dear ${name}
+
+Please find attached our receipt ${d.number} dated ${fmtDate(d.meta.date)}.
+
+Amount: ${currency} ${total} (already paid)
+
+${d.subtitle ? `Subject: ${d.subtitle}\n\n` : ''}Please do not hesitate to contact us if you have any questions.
 
 Kind regards
 ${sender.contact || sender.company}
@@ -313,7 +342,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Adjunto le enviamos nuestro presupuesto ${d.number} del ${fmtDate(d.meta.date)}.
 
-Importe: CHF ${total}
+Importe: ${currency} ${total}
 Válido hasta: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Asunto: ${d.subtitle}\n\n` : ''}Quedamos a su disposición para cualquier consulta.
@@ -328,7 +357,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Adjunto le enviamos nuestra factura ${d.number} del ${fmtDate(d.meta.date)}.
 
-Importe: CHF ${total}
+Importe: ${currency} ${total}
 Fecha de vencimiento: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Asunto: ${d.subtitle}\n\n` : ''}Quedamos a su disposición para cualquier consulta.
@@ -345,11 +374,25 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Lamentablemente no hemos recibido el pago de la factura ${d.number} del ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
 
-Importe pendiente: CHF ${total}
+Importe pendiente: ${currency} ${total}
 Vencido desde: ${fmtDate(d.meta.overdueSince)}
 Fecha límite de pago: ${fmtDate(d.meta.dueDate)}
 
 Le rogamos que realice la transferencia dentro del plazo indicado.
+
+Atentamente
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      quittung: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Estimado/a ${name}
+
+Adjunto le enviamos el recibo ${d.number} del ${fmtDate(d.meta.date)}.
+
+Importe: ${currency} ${total} (ya pagado)
+
+${d.subtitle ? `Asunto: ${d.subtitle}\n\n` : ''}Quedamos a su disposición para cualquier consulta.
 
 Atentamente
 ${sender.contact || sender.company}
@@ -363,7 +406,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Hierbij ontvangt u onze offerte ${d.number} van ${fmtDate(d.meta.date)}.
 
-Offertebedrag: CHF ${total}
+Offertebedrag: ${currency} ${total}
 Geldig tot: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Betreft: ${d.subtitle}\n\n` : ''}Mocht u vragen hebben, neem dan gerust contact met ons op.
@@ -378,7 +421,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Hierbij ontvangt u onze factuur ${d.number} van ${fmtDate(d.meta.date)}.
 
-Factuurbedrag: CHF ${total}
+Factuurbedrag: ${currency} ${total}
 Betaalbaar tot: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Betreft: ${d.subtitle}\n\n` : ''}Mocht u vragen hebben, neem dan gerust contact met ons op.
@@ -395,11 +438,25 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 Helaas hebben wij voor factuur ${d.number} van ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} nog geen betaling ontvangen.
 
-Openstaand bedrag: CHF ${total}
+Openstaand bedrag: ${currency} ${total}
 Vervallen sinds: ${fmtDate(d.meta.overdueSince)}
 Betaalbaar tot: ${fmtDate(d.meta.dueDate)}
 
 Wij verzoeken u het openstaande bedrag binnen de genoemde termijn over te maken.
+
+Met vriendelijke groet
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      quittung: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Geachte ${name}
+
+Hierbij ontvangt u onze kwitantie ${d.number} van ${fmtDate(d.meta.date)}.
+
+Bedrag: ${currency} ${total} (reeds betaald)
+
+${d.subtitle ? `Betreft: ${d.subtitle}\n\n` : ''}Mocht u vragen hebben, neem dan gerust contact met ons op.
 
 Met vriendelijke groet
 ${sender.contact || sender.company}
@@ -413,7 +470,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 В приложении наше коммерческое предложение ${d.number} от ${fmtDate(d.meta.date)}.
 
-Сумма предложения: CHF ${total}
+Сумма предложения: ${currency} ${total}
 Действительно до: ${fmtDate(d.meta.validUntil)}
 
 ${d.subtitle ? `Тема: ${d.subtitle}\n\n` : ''}При возникновении вопросов обращайтесь к нам.
@@ -428,7 +485,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 В приложении наш счёт ${d.number} от ${fmtDate(d.meta.date)}.
 
-Сумма счёта: CHF ${total}
+Сумма счёта: ${currency} ${total}
 Срок оплаты: ${fmtDate(d.meta.dueDate)}
 
 ${d.subtitle ? `Тема: ${d.subtitle}\n\n` : ''}При возникновении вопросов обращайтесь к нам.
@@ -445,11 +502,25 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 
 К сожалению, мы ещё не получили оплату по счёту ${d.number} от ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
 
-Сумма задолженности: CHF ${total}
+Сумма задолженности: ${currency} ${total}
 Просрочено с: ${fmtDate(d.meta.overdueSince)}
 Срок оплаты: ${fmtDate(d.meta.dueDate)}
 
 Просим произвести оплату в указанный срок.
+
+С уважением
+${sender.contact || sender.company}
+${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
+      },
+      quittung: (d) => {
+        const total = formatChf(sumLineItems(d.lineItems ?? []));
+        return `Здравствуйте, ${name}
+
+В приложении квитанция ${d.number} от ${fmtDate(d.meta.date)}.
+
+Сумма: ${currency} ${total} (уже оплачено)
+
+${d.subtitle ? `Тема: ${d.subtitle}\n\n` : ''}При возникновении вопросов обращайтесь к нам.
 
 С уважением
 ${sender.contact || sender.company}
@@ -476,11 +547,15 @@ function sendEmail() {
   const to = doc.recipient.email || client?.email || '';
   const typeLabel =
     doc.type === 'invoice'
-      ? t('Rechnungen')
+      ? t('Invoice')
       : doc.type === 'offerte'
-        ? t('Offerten')
-        : t('Mahnungen');
-  const subject = `${typeLabel} ${doc.number}`;
+        ? t('Quote')
+        : doc.type === 'quittung'
+          ? t('Receipt')
+          : t('Reminder');
+  const subject = doc.subtitle
+    ? `${typeLabel} ${doc.number} – ${doc.subtitle}`
+    : `${typeLabel} ${doc.number}`;
   const body = emailBody();
   window.open(
     `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
@@ -515,6 +590,19 @@ function statusItems(): MenuItem[] {
         label: t(status),
         action: () => store.setStatus(num, status),
         checked: s === status,
+      });
+    }
+    // 'Settled' is derived from the linked invoice being paid, not a status of
+    // its own — so the menu item drives the invoice, not the reminder.
+    const related = activeDoc.value?.relatedInvoice;
+    if (related) {
+      const resolved = store.isMahnungResolved(activeDoc.value!);
+      items.push({ separator: true });
+      items.push({
+        label: t('settled'),
+        checked: resolved,
+        disabled: resolved,
+        action: () => store.setStatus(related, 'paid'),
       });
     }
   }
@@ -559,7 +647,11 @@ const menus = computed<Menu[]>(() => [
       { separator: true },
       { label: t('New Offerte'), shortcut: '⌘N', action: () => store.createOfferte() },
       { label: t('New invoice'), action: () => store.createInvoice() },
-      { label: t('New reminder'), action: () => store.createMahnung() },
+      {
+        label: t('New reminder'),
+        action: () =>
+          store.createMahnung(activeType.value === 'invoice' ? activeDoc.value?.number : undefined),
+      },
       { label: t('New receipt'), action: () => store.createQuittung() },
       { separator: true },
       { label: t('Print / PDF'), shortcut: '⌘P', action: () => emit('generate-pdf') },

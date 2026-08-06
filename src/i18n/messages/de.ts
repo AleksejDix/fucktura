@@ -7,6 +7,10 @@ export default {
   Offerten: 'Offerten',
   Rechnungen: 'Rechnungen',
   Mahnungen: 'Mahnungen',
+  Invoice: 'Rechnung',
+  Quote: 'Offerte',
+  Reminder: 'Mahnung',
+  Receipt: 'Quittung',
   'New Offerte': 'Neue Offerte',
   'New invoice': 'Neue Rechnung',
   'New reminder': 'Neue Mahnung',
@@ -81,6 +85,7 @@ export default {
   paid: 'Bezahlt',
   accepted: 'Angenommen',
   rejected: 'Abgelehnt',
+  settled: 'Erledigt',
 
   // Folder gate
   'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.':
@@ -122,6 +127,8 @@ export default {
   'VAT registered': 'MwSt-pflichtig',
   'VAT registered hint': 'MwSt-Spalte und Aufstellung auf Rechnungen anzeigen.',
   'VAT %': 'MwSt %',
+  'Tax note': 'Steuerhinweis',
+  'Tax note hint': 'Wird unter dem Rechnungsbetrag gedruckt, z. B. Kleinunternehmer-Hinweis nach § 19 UStG.',
   auto: 'auto',
 
   // Error boundary

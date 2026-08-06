@@ -7,6 +7,10 @@ export default {
   Offerten: 'Quotes',
   Rechnungen: 'Invoices',
   Mahnungen: 'Reminders',
+  Invoice: 'Invoice',
+  Quote: 'Quote',
+  Reminder: 'Reminder',
+  Receipt: 'Receipt',
   'New Offerte': 'New Quote',
   'New invoice': 'New Invoice',
   'New reminder': 'New Reminder',
@@ -81,6 +85,7 @@ export default {
   paid: 'Paid',
   accepted: 'Accepted',
   rejected: 'Rejected',
+  settled: 'Settled',
 
   // Folder gate
   'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.':
@@ -122,6 +127,8 @@ export default {
   'VAT registered': 'VAT registered',
   'VAT registered hint': 'Show VAT column and breakdown on invoices.',
   'VAT %': 'VAT %',
+  'Tax note': 'Tax note',
+  'Tax note hint': 'Printed below the invoice total, e.g. a small-business VAT exemption note.',
   auto: 'auto',
 
   // Error boundary

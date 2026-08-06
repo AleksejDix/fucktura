@@ -12,6 +12,7 @@ export interface Address {
   city: string;
   country: string;
   email?: string;
+  uid?: string;
 }
 
 export interface Sender extends Address {
@@ -26,6 +27,8 @@ export interface Sender extends Address {
   quoteValidDays: number;
   /** If false, invoices render "tax exempt" and no VAT column appears. */
   vatRegistered?: boolean;
+  /** Printed under the totals, e.g. the § 19 UStG Kleinunternehmer note. */
+  taxNote?: string;
 }
 
 export interface Position {
@@ -89,6 +92,13 @@ export interface Document {
   subtitle: string;
   /** Foreign key to Client.customerNumber (empty string if unassigned) */
   customerNumber: string;
+  /**
+   * Foreign key to the invoice this document refers to (Document.number).
+   * Set on mahnungen — the reminder duns this invoice, and the reminder is
+   * considered settled once that invoice's status is 'paid'. Optional for
+   * backward compat with reminders created before the link existed.
+   */
+  relatedInvoice?: string;
   /** Foreign key to Sender.key; optional for backward compat with pre-filter docs. */
   senderKey?: string;
   sender: SenderSnapshot;

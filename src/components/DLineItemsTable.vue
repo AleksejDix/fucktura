@@ -113,6 +113,10 @@
     </tfoot>
   </table>
 
+  <p v-if="showFooter && sender?.taxNote" class="text-[8pt] text-gray-600 mt-2">
+    {{ sender.taxNote }}
+  </p>
+
   <button
     v-if="isEdit && showAddButton"
     @click="addRow"

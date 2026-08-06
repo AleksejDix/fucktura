@@ -66,6 +66,13 @@
               tag="div"
               @update:model-value="(v) => update({ 'recipient.country': v })"
             />
+            <DInline
+              v-if="recipient.uid"
+              v-model="recipient.uid"
+              tag="div"
+              class="text-gray-500 font-mono"
+              @update:model-value="(v) => update({ 'recipient.uid': v })"
+            />
           </address>
         </div>
       </div>
@@ -87,6 +94,27 @@
           class="font-bold text-[9pt]"
           @update:model-value="(v) => update({ subtitle: v })"
         />
+      </div>
+
+      <div class="mt-3 print:hidden">
+        <DInvoicePicker :doc-number="doc.number" :has-invoice="!!relatedInvoiceNumber" />
+        <div v-if="relatedInvoiceNumber" class="flex items-center gap-2 text-[9pt]">
+          <span class="text-gray-600">{{ t('reminder to invoice') }}</span>
+          <span class="font-mono font-medium">{{ relatedInvoiceNumber }}</span>
+          <span
+            class="px-2 py-0.5 rounded-sm text-[8pt] font-medium"
+            :class="isResolved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+            >{{ isResolved ? t('settled') : t('Open') }}</span
+          >
+          <button
+            v-if="!isResolved"
+            type="button"
+            @click="markInvoicePaid"
+            class="text-[8pt] underline text-gray-500 hover:text-gray-900"
+          >
+            {{ t('Mark invoice paid') }}
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
@@ -144,7 +172,7 @@
           <tr class="border-b border-gray-200">
             <td class="py-1.5">
               {{ t('Outstanding amount') }} ({{ t('reminder to invoice') }}
-              <span class="font-mono">{{ doc.number }}</span
+              <span class="font-mono">{{ relatedInvoiceNumber || doc.number }}</span
               >)
             </td>
             <td class="py-1.5 text-right font-mono">
@@ -208,6 +236,7 @@ import { useMoney } from '@/composables/useMoney';
 import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import PageTemplate from '../PageTemplate.vue';
 import DClientPicker from '../DClientPicker.vue';
+import DInvoicePicker from '../DInvoicePicker.vue';
 import DInline from '../DInline.vue';
 import DDate from '../DDate.vue';
 
@@ -223,6 +252,8 @@ const props = defineProps<{
 
 const recipient = computed(() => props.doc.recipient);
 const meta = computed(() => props.doc.meta);
+const relatedInvoiceNumber = computed(() => props.doc.relatedInvoice ?? '');
+const isResolved = computed(() => store.isMahnungResolved(props.doc));
 const mahnungStufe = computed(() => props.doc.stufe ?? 1);
 const offenerBetrag = computed(() => props.doc.offenerBetrag ?? 0);
 const mahngebuehr = computed(() => props.doc.mahngebuehr ?? 0);
@@ -234,6 +265,10 @@ const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, 
 function update(changes: DocumentPatch) {
   if (!props.doc.number) return;
   store.updateDocument(props.doc.number, changes);
+}
+
+function markInvoicePaid() {
+  if (relatedInvoiceNumber.value) store.setStatus(relatedInvoiceNumber.value, 'paid');
 }
 
 function updateStufe(value: string) {
@@ -263,6 +298,9 @@ function formatAmount(n: number): string {
     "Price in CHF": "Betrag in CHF",
     "Outstanding amount": "Offener Rechnungsbetrag",
     "reminder to invoice": "zur Rechnung",
+    "Open": "Offen",
+    "settled": "Erledigt",
+    "Mark invoice paid": "Rechnung als bezahlt markieren",
     "Reminder fee": "Mahngebühr",
     "Default interest": "Verzugszins",
     "Total amount due": "Fälliger Gesamtbetrag",
@@ -286,6 +324,9 @@ function formatAmount(n: number): string {
     "Price in CHF": "Amount in CHF",
     "Outstanding amount": "Outstanding amount",
     "reminder to invoice": "to invoice",
+    "Open": "Open",
+    "settled": "Settled",
+    "Mark invoice paid": "Mark invoice as paid",
     "Reminder fee": "Reminder fee",
     "Default interest": "Default interest",
     "Total amount due": "Total amount due",
@@ -309,6 +350,9 @@ function formatAmount(n: number): string {
     "Price in CHF": "Importe en CHF",
     "Outstanding amount": "Importe pendiente de la factura",
     "reminder to invoice": "a la factura",
+    "Open": "Pendiente",
+    "settled": "Saldado",
+    "Mark invoice paid": "Marcar factura como pagada",
     "Reminder fee": "Gastos de recordatorio",
     "Default interest": "Intereses de demora",
     "Total amount due": "Importe total adeudado",
@@ -332,6 +376,9 @@ function formatAmount(n: number): string {
     "Price in CHF": "Bedrag in CHF",
     "Outstanding amount": "Openstaand factuurbedrag",
     "reminder to invoice": "bij factuur",
+    "Open": "Openstaand",
+    "settled": "Afgehandeld",
+    "Mark invoice paid": "Factuur als betaald markeren",
     "Reminder fee": "Aanmaningskosten",
     "Default interest": "Wettelijke rente",
     "Total amount due": "Totaal verschuldigd bedrag",
@@ -355,6 +402,9 @@ function formatAmount(n: number): string {
     "Price in CHF": "Сумма в CHF",
     "Outstanding amount": "Сумма задолженности",
     "reminder to invoice": "к счёту",
+    "Open": "Открыто",
+    "settled": "Погашено",
+    "Mark invoice paid": "Отметить счёт оплаченным",
     "Reminder fee": "Сбор за напоминание",
     "Default interest": "Пени за просрочку",
     "Total amount due": "Итого к оплате",

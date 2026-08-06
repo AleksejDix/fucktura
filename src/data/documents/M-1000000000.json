@@ -4,6 +4,7 @@
   "status": "draft",
   "clientNumber": "0001",
   "senderKey": "default",
+  "relatedInvoice": "R-1000000000",
   "subtitle": "1. Mahnung zur Rechnung R-1000000000",
   "recipient": {
     "company": "Example Corp",

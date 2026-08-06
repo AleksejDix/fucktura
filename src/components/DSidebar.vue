@@ -66,7 +66,9 @@
                     ? 'bg-red-500'
                     : doc.type === 'offerte' && doc.status === 'accepted'
                       ? 'bg-emerald-500'
-                      : dotClass[doc.type]
+                      : doc.type === 'mahnung' && store.isMahnungResolved(doc)
+                        ? 'bg-emerald-500'
+                        : dotClass[doc.type]
               "
             />
             {{ doc.recipient.company || doc.recipient.name || $t('No client') }}

@@ -66,6 +66,13 @@
               tag="div"
               @update:model-value="(v) => update({ 'recipient.country': v })"
             />
+            <DInline
+              v-if="recipient.uid"
+              v-model="recipient.uid"
+              tag="div"
+              class="text-gray-500 font-mono"
+              @update:model-value="(v) => update({ 'recipient.uid': v })"
+            />
           </address>
         </div>
       </div>

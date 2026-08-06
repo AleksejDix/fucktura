@@ -64,6 +64,7 @@ export function isDocument(v: unknown): v is Document {
   if (!isStr(v.status)) return false;
   if (!isStr(v.subtitle)) return false;
   if (!isStr(v.customerNumber)) return false;
+  if (v.relatedInvoice !== undefined && !isStr(v.relatedInvoice)) return false;
   if (!isObj(v.sender) || !isObj(v.recipient) || !isObj(v.meta)) return false;
   if (v.lineItems !== undefined && (!isArr(v.lineItems) || !v.lineItems.every(isLineItem)))
     return false;

@@ -7,6 +7,10 @@ export default {
   Offerten: 'Offertes',
   Rechnungen: 'Facturen',
   Mahnungen: 'Aanmaningen',
+  Invoice: 'Factuur',
+  Quote: 'Offerte',
+  Reminder: 'Aanmaning',
+  Receipt: 'Kwitantie',
   Quittungen: 'Kwitanties',
   'New Offerte': 'Nieuwe offerte',
   'New invoice': 'Nieuwe factuur',
@@ -81,6 +85,7 @@ export default {
   paid: 'Betaald',
   accepted: 'Geaccepteerd',
   rejected: 'Afgewezen',
+  settled: 'Afgehandeld',
 
   // Folder gate
   'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.':
@@ -122,6 +127,8 @@ export default {
   'VAT registered': 'BTW-plichtig',
   'VAT registered hint': 'BTW-kolom en overzicht op facturen tonen.',
   'VAT %': 'BTW %',
+  'Tax note': 'Belastingvermelding',
+  'Tax note hint': 'Wordt onder het factuurbedrag afgedrukt, bijv. een btw-vrijstellingsvermelding.',
   auto: 'auto',
 
   // Error boundary

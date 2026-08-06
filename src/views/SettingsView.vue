@@ -160,6 +160,15 @@
           <span>{{ $t('VAT registered') }}</span>
           <span class="text-gray-400 text-[8pt]">{{ $t('VAT registered hint') }}</span>
         </label>
+        <div class="mt-2">
+          <label class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Tax note') }}</label>
+          <input
+            v-model="form.taxNote"
+            @blur="save"
+            :placeholder="$t('Tax note hint')"
+            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
+          />
+        </div>
       </section>
 
       <section>

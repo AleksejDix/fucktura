@@ -7,6 +7,10 @@ export default {
   Offerten: 'Presupuestos',
   Rechnungen: 'Facturas',
   Mahnungen: 'Recordatorios',
+  Invoice: 'Factura',
+  Quote: 'Presupuesto',
+  Reminder: 'Recordatorio',
+  Receipt: 'Recibo',
   Quittungen: 'Recibos',
   'New Offerte': 'Nuevo presupuesto',
   'New invoice': 'Nueva factura',
@@ -82,6 +86,7 @@ export default {
   paid: 'Pagado',
   accepted: 'Aceptado',
   rejected: 'Rechazado',
+  settled: 'Saldado',
 
   // Folder gate
   'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.':
@@ -123,6 +128,8 @@ export default {
   'VAT registered': 'Sujeto a IVA',
   'VAT registered hint': 'Mostrar columna de IVA y desglose en facturas.',
   'VAT %': 'IVA %',
+  'Tax note': 'Nota fiscal',
+  'Tax note hint': 'Se imprime debajo del importe total, p. ej. una nota de exención de IVA.',
   auto: 'auto',
 
   // Error boundary

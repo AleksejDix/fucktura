@@ -11,6 +11,7 @@ import type {
 } from '@/fs/types';
 import { defaultUnitForType, numberPrefix } from '@/lib/documents';
 import { defaultVatRate as countryDefaultVatRate } from '@/lib/vat';
+import { useMoney } from '@/composables/useMoney';
 import { documentHaystack } from '@/lib/search';
 import { getMahnungDefaults } from '@/data/mahnung-defaults';
 import { defineStore } from 'pinia';
@@ -32,8 +33,22 @@ export const useDocumentsStore = defineStore('documents', () => {
   const loading = ref(true);
   const activeDocumentNumber = ref<string | null>(null);
 
+  const { sumGross } = useMoney();
+
+  /** The invoice a mahnung refers to, resolved via its relatedInvoice FK. */
+  function mahnungInvoice(doc: Document): Document | null {
+    if (doc.type !== 'mahnung' || !doc.relatedInvoice) return null;
+    return documents.value.find((d) => d.number === doc.relatedInvoice) ?? null;
+  }
+
+  /** A mahnung is settled once the invoice it duns is marked paid. */
+  function isMahnungResolved(doc: Document): boolean {
+    return mahnungInvoice(doc)?.status === 'paid';
+  }
+
   function isOverdue(doc: Document): boolean {
     if (doc.type === 'invoice' && doc.status === 'paid') return false;
+    if (doc.type === 'mahnung' && isMahnungResolved(doc)) return false;
     if (doc.type === 'offerte' && (doc.status === 'accepted' || doc.status === 'rejected'))
       return false;
     const due =
@@ -238,6 +253,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         zip: client?.zip ?? '',
         city: client?.city ?? '',
         country: client?.country ?? '',
+        uid: client?.uid,
       },
       meta: {
         date: today.toISOString(),
@@ -281,6 +297,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         zip: client?.zip ?? '',
         city: client?.city ?? '',
         country: client?.country ?? '',
+        uid: client?.uid,
       },
       meta: {
         date: today.toISOString(),
@@ -324,6 +341,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         zip: client?.zip ?? '',
         city: client?.city ?? '',
         country: client?.country ?? '',
+        uid: client?.uid,
       },
       meta: {
         date: today.toISOString(),
@@ -346,41 +364,69 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
-  async function createMahnung(customerNumber?: string, senderKey?: string) {
-    const s = findSender(senderKey);
+  /**
+   * Creates a reminder for an invoice. A reminder always duns an existing
+   * invoice, so recipient, amount and dates are derived from it. Created
+   * without an invoiceNumber (e.g. from the menu) it starts unlinked and the
+   * invoice must be picked before the reminder is complete.
+   */
+  async function createMahnung(invoiceNumber?: string, senderKey?: string) {
+    const invoice = invoiceNumber
+      ? documents.value.find((d) => d.number === invoiceNumber && d.type === 'invoice')
+      : null;
+    const s = findSender(invoice?.senderKey ?? senderKey);
     if (!s) return;
-    const client = findClient(customerNumber);
-    const country = client?.country ?? 'Schweiz';
+    const country = invoice?.recipient.country || 'Schweiz';
     const md = getMahnungDefaults(country);
     const today = new Date();
     return addDocument({
       type: 'mahnung',
       status: 'draft',
       number: generateNumber('M'),
-      subtitle: '',
-      customerNumber: customerNumber ?? '',
+      subtitle: invoice?.subtitle ?? '',
+      customerNumber: invoice?.customerNumber ?? '',
+      relatedInvoice: invoice?.number,
       senderKey: s.key,
       sender: senderSnapshot(s),
-      recipient: {
-        company: client?.company ?? '',
-        name: client?.name ?? '',
-        street: client?.street ?? '',
-        zip: client?.zip ?? '',
-        city: client?.city ?? '',
-        country,
-      },
+      recipient: invoice
+        ? { ...invoice.recipient }
+        : { company: '', name: '', street: '', zip: '', city: '', country: '' },
       meta: {
         date: today.toISOString(),
         dueDate: addDays(today, md.zahlungsfrist),
-        invoiceDate: '',
-        overdueSince: '',
+        invoiceDate: invoice?.meta.date ?? '',
+        overdueSince: invoice?.meta.dueDate ?? '',
         contactPerson: s.contact ?? '',
-        customerNumber: client?.customerNumber ?? '',
+        customerNumber: invoice?.customerNumber ?? '',
       },
       stufe: 1,
-      offenerBetrag: 0,
+      offenerBetrag: invoice ? sumGross(invoice.lineItems ?? []) : 0,
       mahngebuehr: md.mahngebuehr[0],
       verzugszins: 0,
+    });
+  }
+
+  /**
+   * Links a reminder to the invoice it duns and pulls recipient, dates and
+   * (when still empty) the outstanding amount from that invoice.
+   */
+  async function linkMahnungInvoice(mahnungNumber: string, invoiceNumber: string) {
+    const doc = documents.value.find((d) => d.number === mahnungNumber);
+    const invoice = documents.value.find((d) => d.number === invoiceNumber && d.type === 'invoice');
+    if (!doc || doc.type !== 'mahnung' || !invoice) return;
+    const md = getMahnungDefaults(invoice.recipient.country || 'Schweiz');
+    await updateDocument(mahnungNumber, {
+      relatedInvoice: invoice.number,
+      customerNumber: invoice.customerNumber,
+      subtitle: doc.subtitle || invoice.subtitle,
+      recipient: { ...invoice.recipient },
+      offenerBetrag: doc.offenerBetrag || sumGross(invoice.lineItems ?? []),
+      mahngebuehr: doc.mahngebuehr || md.mahngebuehr[0],
+      meta: {
+        customerNumber: invoice.customerNumber,
+        invoiceDate: invoice.meta.date,
+        overdueSince: invoice.meta.dueDate ?? '',
+      },
     });
   }
 
@@ -481,6 +527,7 @@ export const useDocumentsStore = defineStore('documents', () => {
         city: client.city,
         country: client.country,
         email: client.email ?? '',
+        uid: client.uid,
       },
       lineItems: resolveClientPositions(client, doc),
       meta: { ...doc.meta, customerNumber: client.customerNumber ?? '' },
@@ -602,6 +649,8 @@ export const useDocumentsStore = defineStore('documents', () => {
     setView,
     viewCount,
     isOverdue,
+    mahnungInvoice,
+    isMahnungResolved,
     activeSender,
     loading,
     activeDocumentNumber,
@@ -618,6 +667,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     createOfferte,
     createInvoice,
     createMahnung,
+    linkMahnungInvoice,
     createQuittung,
     convertToInvoice,
     assignClient,

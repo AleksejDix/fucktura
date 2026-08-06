@@ -7,6 +7,10 @@ export default {
   Offerten: 'Коммерческие предложения',
   Rechnungen: 'Счета',
   Mahnungen: 'Напоминания',
+  Invoice: 'Счёт',
+  Quote: 'Предложение',
+  Reminder: 'Напоминание',
+  Receipt: 'Квитанция',
   Quittungen: 'Квитанции',
   'New Offerte': 'Новое предложение',
   'New invoice': 'Новый счёт',
@@ -81,6 +85,7 @@ export default {
   paid: 'Оплачено',
   accepted: 'Принято',
   rejected: 'Отклонено',
+  settled: 'Погашено',
 
   // Folder gate
   'Browser not supported — please use Chrome, Edge, Brave, or another Chromium-based browser.':
@@ -122,6 +127,8 @@ export default {
   'VAT registered': 'Плательщик НДС',
   'VAT registered hint': 'Показывать столбец НДС и разбивку на счетах.',
   'VAT %': 'НДС %',
+  'Tax note': 'Налоговая пометка',
+  'Tax note hint': 'Печатается под итоговой суммой, напр. пометка об освобождении от НДС.',
   auto: 'авто',
 
   // Error boundary
