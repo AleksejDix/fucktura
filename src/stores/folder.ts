@@ -14,6 +14,8 @@ import {
 import { isEmpty, setRoot } from '@/fs/repo';
 import { seedFromBundled } from '@/fs/seed';
 import { tryMigrateFromLegacy } from '@/fs/migrate';
+import { i18n } from '@/i18n';
+import { useConfirmStore } from './confirm';
 import { useDocumentsStore } from './documents';
 
 export type BootState = 'init' | 'unsupported' | 'needs-pick' | 'picking' | 'loading' | 'ready';
@@ -40,12 +42,19 @@ export const useFolderStore = defineStore('folder', () => {
     setRoot(handle);
     state.value = 'loading';
     if (await isEmpty()) {
-      const isFirstBoot = recents.value.length === 0;
-      if (isFirstBoot) {
-        const migrated = await tryMigrateFromLegacy();
-        if (!migrated) await seedFromBundled();
+      // Legacy IndexedDB import is real user data — always take it.
+      const migrated = await tryMigrateFromLegacy();
+      if (!migrated) {
+        // Never write demo data into a real folder unnoticed: ask.
+        // (The old heuristic seeded whenever recents was empty, which
+        // also fired after "Clear recent folders".)
+        const confirm = useConfirmStore();
+        const wantsDemo = await confirm.ask({
+          message: i18n.global.t('Seed demo data question'),
+          confirmLabel: i18n.global.t('Load demo data'),
+        });
+        if (wantsDemo) await seedFromBundled();
       }
-      // On subsequent folder switches, an empty folder stays empty.
     }
     const docs = useDocumentsStore();
     await docs.load();

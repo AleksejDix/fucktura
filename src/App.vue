@@ -21,8 +21,9 @@
       <h2>{{ $t('Loading') }}</h2>
     </main>
     <DCommandPalette v-model:open="palette.open" />
-    <DConfirmDialog />
   </BootGate>
+  <!-- Outside BootGate: the folder store asks about demo seeding while the gate still shows "Loading". -->
+  <DConfirmDialog />
 </template>
 
 <script setup lang="ts">

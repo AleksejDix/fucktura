@@ -135,6 +135,9 @@ export default {
     'Wordt onder het factuurbedrag afgedrukt, bijv. een btw-vrijstellingsvermelding.',
   auto: 'auto',
 
+  // Seeding
+  'Seed demo data question': 'Deze map is leeg. Starten met demogegevens om de app te verkennen?',
+  'Load demo data': 'Demogegevens laden',
   'Not saved': 'Niet opgeslagen',
 
   // Load problems

@@ -159,11 +159,12 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   async function load() {
     const snap = await repo.loadAll();
+    const problems = snap.problems ?? [];
     const signature = (p: FileProblem[]) => p.map((x) => `${x.file}:${x.reason}`).join('|');
-    if (signature(snap.problems) !== signature(loadProblems.value)) {
+    if (signature(problems) !== signature(loadProblems.value)) {
       loadProblemsDismissed.value = false;
     }
-    loadProblems.value = snap.problems;
+    loadProblems.value = problems;
     senders.value = [...snap.senders].sort((a, b) => a.key.localeCompare(b.key));
     clients.value = [...snap.clients].sort((a, b) =>
       a.customerNumber.localeCompare(b.customerNumber),

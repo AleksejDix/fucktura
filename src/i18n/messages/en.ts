@@ -134,6 +134,9 @@ export default {
   'Tax note hint': 'Printed below the invoice total, e.g. a small-business VAT exemption note.',
   auto: 'auto',
 
+  // Seeding
+  'Seed demo data question': 'This folder is empty. Start with demo data to explore the app?',
+  'Load demo data': 'Load demo data',
   'Not saved': 'Not saved',
 
   // Load problems
