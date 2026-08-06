@@ -1,16 +1,18 @@
 <template>
-  <div
-    class="grid gap-[1px] p-[1px] bg-black/5 rounded-[1px]"
-    :class="active ? 'opacity-100' : 'opacity-40'"
-    style="grid-template-columns: repeat(4, 2px); grid-template-rows: repeat(4, 2px)"
-    :title="active ? 'Saving…' : 'Saved'"
-  >
-    <span
-      v-for="(on, i) in cells"
-      :key="i"
-      class="w-[2px] h-[2px] transition-colors"
-      :class="on ? 'bg-emerald-500' : 'bg-gray-300'"
-    />
+  <div class="flex items-center gap-1.5" :title="error ?? (active ? 'Saving…' : 'Saved')">
+    <span v-if="error" class="text-red-600 font-medium">{{ $t('Not saved') }}</span>
+    <div
+      class="grid gap-[1px] p-[1px] bg-black/5 rounded-[1px]"
+      :class="active || error ? 'opacity-100' : 'opacity-40'"
+      style="grid-template-columns: repeat(4, 2px); grid-template-rows: repeat(4, 2px)"
+    >
+      <span
+        v-for="(on, i) in cells"
+        :key="i"
+        class="w-[2px] h-[2px] transition-colors"
+        :class="error ? 'bg-red-500' : on ? 'bg-emerald-500' : 'bg-gray-300'"
+      />
+    </div>
   </div>
 </template>
 
@@ -25,6 +27,8 @@ const HOLD_MS = 80;
 
 const cells = ref<boolean[]>(new Array(16).fill(false));
 const active = ref(false);
+/** Last write error message; sticky until a write succeeds. */
+const error = ref<string | null>(null);
 let token = 0;
 
 async function play() {
@@ -58,6 +62,26 @@ function onSaveStart() {
   play();
 }
 
-onMounted(() => saveEvents.addEventListener('save-start', onSaveStart));
-onUnmounted(() => saveEvents.removeEventListener('save-start', onSaveStart));
+function onSaveSuccess() {
+  error.value = null;
+}
+
+function onSaveError(e: Event) {
+  // Halt the spiral and light the grid solid red until a write succeeds.
+  token++;
+  active.value = false;
+  cells.value = cells.value.map(() => true);
+  error.value = (e as CustomEvent<string>).detail || 'Save failed';
+}
+
+onMounted(() => {
+  saveEvents.addEventListener('save-start', onSaveStart);
+  saveEvents.addEventListener('save-success', onSaveSuccess);
+  saveEvents.addEventListener('save-error', onSaveError);
+});
+onUnmounted(() => {
+  saveEvents.removeEventListener('save-start', onSaveStart);
+  saveEvents.removeEventListener('save-success', onSaveSuccess);
+  saveEvents.removeEventListener('save-error', onSaveError);
+});
 </script>

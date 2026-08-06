@@ -138,6 +138,15 @@ export default {
   // Seeding
   'Seed demo data question': 'Deze map is leeg. Starten met demogegevens om de app te verkennen?',
   'Load demo data': 'Demogegevens laden',
+  'Not saved': 'Niet opgeslagen',
+
+  // Load problems
+  'Unreadable files': '{count} bestand(en) konden niet worden gelezen en worden niet getoond',
+  'Unreadable files hint':
+    'Herstel het bestand in uw datamap; de app laadt opnieuw zodra het venster weer focus krijgt.',
+  'Invalid JSON': 'Ongeldige JSON',
+  'Unexpected shape': 'Onverwachte structuur',
+  Dismiss: 'Verbergen',
 
   // Error boundary
   'Something went wrong': 'Er ging iets mis',

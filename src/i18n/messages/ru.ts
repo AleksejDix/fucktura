@@ -138,6 +138,15 @@ export default {
   'Seed demo data question':
     'Эта папка пуста. Начать с демонстрационными данными, чтобы изучить приложение?',
   'Load demo data': 'Загрузить демоданные',
+  'Not saved': 'Не сохранено',
+
+  // Load problems
+  'Unreadable files': 'Файлы, которые не удалось прочитать: {count}. Они не отображаются',
+  'Unreadable files hint':
+    'Исправьте файл в папке данных; приложение перезагрузится, когда окно снова получит фокус.',
+  'Invalid JSON': 'Некорректный JSON',
+  'Unexpected shape': 'Неожиданная структура',
+  Dismiss: 'Скрыть',
 
   // Error boundary
   'Something went wrong': 'Что-то пошло не так',

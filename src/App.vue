@@ -15,6 +15,7 @@
         </DErrorBoundary>
       </main>
       <DStatusBar class="col-span-3" />
+      <DLoadProblems />
     </div>
     <main v-else>
       <h2>{{ $t('Loading') }}</h2>
@@ -40,6 +41,7 @@ import DStatusBar from './components/DStatusBar.vue';
 import DErrorBoundary from './components/DErrorBoundary.vue';
 import DCollectionsSidebar from './components/DCollectionsSidebar.vue';
 import DConfirmDialog from './components/DConfirmDialog.vue';
+import DLoadProblems from './components/DLoadProblems.vue';
 
 const router = useRouter();
 const documentsStore = useDocumentsStore();

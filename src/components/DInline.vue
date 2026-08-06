@@ -29,9 +29,15 @@ const emit = defineEmits<{
 }>();
 
 function onBlur(e: Event) {
-  const text = (e.target as HTMLElement).textContent?.trim() ?? '';
+  const el = e.target as HTMLElement;
+  const text = el.textContent?.trim() ?? '';
   if (text !== String(props.modelValue)) {
     emit('update:modelValue', text);
+    // Snap the DOM back to the store value. contenteditable text lives
+    // outside Vue's vdom, so if the save fails (and modelValue never
+    // changes) the screen would otherwise keep showing unsaved text as
+    // saved. On success the modelValue update patches the new text in.
+    el.textContent = String(props.modelValue);
   }
 }
 </script>

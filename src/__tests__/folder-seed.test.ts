@@ -4,7 +4,9 @@ import { createPinia, setActivePinia } from 'pinia';
 vi.mock('@/fs/repo', () => ({
   isEmpty: vi.fn(),
   setRoot: vi.fn(),
-  loadAll: vi.fn().mockResolvedValue({ senders: [], clients: [], positions: [], documents: [] }),
+  loadAll: vi
+    .fn()
+    .mockResolvedValue({ senders: [], clients: [], positions: [], documents: [], problems: [] }),
 }));
 vi.mock('@/fs/seed', () => ({ seedFromBundled: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('@/fs/migrate', () => ({ tryMigrateFromLegacy: vi.fn().mockResolvedValue(false) }));

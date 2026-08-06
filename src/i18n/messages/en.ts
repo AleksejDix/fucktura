@@ -137,6 +137,15 @@ export default {
   // Seeding
   'Seed demo data question': 'This folder is empty. Start with demo data to explore the app?',
   'Load demo data': 'Load demo data',
+  'Not saved': 'Not saved',
+
+  // Load problems
+  'Unreadable files': '{count} file(s) could not be read and are not shown',
+  'Unreadable files hint':
+    'Fix the file in your data folder; the app reloads when the window regains focus.',
+  'Invalid JSON': 'Invalid JSON',
+  'Unexpected shape': 'Unexpected shape',
+  Dismiss: 'Dismiss',
 
   // Error boundary
   'Something went wrong': 'Something went wrong',

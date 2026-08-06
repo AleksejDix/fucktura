@@ -139,6 +139,15 @@ export default {
   'Seed demo data question':
     'Dieser Ordner ist leer. Mit Demo-Daten starten, um die App kennenzulernen?',
   'Load demo data': 'Demo-Daten laden',
+  'Not saved': 'Nicht gespeichert',
+
+  // Load problems
+  'Unreadable files': '{count} Datei(en) konnten nicht gelesen werden und werden nicht angezeigt',
+  'Unreadable files hint':
+    'Korrigieren Sie die Datei im Datenordner; die App lädt neu, sobald das Fenster wieder den Fokus erhält.',
+  'Invalid JSON': 'Ungültiges JSON',
+  'Unexpected shape': 'Unerwartete Struktur',
+  Dismiss: 'Ausblenden',
 
   // Error boundary
   'Something went wrong': 'Etwas ist schiefgelaufen',
