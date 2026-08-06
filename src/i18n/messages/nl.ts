@@ -128,7 +128,8 @@ export default {
   'VAT registered hint': 'BTW-kolom en overzicht op facturen tonen.',
   'VAT %': 'BTW %',
   'Tax note': 'Belastingvermelding',
-  'Tax note hint': 'Wordt onder het factuurbedrag afgedrukt, bijv. een btw-vrijstellingsvermelding.',
+  'Tax note hint':
+    'Wordt onder het factuurbedrag afgedrukt, bijv. een btw-vrijstellingsvermelding.',
   auto: 'auto',
 
   // Error boundary

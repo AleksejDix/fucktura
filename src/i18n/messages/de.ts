@@ -128,7 +128,8 @@ export default {
   'VAT registered hint': 'MwSt-Spalte und Aufstellung auf Rechnungen anzeigen.',
   'VAT %': 'MwSt %',
   'Tax note': 'Steuerhinweis',
-  'Tax note hint': 'Wird unter dem Rechnungsbetrag gedruckt, z. B. Kleinunternehmer-Hinweis nach § 19 UStG.',
+  'Tax note hint':
+    'Wird unter dem Rechnungsbetrag gedruckt, z. B. Kleinunternehmer-Hinweis nach § 19 UStG.',
   auto: 'auto',
 
   // Error boundary
