@@ -2,13 +2,24 @@ import { normalizeLegacyDocument } from './normalize';
 import type { Client, Document, FileProblem, Position, RepoSnapshot, Sender } from './types';
 import { isClient, isDocument, isPosition, isSender } from './validate';
 
-/** Dispatches 'save-start' and 'save-end' whenever the repo writes a file. */
+/**
+ * Dispatches 'save-start' / 'save-end' around every repo write, plus
+ * 'save-success' or 'save-error' (CustomEvent with the message as detail)
+ * depending on the outcome, so the UI can distinguish failure from
+ * completion.
+ */
 export const saveEvents = new EventTarget();
 
 async function tracked<T>(fn: () => Promise<T>): Promise<T> {
   saveEvents.dispatchEvent(new Event('save-start'));
   try {
-    return await fn();
+    const result = await fn();
+    saveEvents.dispatchEvent(new Event('save-success'));
+    return result;
+  } catch (e) {
+    const detail = e instanceof Error ? e.message : String(e);
+    saveEvents.dispatchEvent(new CustomEvent('save-error', { detail }));
+    throw e;
   } finally {
     saveEvents.dispatchEvent(new Event('save-end'));
   }

@@ -134,6 +134,8 @@ export default {
   'Tax note hint': 'Printed below the invoice total, e.g. a small-business VAT exemption note.',
   auto: 'auto',
 
+  'Not saved': 'Not saved',
+
   // Load problems
   'Unreadable files': '{count} file(s) could not be read and are not shown',
   'Unreadable files hint':
