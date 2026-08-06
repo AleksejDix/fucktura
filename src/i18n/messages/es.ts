@@ -135,6 +135,8 @@ export default {
   'Tax note hint': 'Se imprime debajo del importe total, p. ej. una nota de exención de IVA.',
   auto: 'auto',
 
+  'Not saved': 'No guardado',
+
   // Load problems
   'Unreadable files': '{count} archivo(s) no se pudieron leer y no se muestran',
   'Unreadable files hint':

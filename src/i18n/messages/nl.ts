@@ -135,6 +135,8 @@ export default {
     'Wordt onder het factuurbedrag afgedrukt, bijv. een btw-vrijstellingsvermelding.',
   auto: 'auto',
 
+  'Not saved': 'Niet opgeslagen',
+
   // Load problems
   'Unreadable files': '{count} bestand(en) konden niet worden gelezen en worden niet getoond',
   'Unreadable files hint':
