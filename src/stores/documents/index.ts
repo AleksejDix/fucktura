@@ -206,10 +206,35 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   // --- Document persistence ---
 
+  /**
+   * Numbers double as filenames and generateNumber has second resolution,
+   * so two quick creations (double-click, duplicate twice) could collide
+   * and overwrite the same file. Claims run synchronously against loaded
+   * documents plus in-flight writes, bumping the numeric tail until free.
+   */
+  const pendingNumbers = new Set<string>();
+
+  function claimNumber(desired: string): string {
+    const taken = (n: string) =>
+      pendingNumbers.has(n) || documents.value.some((d) => d.number === n);
+    let candidate = desired;
+    while (taken(candidate)) {
+      const m = candidate.match(/^(.*)-(\d+)$/);
+      candidate = m ? `${m[1]}-${Number(m[2]) + 1}` : `${candidate}-2`;
+    }
+    pendingNumbers.add(candidate);
+    return candidate;
+  }
+
   async function addDocument(doc: Omit<Document, 'createdAt' | 'updatedAt'>) {
+    const number = claimNumber(doc.number);
     const now = new Date().toISOString();
-    const full: Document = { ...doc, createdAt: now, updatedAt: now };
-    await repo.writeDocument(full);
+    const full: Document = { ...doc, number, createdAt: now, updatedAt: now };
+    try {
+      await repo.writeDocument(full);
+    } finally {
+      pendingNumbers.delete(number);
+    }
     documents.value = [full, ...documents.value];
     setActive(full.number);
     return full.number;
