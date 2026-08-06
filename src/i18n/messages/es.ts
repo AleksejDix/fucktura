@@ -135,6 +135,11 @@ export default {
   'Tax note hint': 'Se imprime debajo del importe total, p. ej. una nota de exención de IVA.',
   auto: 'auto',
 
+  // Seeding
+  'Seed demo data question':
+    'Esta carpeta está vacía. ¿Empezar con datos de demostración para explorar la app?',
+  'Load demo data': 'Cargar datos de demo',
+
   // Error boundary
   'Something went wrong': 'Algo salió mal',
   Retry: 'Reintentar',

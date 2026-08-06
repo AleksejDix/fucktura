@@ -134,6 +134,11 @@ export default {
   'Tax note hint': 'Печатается под итоговой суммой, напр. пометка об освобождении от НДС.',
   auto: 'авто',
 
+  // Seeding
+  'Seed demo data question':
+    'Эта папка пуста. Начать с демонстрационными данными, чтобы изучить приложение?',
+  'Load demo data': 'Загрузить демоданные',
+
   // Error boundary
   'Something went wrong': 'Что-то пошло не так',
   Retry: 'Повторить',

@@ -135,6 +135,11 @@ export default {
     'Wird unter dem Rechnungsbetrag gedruckt, z. B. Kleinunternehmer-Hinweis nach § 19 UStG.',
   auto: 'auto',
 
+  // Seeding
+  'Seed demo data question':
+    'Dieser Ordner ist leer. Mit Demo-Daten starten, um die App kennenzulernen?',
+  'Load demo data': 'Demo-Daten laden',
+
   // Error boundary
   'Something went wrong': 'Etwas ist schiefgelaufen',
   Retry: 'Erneut versuchen',
