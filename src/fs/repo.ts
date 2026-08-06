@@ -1,5 +1,5 @@
 import { normalizeLegacyDocument } from './normalize';
-import type { Client, Document, Position, RepoSnapshot, Sender } from './types';
+import type { Client, Document, FileProblem, Position, RepoSnapshot, Sender } from './types';
 import { isClient, isDocument, isPosition, isSender } from './validate';
 
 /** Dispatches 'save-start' and 'save-end' whenever the repo writes a file. */
@@ -67,12 +67,19 @@ async function writeJson(
   }
 }
 
+interface ListResult<T> {
+  items: T[];
+  problems: FileProblem[];
+}
+
 async function listJson<T>(
   dir: FileSystemDirectoryHandle,
+  dirName: string,
   guard: (v: unknown) => v is T,
   normalize?: (v: unknown) => unknown,
-): Promise<T[]> {
-  const out: T[] = [];
+): Promise<ListResult<T>> {
+  const items: T[] = [];
+  const problems: FileProblem[] = [];
   for await (const [name, entry] of dir as unknown as AsyncIterable<[string, FileSystemHandle]>) {
     if (entry.kind !== 'file' || !name.endsWith('.json')) continue;
     const file = await (entry as FileSystemFileHandle).getFile();
@@ -81,17 +88,19 @@ async function listJson<T>(
     try {
       parsed = JSON.parse(text);
     } catch {
-      console.warn(`[fs/repo] Skipping unparseable JSON: ${name}`);
+      console.warn(`[fs/repo] Unparseable JSON: ${dirName}/${name}`);
+      problems.push({ file: `${dirName}/${name}`, reason: 'unparseable' });
       continue;
     }
     if (normalize) parsed = normalize(parsed);
     if (!guard(parsed)) {
-      console.warn(`[fs/repo] Skipping invalid shape: ${name}`);
+      console.warn(`[fs/repo] Invalid shape: ${dirName}/${name}`);
+      problems.push({ file: `${dirName}/${name}`, reason: 'invalid' });
       continue;
     }
-    out.push(parsed);
+    items.push(parsed);
   }
-  return out;
+  return { items, problems };
 }
 
 async function removeFile(dir: FileSystemDirectoryHandle, filename: string): Promise<void> {
@@ -105,9 +114,9 @@ async function removeFile(dir: FileSystemDirectoryHandle, filename: string): Pro
 
 // ---------- senders ----------
 
-export async function listSenders(): Promise<Sender[]> {
+export async function listSenders(): Promise<ListResult<Sender>> {
   const dir = await getDir('senders');
-  return listJson(dir, isSender);
+  return listJson(dir, 'senders', isSender);
 }
 
 export async function writeSender(s: Sender): Promise<void> {
@@ -127,9 +136,9 @@ export async function deleteSender(key: string): Promise<void> {
 
 // ---------- clients ----------
 
-export async function listClients(): Promise<Client[]> {
+export async function listClients(): Promise<ListResult<Client>> {
   const dir = await getDir('clients');
-  return listJson(dir, isClient);
+  return listJson(dir, 'clients', isClient);
 }
 
 export async function writeClient(c: Client): Promise<void> {
@@ -149,14 +158,31 @@ export async function deleteClient(customerNumber: string): Promise<void> {
 
 // ---------- positions (single flat file) ----------
 
-export async function listPositions(): Promise<Position[]> {
-  const data = await readJson<unknown>(getRoot(), 'positions.json');
-  if (!Array.isArray(data)) return [];
-  return data.filter((p): p is Position => {
+export async function listPositions(): Promise<ListResult<Position>> {
+  let data: unknown;
+  try {
+    data = await readJson<unknown>(getRoot(), 'positions.json');
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      console.warn('[fs/repo] Unparseable JSON: positions.json');
+      return { items: [], problems: [{ file: 'positions.json', reason: 'unparseable' }] };
+    }
+    throw e;
+  }
+  if (data === null) return { items: [], problems: [] };
+  if (!Array.isArray(data)) {
+    return { items: [], problems: [{ file: 'positions.json', reason: 'invalid' }] };
+  }
+  const problems: FileProblem[] = [];
+  const items = data.filter((p): p is Position => {
     const ok = isPosition(p);
-    if (!ok) console.warn(`[fs/repo] Skipping invalid position entry`, p);
+    if (!ok) {
+      console.warn(`[fs/repo] Skipping invalid position entry`, p);
+      problems.push({ file: 'positions.json', reason: 'invalid' });
+    }
     return ok;
   });
+  return { items, problems };
 }
 
 export async function writePositions(list: Position[]): Promise<void> {
@@ -165,9 +191,9 @@ export async function writePositions(list: Position[]): Promise<void> {
 
 // ---------- documents ----------
 
-export async function listDocuments(): Promise<Document[]> {
+export async function listDocuments(): Promise<ListResult<Document>> {
   const dir = await getDir('documents');
-  return listJson(dir, isDocument, normalizeLegacyDocument);
+  return listJson(dir, 'documents', isDocument, normalizeLegacyDocument);
 }
 
 export async function writeDocument(d: Document): Promise<void> {
@@ -194,7 +220,18 @@ export async function loadAll(): Promise<RepoSnapshot> {
     listPositions(),
     listDocuments(),
   ]);
-  return { senders, clients, positions, documents };
+  return {
+    senders: senders.items,
+    clients: clients.items,
+    positions: positions.items,
+    documents: documents.items,
+    problems: [
+      ...senders.problems,
+      ...clients.problems,
+      ...positions.problems,
+      ...documents.problems,
+    ],
+  };
 }
 
 /** True if the chosen folder is empty (no known subdirs / files). */

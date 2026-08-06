@@ -4,6 +4,7 @@ import type {
   Document,
   DocumentPatch,
   DocumentStatus,
+  FileProblem,
   Position,
   Sender,
   ViewId,
@@ -44,6 +45,9 @@ export const useDocumentsStore = defineStore('documents', () => {
   const quickSearch = ref('');
   const loading = ref(true);
   const activeDocumentNumber = ref<string | null>(null);
+  /** Files skipped during load; shown as a banner until dismissed. */
+  const loadProblems = ref<FileProblem[]>([]);
+  const loadProblemsDismissed = ref(false);
 
   // --- Lookups ---
 
@@ -155,6 +159,11 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   async function load() {
     const snap = await repo.loadAll();
+    const signature = (p: FileProblem[]) => p.map((x) => `${x.file}:${x.reason}`).join('|');
+    if (signature(snap.problems) !== signature(loadProblems.value)) {
+      loadProblemsDismissed.value = false;
+    }
+    loadProblems.value = snap.problems;
     senders.value = [...snap.senders].sort((a, b) => a.key.localeCompare(b.key));
     clients.value = [...snap.clients].sort((a, b) =>
       a.customerNumber.localeCompare(b.customerNumber),
@@ -404,6 +413,8 @@ export const useDocumentsStore = defineStore('documents', () => {
     isReminderResolved,
     activeSender,
     loading,
+    loadProblems,
+    loadProblemsDismissed,
     activeDocumentNumber,
     activeDocument,
     filteredDocuments,
