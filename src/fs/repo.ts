@@ -47,15 +47,15 @@ async function readJson<T>(dir: FileSystemDirectoryHandle, filename: string): Pr
  * serialization / write never leaves the stream dangling or the file in a
  * half-written state.
  */
-async function writeJson(
+async function writeText(
   dir: FileSystemDirectoryHandle,
   filename: string,
-  data: unknown,
+  text: string,
 ): Promise<void> {
   const fh = await dir.getFileHandle(filename, { create: true });
   const writable = await fh.createWritable();
   try {
-    await writable.write(JSON.stringify(data, null, 2) + '\n');
+    await writable.write(text);
     await writable.close();
   } catch (e) {
     try {
@@ -65,6 +65,14 @@ async function writeJson(
     }
     throw e;
   }
+}
+
+async function writeJson(
+  dir: FileSystemDirectoryHandle,
+  filename: string,
+  data: unknown,
+): Promise<void> {
+  await writeText(dir, filename, JSON.stringify(data, null, 2) + '\n');
 }
 
 async function listJson<T>(
@@ -178,9 +186,40 @@ export async function writeDocument(d: Document): Promise<void> {
   });
 }
 
+const TRASH_DIR = '.trash';
+
+async function fileExists(dir: FileSystemDirectoryHandle, filename: string): Promise<boolean> {
+  try {
+    await dir.getFileHandle(filename);
+    return true;
+  } catch (e) {
+    if ((e as DOMException).name === 'NotFoundError') return false;
+    throw e;
+  }
+}
+
+/**
+ * Deleting a document moves its file into .trash/ instead of destroying
+ * it: removeEntry bypasses the OS trash, and one misclick past the
+ * confirm dialog should never be able to lose a real invoice. Each
+ * deletion gets a timestamped name so re-deleting a recreated number
+ * never overwrites older trash.
+ */
 export async function deleteDocument(number: string): Promise<void> {
   await tracked(async () => {
     const dir = await getDir('documents');
+    let text: string;
+    try {
+      const fh = await dir.getFileHandle(`${number}.json`);
+      text = await (await fh.getFile()).text();
+    } catch (e) {
+      if ((e as DOMException).name === 'NotFoundError') return;
+      throw e;
+    }
+    const trash = await getRoot().getDirectoryHandle(TRASH_DIR, { create: true });
+    let stamp = Date.now();
+    while (await fileExists(trash, `${number}.${stamp}.json`)) stamp++;
+    await writeText(trash, `${number}.${stamp}.json`, text);
     await removeFile(dir, `${number}.json`);
   });
 }
