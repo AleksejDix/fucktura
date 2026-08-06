@@ -26,6 +26,16 @@ export const useFolderStore = defineStore('folder', () => {
 
   const currentName = computed(() => currentHandle.value?.name ?? '');
 
+  /**
+   * Only these errors mean the folder itself is gone or blocked. Anything
+   * else (a read hiccup, a bug in load) must not cost the user their
+   * remembered folder.
+   */
+  function isPermanentFolderError(e: unknown): boolean {
+    const name = (e as DOMException)?.name;
+    return name === 'NotFoundError' || name === 'NotAllowedError';
+  }
+
   async function activate(handle: FileSystemDirectoryHandle) {
     setRoot(handle);
     state.value = 'loading';
@@ -62,8 +72,12 @@ export const useFolderStore = defineStore('folder', () => {
         await activate(entry.handle);
         return;
       } catch (e) {
-        console.warn(`Recent folder "${entry.name}" failed, pruning`, e);
-        recents.value = await forgetFolder(entry.handle);
+        if (isPermanentFolderError(e)) {
+          console.warn(`Recent folder "${entry.name}" is gone, pruning`, e);
+          recents.value = await forgetFolder(entry.handle);
+        } else {
+          console.warn(`Recent folder "${entry.name}" failed to load, keeping`, e);
+        }
       }
     }
     state.value = 'needs-pick';
@@ -101,8 +115,11 @@ export const useFolderStore = defineStore('folder', () => {
     try {
       await activate(entry.handle);
     } catch (e) {
-      recents.value = await forgetFolder(entry.handle);
+      if (isPermanentFolderError(e)) {
+        recents.value = await forgetFolder(entry.handle);
+      }
       error.value = (e as Error).message;
+      state.value = 'needs-pick';
     }
   }
 
