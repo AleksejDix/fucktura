@@ -1,3 +1,4 @@
+import { normalizeLegacyDocument } from './normalize';
 import type { Client, Document, Position, RepoSnapshot, Sender } from './types';
 import { isClient, isDocument, isPosition, isSender } from './validate';
 
@@ -69,6 +70,7 @@ async function writeJson(
 async function listJson<T>(
   dir: FileSystemDirectoryHandle,
   guard: (v: unknown) => v is T,
+  normalize?: (v: unknown) => unknown,
 ): Promise<T[]> {
   const out: T[] = [];
   for await (const [name, entry] of dir as unknown as AsyncIterable<[string, FileSystemHandle]>) {
@@ -82,6 +84,7 @@ async function listJson<T>(
       console.warn(`[fs/repo] Skipping unparseable JSON: ${name}`);
       continue;
     }
+    if (normalize) parsed = normalize(parsed);
     if (!guard(parsed)) {
       console.warn(`[fs/repo] Skipping invalid shape: ${name}`);
       continue;
@@ -164,7 +167,7 @@ export async function writePositions(list: Position[]): Promise<void> {
 
 export async function listDocuments(): Promise<Document[]> {
   const dir = await getDir('documents');
-  return listJson(dir, isDocument);
+  return listJson(dir, isDocument, normalizeLegacyDocument);
 }
 
 export async function writeDocument(d: Document): Promise<void> {

@@ -3,8 +3,8 @@ import senderData from '@/data/senders/default.json';
 import exampleCorp from '@/data/clients/example-corp.json';
 import demoInc from '@/data/clients/demo-inc.json';
 import invoiceDoc from '@/data/documents/R-1000000000.json';
-import offerteDoc from '@/data/documents/O-1000000000.json';
-import mahnungDoc from '@/data/documents/M-1000000000.json';
+import quoteDoc from '@/data/documents/O-1000000000.json';
+import reminderDoc from '@/data/documents/M-1000000000.json';
 
 describe('sender data', () => {
   it('has required fields', () => {
@@ -63,36 +63,36 @@ describe('document data', () => {
     expect(invoiceDoc.lineItems.length).toBeGreaterThan(0);
   });
 
-  it('O-1000000000 is an offerte', () => {
-    expect(offerteDoc.type).toBe('offerte');
-    expect(offerteDoc.number).toBe('O-1000000000');
-    expect(offerteDoc.lineItems.length).toBeGreaterThan(0);
+  it('O-1000000000 is an quote', () => {
+    expect(quoteDoc.type).toBe('quote');
+    expect(quoteDoc.number).toBe('O-1000000000');
+    expect(quoteDoc.lineItems.length).toBeGreaterThan(0);
   });
 
-  it('M-1000000000 is a mahnung', () => {
-    expect(mahnungDoc.type).toBe('mahnung');
-    expect(mahnungDoc.stufe).toBeGreaterThanOrEqual(1);
+  it('M-1000000000 is a reminder', () => {
+    expect(reminderDoc.type).toBe('reminder');
+    expect(reminderDoc.reminderLevel).toBeGreaterThanOrEqual(1);
   });
 
   it('all documents have consistent contactPerson', () => {
     const contact = senderData.contact;
     expect(invoiceDoc.meta.contactPerson).toBe(contact);
-    expect(offerteDoc.meta.contactPerson).toBe(contact);
-    expect(mahnungDoc.meta.contactPerson).toBe(contact);
+    expect(quoteDoc.meta.contactPerson).toBe(contact);
+    expect(reminderDoc.meta.contactPerson).toBe(contact);
   });
 
   it('all document recipients have email', () => {
     expect(invoiceDoc.recipient.email).toBeTruthy();
-    expect(offerteDoc.recipient.email).toBeTruthy();
-    expect(mahnungDoc.recipient.email).toBeTruthy();
+    expect(quoteDoc.recipient.email).toBeTruthy();
+    expect(reminderDoc.recipient.email).toBeTruthy();
   });
 
   it('all documents have clientNumber and senderKey', () => {
     expect(invoiceDoc.clientNumber).toBeTruthy();
     expect(invoiceDoc.senderKey).toBeTruthy();
-    expect(offerteDoc.clientNumber).toBeTruthy();
-    expect(offerteDoc.senderKey).toBeTruthy();
-    expect(mahnungDoc.clientNumber).toBeTruthy();
-    expect(mahnungDoc.senderKey).toBeTruthy();
+    expect(quoteDoc.clientNumber).toBeTruthy();
+    expect(quoteDoc.senderKey).toBeTruthy();
+    expect(reminderDoc.clientNumber).toBeTruthy();
+    expect(reminderDoc.senderKey).toBeTruthy();
   });
 });

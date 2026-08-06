@@ -1,5 +1,5 @@
 {
-  "type": "mahnung",
+  "type": "reminder",
   "number": "M-1000000000",
   "status": "draft",
   "clientNumber": "0001",
@@ -23,8 +23,8 @@
     "contactPerson": "Alex Example",
     "customerNumber": "0001"
   },
-  "stufe": 1,
-  "offenerBetrag": 960,
-  "mahngebuehr": 20,
-  "verzugszins": 0
+  "reminderLevel": 1,
+  "outstandingAmount": 960,
+  "reminderFee": 20,
+  "lateInterest": 0
 }

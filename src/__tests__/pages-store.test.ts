@@ -53,32 +53,32 @@ describe('usePagesStore', () => {
     expect(pagesStore.pages[1].name).toBe('QRBill');
   });
 
-  it('builds pages for an offerte without QR bill', () => {
+  it('builds pages for an quote without QR bill', () => {
     const docsStore = useDocumentsStore();
-    docsStore.documents = [makeDoc({ number: 'O-1', type: 'offerte' })];
+    docsStore.documents = [makeDoc({ number: 'O-1', type: 'quote' })];
     docsStore.activeDocumentNumber = 'O-1';
 
     const pagesStore = usePagesStore();
     expect(pagesStore.pages).toHaveLength(1);
-    expect(pagesStore.pages[0].name).toBe('Offerte');
+    expect(pagesStore.pages[0].name).toBe('Quote');
   });
 
-  it('builds pages for a mahnung with QR bill', () => {
+  it('builds pages for a reminder with QR bill', () => {
     const docsStore = useDocumentsStore();
     docsStore.documents = [
       makeDoc({
         number: 'M-1',
-        type: 'mahnung',
-        offenerBetrag: 100,
-        mahngebuehr: 20,
-        verzugszins: 5,
+        type: 'reminder',
+        outstandingAmount: 100,
+        reminderFee: 20,
+        lateInterest: 5,
       }),
     ];
     docsStore.activeDocumentNumber = 'M-1';
 
     const pagesStore = usePagesStore();
     expect(pagesStore.pages).toHaveLength(2);
-    expect(pagesStore.pages[0].name).toBe('Mahnung');
+    expect(pagesStore.pages[0].name).toBe('Reminder');
     expect(pagesStore.pages[1].name).toBe('QRBill');
   });
 
@@ -86,8 +86,14 @@ describe('usePagesStore', () => {
     const docsStore = useDocumentsStore();
     docsStore.documents = [
       makeDoc({ number: 'R-1', type: 'invoice' }),
-      makeDoc({ number: 'O-1', type: 'offerte' }),
-      makeDoc({ number: 'M-1', type: 'mahnung', offenerBetrag: 0, mahngebuehr: 0, verzugszins: 0 }),
+      makeDoc({ number: 'O-1', type: 'quote' }),
+      makeDoc({
+        number: 'M-1',
+        type: 'reminder',
+        outstandingAmount: 0,
+        reminderFee: 0,
+        lateInterest: 0,
+      }),
     ];
     docsStore.activeDocumentNumber = null;
 

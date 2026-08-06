@@ -1,3 +1,4 @@
+import { normalizeLegacyDocument } from './normalize';
 import * as repo from './repo';
 import type { Client, ClientPosition, Document, Position, Sender, SenderSnapshot } from './types';
 
@@ -44,7 +45,8 @@ interface LegacyClient {
 
 interface LegacyDocument {
   id: number;
-  type: Document['type'];
+  /** Legacy German type values ('quote', 'reminder', 'receipt') included. */
+  type: string;
   status: Document['status'];
   number: string;
   subtitle: string;
@@ -53,10 +55,10 @@ interface LegacyDocument {
   recipient: Document['recipient'];
   meta: Document['meta'];
   lineItems?: Document['lineItems'];
-  stufe?: number;
-  offenerBetrag?: number;
-  mahngebuehr?: number;
-  verzugszins?: number;
+  reminderLevel?: number;
+  outstandingAmount?: number;
+  reminderFee?: number;
+  lateInterest?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -157,7 +159,7 @@ export async function tryMigrateFromLegacy(): Promise<boolean> {
       d.meta?.customerNumber ||
       (clientId !== undefined ? clientByLegacyId.get(clientId)?.customerNumber : '') ||
       '';
-    const doc: Document = { ...rest, customerNumber };
+    const doc = normalizeLegacyDocument({ ...rest, customerNumber }) as Document;
     await repo.writeDocument(doc);
   }
 

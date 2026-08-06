@@ -69,13 +69,13 @@ watch(
   () => JSON.stringify(props.doc) + locale.value,
   () => {
     let amount = 0;
-    if (props.doc.type === 'mahnung') {
+    if (props.doc.type === 'reminder') {
       amount = parseFloat(
         toDecimal(
           sumAmounts(
-            props.doc.offenerBetrag ?? 0,
-            props.doc.mahngebuehr ?? 0,
-            props.doc.verzugszins ?? 0,
+            props.doc.outstandingAmount ?? 0,
+            props.doc.reminderFee ?? 0,
+            props.doc.lateInterest ?? 0,
           ),
         ),
       );

@@ -54,10 +54,10 @@ const smartViews = computed<ViewDef[]>(() => [
 ]);
 
 const typeViews = computed<ViewDef[]>(() => [
-  { id: 'type:invoice', label: t('Rechnungen'), icon: '🧾' },
-  { id: 'type:offerte', label: t('Offerten'), icon: '📝' },
-  { id: 'type:mahnung', label: t('Mahnungen'), icon: '⚠️' },
-  { id: 'type:quittung', label: t('Quittungen'), icon: '🪪' },
+  { id: 'type:invoice', label: t('Invoices'), icon: '🧾' },
+  { id: 'type:quote', label: t('Quotes'), icon: '📝' },
+  { id: 'type:reminder', label: t('Reminders'), icon: '⚠️' },
+  { id: 'type:receipt', label: t('Receipts'), icon: '🪪' },
 ]);
 
 const senderViews = computed<ViewDef[]>(() =>

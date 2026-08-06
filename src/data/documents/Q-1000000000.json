@@ -1,5 +1,5 @@
 {
-  "type": "quittung",
+  "type": "receipt",
   "number": "Q-1000000000",
   "status": "paid",
   "clientNumber": "0002",

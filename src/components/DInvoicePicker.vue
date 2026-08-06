@@ -65,7 +65,7 @@ const invoices = computed<Document[]>(() =>
 
 function select(invoice: Document) {
   open.value = false;
-  store.linkMahnungInvoice(props.docNumber, invoice.number);
+  store.linkReminderInvoice(props.docNumber, invoice.number);
 }
 
 function onClickOutside(e: MouseEvent) {

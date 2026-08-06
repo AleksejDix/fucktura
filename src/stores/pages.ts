@@ -22,12 +22,12 @@ export const usePagesStore = defineStore('pages', () => {
     switch (type) {
       case 'invoice':
         return Pages.Invoice;
-      case 'offerte':
-        return Pages.Offerte;
-      case 'mahnung':
-        return Pages.Mahnung;
-      case 'quittung':
-        return Pages.Quittung;
+      case 'quote':
+        return Pages.Quote;
+      case 'reminder':
+        return Pages.Reminder;
+      case 'receipt':
+        return Pages.Receipt;
       default:
         return null;
     }
@@ -51,7 +51,7 @@ export const usePagesStore = defineStore('pages', () => {
       const hasSwissIban = doc.sender?.accounts?.some((a: { iban: string }) =>
         a.iban.startsWith('CH'),
       );
-      if ((doc.type === 'invoice' || doc.type === 'mahnung') && hasSwissIban) {
+      if ((doc.type === 'invoice' || doc.type === 'reminder') && hasSwissIban) {
         result.push({
           id: `doc-${doc.number}-qr`,
           name: 'QRBill' as PageName,

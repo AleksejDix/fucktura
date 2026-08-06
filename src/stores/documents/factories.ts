@@ -1,5 +1,5 @@
 import { useMoney } from '@/composables/useMoney';
-import { getMahnungDefaults } from '@/data/mahnung-defaults';
+import { getReminderDefaults } from '@/data/reminder-defaults';
 import type {
   Client,
   Document,
@@ -116,11 +116,11 @@ export function clientLineItems(client: Client, doc: Document, positions: Positi
 }
 
 /**
- * A fresh offerte, invoice or quittung for an optional client. Mahnungen
- * are built by buildMahnung since they derive from an invoice instead.
+ * A fresh quote, invoice or receipt for an optional client. Reminders
+ * are built by buildReminder since they derive from an invoice instead.
  */
 export function buildBlankDocument(
-  type: 'offerte' | 'invoice' | 'quittung',
+  type: 'quote' | 'invoice' | 'receipt',
   s: Sender,
   client: Client | undefined,
   customerNumber?: string,
@@ -132,11 +132,11 @@ export function buildBlankDocument(
     contactPerson: s.contact ?? '',
     customerNumber: client?.customerNumber ?? '',
   };
-  if (type === 'offerte') meta.validUntil = addDays(today, s.quoteValidDays ?? 14);
+  if (type === 'quote') meta.validUntil = addDays(today, s.quoteValidDays ?? 14);
   if (type === 'invoice') meta.dueDate = addDays(today, s.invoiceDueDays ?? 14);
   return {
     type,
-    status: type === 'quittung' ? 'paid' : 'draft',
+    status: type === 'receipt' ? 'paid' : 'draft',
     number: generateNumber(numberPrefix(type)),
     subtitle: '',
     customerNumber: customerNumber ?? '',
@@ -154,11 +154,11 @@ export function buildBlankDocument(
  * invoice (e.g. from the menu) it starts unlinked and the invoice must be
  * picked before the reminder is complete.
  */
-export function buildMahnung(s: Sender, invoice: Document | null): NewDocument {
-  const md = getMahnungDefaults(invoice?.recipient.country || 'Schweiz');
+export function buildReminder(s: Sender, invoice: Document | null): NewDocument {
+  const md = getReminderDefaults(invoice?.recipient.country || 'Schweiz');
   const today = new Date();
   return {
-    type: 'mahnung',
+    type: 'reminder',
     status: 'draft',
     number: generateNumber('M'),
     subtitle: invoice?.subtitle ?? '',
@@ -171,16 +171,16 @@ export function buildMahnung(s: Sender, invoice: Document | null): NewDocument {
       : { company: '', name: '', street: '', zip: '', city: '', country: '' },
     meta: {
       date: today.toISOString(),
-      dueDate: addDays(today, md.zahlungsfrist),
+      dueDate: addDays(today, md.paymentDays),
       invoiceDate: invoice?.meta.date ?? '',
       overdueSince: invoice?.meta.dueDate ?? '',
       contactPerson: s.contact ?? '',
       customerNumber: invoice?.customerNumber ?? '',
     },
-    stufe: 1,
-    offenerBetrag: invoice ? sumGross(invoice.lineItems ?? []) : 0,
-    mahngebuehr: md.mahngebuehr[0],
-    verzugszins: 0,
+    reminderLevel: 1,
+    outstandingAmount: invoice ? sumGross(invoice.lineItems ?? []) : 0,
+    reminderFee: md.fees[0],
+    lateInterest: 0,
   };
 }
 
@@ -188,15 +188,15 @@ export function buildMahnung(s: Sender, invoice: Document | null): NewDocument {
  * Patch that links a reminder to the invoice it duns, pulling recipient,
  * dates and (when still empty) the outstanding amount from that invoice.
  */
-export function mahnungLinkPatch(mahnung: Document, invoice: Document): DocumentPatch {
-  const md = getMahnungDefaults(invoice.recipient.country || 'Schweiz');
+export function reminderLinkPatch(reminder: Document, invoice: Document): DocumentPatch {
+  const md = getReminderDefaults(invoice.recipient.country || 'Schweiz');
   return {
     relatedInvoice: invoice.number,
     customerNumber: invoice.customerNumber,
-    subtitle: mahnung.subtitle || invoice.subtitle,
+    subtitle: reminder.subtitle || invoice.subtitle,
     recipient: { ...invoice.recipient },
-    offenerBetrag: mahnung.offenerBetrag || sumGross(invoice.lineItems ?? []),
-    mahngebuehr: mahnung.mahngebuehr || md.mahngebuehr[0],
+    outstandingAmount: reminder.outstandingAmount || sumGross(invoice.lineItems ?? []),
+    reminderFee: reminder.reminderFee || md.fees[0],
     meta: {
       customerNumber: invoice.customerNumber,
       invoiceDate: invoice.meta.date,
@@ -205,25 +205,25 @@ export function mahnungLinkPatch(mahnung: Document, invoice: Document): Document
   };
 }
 
-/** A draft invoice carrying over everything billable from an offerte. */
-export function buildInvoiceFromOfferte(offerte: Document, s: Sender | null): NewDocument {
+/** A draft invoice carrying over everything billable from an quote. */
+export function buildInvoiceFromQuote(quote: Document, s: Sender | null): NewDocument {
   const today = new Date();
   return {
     type: 'invoice',
     status: 'draft',
     number: generateNumber('R'),
-    subtitle: offerte.subtitle,
-    customerNumber: offerte.customerNumber,
-    senderKey: offerte.senderKey ?? s?.key,
-    sender: { ...offerte.sender },
-    recipient: { ...offerte.recipient },
+    subtitle: quote.subtitle,
+    customerNumber: quote.customerNumber,
+    senderKey: quote.senderKey ?? s?.key,
+    sender: { ...quote.sender },
+    recipient: { ...quote.recipient },
     meta: {
       date: today.toISOString(),
       dueDate: addDays(today, s?.invoiceDueDays ?? 14),
-      contactPerson: offerte.meta.contactPerson,
-      customerNumber: offerte.meta.customerNumber,
+      contactPerson: quote.meta.contactPerson,
+      customerNumber: quote.meta.customerNumber,
     },
-    lineItems: offerte.lineItems?.map((item) => ({ ...item })),
+    lineItems: quote.lineItems?.map((item) => ({ ...item })),
   };
 }
 
@@ -231,12 +231,12 @@ export function buildInvoiceFromOfferte(offerte: Document, s: Sender | null): Ne
 export function duplicateOf(src: Document): NewDocument {
   const clone = structuredClone(src);
   clone.number = generateNumber(numberPrefix(src.type));
-  clone.status = src.type === 'quittung' ? 'paid' : 'draft';
+  clone.status = src.type === 'receipt' ? 'paid' : 'draft';
   const today = new Date();
   clone.meta = { ...clone.meta, date: today.toISOString() };
   if (src.type === 'invoice' && src.sender.invoiceDueDays)
     clone.meta.dueDate = addDays(today, src.sender.invoiceDueDays);
-  if (src.type === 'offerte' && src.sender.quoteValidDays)
+  if (src.type === 'quote' && src.sender.quoteValidDays)
     clone.meta.validUntil = addDays(today, src.sender.quoteValidDays);
   const { createdAt: _c, updatedAt: _u, ...rest } = clone;
   return rest;

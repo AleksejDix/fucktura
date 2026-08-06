@@ -78,11 +78,11 @@ export interface DocumentMeta {
 
 export type SenderSnapshot = Omit<Sender, 'key'>;
 
-export type OfferteStatus = 'draft' | 'sent' | 'accepted' | 'rejected';
+export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'rejected';
 export type InvoiceStatus = 'draft' | 'sent' | 'paid';
-export type MahnungStatus = 'draft' | 'sent';
-export type DocumentStatus = OfferteStatus | InvoiceStatus | MahnungStatus;
-export type DocumentType = 'invoice' | 'offerte' | 'mahnung' | 'quittung';
+export type ReminderStatus = 'draft' | 'sent';
+export type DocumentStatus = QuoteStatus | InvoiceStatus | ReminderStatus;
+export type DocumentType = 'invoice' | 'quote' | 'reminder' | 'receipt';
 
 export interface Document {
   /** Primary key — also used as filename */
@@ -94,7 +94,7 @@ export interface Document {
   customerNumber: string;
   /**
    * Foreign key to the invoice this document refers to (Document.number).
-   * Set on mahnungen — the reminder duns this invoice, and the reminder is
+   * Set on reminders: the reminder duns this invoice, and the reminder is
    * considered settled once that invoice's status is 'paid'. Optional for
    * backward compat with reminders created before the link existed.
    */
@@ -105,10 +105,14 @@ export interface Document {
   recipient: Recipient;
   meta: DocumentMeta;
   lineItems?: LineItem[];
-  stufe?: number;
-  offenerBetrag?: number;
-  mahngebuehr?: number;
-  verzugszins?: number;
+  /** Reminder escalation level (1st, 2nd, 3rd reminder). Reminders only. */
+  reminderLevel?: number;
+  /** Outstanding invoice amount being dunned. Reminders only. */
+  outstandingAmount?: number;
+  /** Flat reminder fee added on top. Reminders only. */
+  reminderFee?: number;
+  /** Late-payment interest amount. Reminders only. */
+  lateInterest?: number;
   createdAt: string;
   updatedAt: string;
 }

@@ -64,9 +64,9 @@
                   ? 'bg-white'
                   : store.isOverdue(doc)
                     ? 'bg-red-500'
-                    : doc.type === 'offerte' && doc.status === 'accepted'
+                    : doc.type === 'quote' && doc.status === 'accepted'
                       ? 'bg-emerald-500'
-                      : doc.type === 'mahnung' && store.isMahnungResolved(doc)
+                      : doc.type === 'reminder' && store.isReminderResolved(doc)
                         ? 'bg-emerald-500'
                         : dotClass[doc.type]
               "
@@ -114,8 +114,8 @@ const { formatDate } = useDate();
 
 function dueDateField(doc: Document): string | null {
   if (doc.type === 'invoice') return doc.meta.dueDate ?? null;
-  if (doc.type === 'offerte') return doc.meta.validUntil ?? null;
-  if (doc.type === 'mahnung') return doc.meta.overdueSince ?? null;
+  if (doc.type === 'quote') return doc.meta.validUntil ?? null;
+  if (doc.type === 'reminder') return doc.meta.overdueSince ?? null;
   return null;
 }
 </script>

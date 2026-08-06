@@ -16,14 +16,15 @@ interface RawDocument {
   clientNumber: string;
   senderKey: string;
   subtitle: string;
+  relatedInvoice?: string;
   recipient: Document['recipient'];
   meta: Document['meta'];
   lineItems?: Document['lineItems'];
   notes?: string;
-  stufe?: number;
-  offenerBetrag?: number;
-  mahngebuehr?: number;
-  verzugszins?: number;
+  reminderLevel?: number;
+  outstandingAmount?: number;
+  reminderFee?: number;
+  lateInterest?: number;
 }
 
 const bundledSenders = import.meta.glob('@/data/senders/*.json', {
@@ -98,14 +99,16 @@ export async function seedFromBundled(): Promise<void> {
       status: raw.status,
       subtitle: raw.subtitle,
       customerNumber: raw.clientNumber,
+      relatedInvoice: raw.relatedInvoice,
+      senderKey: sender.key,
       sender: toSnapshot(sender),
       recipient: raw.recipient,
       meta: raw.meta,
       lineItems,
-      stufe: raw.stufe,
-      offenerBetrag: raw.offenerBetrag,
-      mahngebuehr: raw.mahngebuehr,
-      verzugszins: raw.verzugszins,
+      reminderLevel: raw.reminderLevel,
+      outstandingAmount: raw.outstandingAmount,
+      reminderFee: raw.reminderFee,
+      lateInterest: raw.lateInterest,
       createdAt: now,
       updatedAt: now,
     };

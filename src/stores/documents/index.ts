@@ -13,12 +13,12 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import {
   buildBlankDocument,
-  buildInvoiceFromOfferte,
-  buildMahnung,
+  buildInvoiceFromQuote,
+  buildReminder,
   clientLineItems,
   duplicateOf,
   generateNumber,
-  mahnungLinkPatch,
+  reminderLinkPatch,
   nextLineItem,
   recipientFromClient,
 } from './factories';
@@ -78,21 +78,21 @@ export const useDocumentsStore = defineStore('documents', () => {
     return match?.key ?? null;
   }
 
-  /** The invoice a mahnung refers to, resolved via its relatedInvoice FK. */
-  function mahnungInvoice(doc: Document): Document | null {
-    if (doc.type !== 'mahnung' || !doc.relatedInvoice) return null;
+  /** The invoice a reminder refers to, resolved via its relatedInvoice FK. */
+  function reminderInvoice(doc: Document): Document | null {
+    if (doc.type !== 'reminder' || !doc.relatedInvoice) return null;
     return documents.value.find((d) => d.number === doc.relatedInvoice) ?? null;
   }
 
-  /** A mahnung is settled once the invoice it duns is marked paid. */
-  function isMahnungResolved(doc: Document): boolean {
-    return mahnungInvoice(doc)?.status === 'paid';
+  /** A reminder is settled once the invoice it duns is marked paid. */
+  function isReminderResolved(doc: Document): boolean {
+    return reminderInvoice(doc)?.status === 'paid';
   }
 
   // --- Views & filtering ---
 
   function isOverdue(doc: Document): boolean {
-    return docIsOverdue(doc, isMahnungResolved);
+    return docIsOverdue(doc, isReminderResolved);
   }
 
   const viewCtx = { isOverdue, senderKeyOf: resolveSenderKey };
@@ -145,10 +145,10 @@ export const useDocumentsStore = defineStore('documents', () => {
   }
 
   const grouped = computed(() => ({
-    offerte: documents.value.filter((d) => d.type === 'offerte'),
+    quote: documents.value.filter((d) => d.type === 'quote'),
     invoice: documents.value.filter((d) => d.type === 'invoice'),
-    mahnung: documents.value.filter((d) => d.type === 'mahnung'),
-    quittung: documents.value.filter((d) => d.type === 'quittung'),
+    reminder: documents.value.filter((d) => d.type === 'reminder'),
+    receipt: documents.value.filter((d) => d.type === 'receipt'),
   }));
 
   // --- Loading & navigation ---
@@ -246,12 +246,10 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   // --- Document creation ---
 
-  async function createOfferte(customerNumber?: string, senderKey?: string) {
+  async function createQuote(customerNumber?: string, senderKey?: string) {
     const s = findSender(senderKey);
     if (!s) return;
-    return addDocument(
-      buildBlankDocument('offerte', s, findClient(customerNumber), customerNumber),
-    );
+    return addDocument(buildBlankDocument('quote', s, findClient(customerNumber), customerNumber));
   }
 
   async function createInvoice(customerNumber?: string, senderKey?: string) {
@@ -262,11 +260,11 @@ export const useDocumentsStore = defineStore('documents', () => {
     );
   }
 
-  async function createQuittung(customerNumber?: string, senderKey?: string) {
+  async function createReceipt(customerNumber?: string, senderKey?: string) {
     const s = findSender(senderKey);
     if (!s) return;
     return addDocument(
-      buildBlankDocument('quittung', s, findClient(customerNumber), customerNumber),
+      buildBlankDocument('receipt', s, findClient(customerNumber), customerNumber),
     );
   }
 
@@ -275,27 +273,27 @@ export const useDocumentsStore = defineStore('documents', () => {
    * (e.g. from the menu) it starts unlinked and the invoice must be picked
    * before the reminder is complete.
    */
-  async function createMahnung(invoiceNumber?: string, senderKey?: string) {
+  async function createReminder(invoiceNumber?: string, senderKey?: string) {
     const invoice = invoiceNumber
       ? (documents.value.find((d) => d.number === invoiceNumber && d.type === 'invoice') ?? null)
       : null;
     const s = findSender(invoice?.senderKey ?? senderKey);
     if (!s) return;
-    return addDocument(buildMahnung(s, invoice));
+    return addDocument(buildReminder(s, invoice));
   }
 
-  /** Links a reminder to the invoice it duns; see mahnungLinkPatch. */
-  async function linkMahnungInvoice(mahnungNumber: string, invoiceNumber: string) {
-    const doc = documents.value.find((d) => d.number === mahnungNumber);
+  /** Links a reminder to the invoice it duns; see reminderLinkPatch. */
+  async function linkReminderInvoice(reminderNumber: string, invoiceNumber: string) {
+    const doc = documents.value.find((d) => d.number === reminderNumber);
     const invoice = documents.value.find((d) => d.number === invoiceNumber && d.type === 'invoice');
-    if (!doc || doc.type !== 'mahnung' || !invoice) return;
-    await updateDocument(mahnungNumber, mahnungLinkPatch(doc, invoice));
+    if (!doc || doc.type !== 'reminder' || !invoice) return;
+    await updateDocument(reminderNumber, reminderLinkPatch(doc, invoice));
   }
 
-  async function convertToInvoice(offerteNumber: string) {
-    const offerte = documents.value.find((d) => d.number === offerteNumber);
-    if (!offerte || offerte.type !== 'offerte') return;
-    return addDocument(buildInvoiceFromOfferte(offerte, activeSender.value));
+  async function convertToInvoice(quoteNumber: string) {
+    const quote = documents.value.find((d) => d.number === quoteNumber);
+    if (!quote || quote.type !== 'quote') return;
+    return addDocument(buildInvoiceFromQuote(quote, activeSender.value));
   }
 
   async function duplicateDocument(docNumber: string) {
@@ -402,8 +400,8 @@ export const useDocumentsStore = defineStore('documents', () => {
     setView,
     viewCount,
     isOverdue,
-    mahnungInvoice,
-    isMahnungResolved,
+    reminderInvoice,
+    isReminderResolved,
     activeSender,
     loading,
     activeDocumentNumber,
@@ -417,11 +415,11 @@ export const useDocumentsStore = defineStore('documents', () => {
     addDocument,
     deleteDocument,
     generateNumber,
-    createOfferte,
+    createQuote,
     createInvoice,
-    createMahnung,
-    linkMahnungInvoice,
-    createQuittung,
+    createReminder,
+    linkReminderInvoice,
+    createReceipt,
     convertToInvoice,
     assignClient,
     updateDocument,

@@ -81,9 +81,9 @@
         <div class="flex justify-between items-baseline">
           <h2 class="text-[14pt] font-bold">
             <DInline
-              :model-value="String(mahnungStufe)"
+              :model-value="String(currentLevel)"
               tag="span"
-              @update:model-value="(v) => updateStufe(v)"
+              @update:model-value="(v) => updateLevel(v)"
             />. {{ t('Reminder') }}
           </h2>
           <span class="text-[14pt] font-bold">{{ doc.number }}</span>
@@ -177,9 +177,9 @@
             </td>
             <td class="py-1.5 text-right font-mono">
               <DInline
-                :model-value="formatAmount(offenerBetrag)"
+                :model-value="formatAmount(outstandingAmount)"
                 tag="span"
-                @update:model-value="(v) => update({ offenerBetrag: parseFloat(v) || 0 })"
+                @update:model-value="(v) => update({ outstandingAmount: parseFloat(v) || 0 })"
               />
             </td>
           </tr>
@@ -187,9 +187,9 @@
             <td class="py-1.5">{{ t('Reminder fee') }}</td>
             <td class="py-1.5 text-right font-mono">
               <DInline
-                :model-value="formatAmount(mahngebuehr)"
+                :model-value="formatAmount(reminderFee)"
                 tag="span"
-                @update:model-value="(v) => update({ mahngebuehr: parseFloat(v) || 0 })"
+                @update:model-value="(v) => update({ reminderFee: parseFloat(v) || 0 })"
               />
             </td>
           </tr>
@@ -197,9 +197,9 @@
             <td class="py-1.5">{{ t('Default interest') }}</td>
             <td class="py-1.5 text-right font-mono">
               <DInline
-                :model-value="formatAmount(verzugszins)"
+                :model-value="formatAmount(lateInterest)"
                 tag="span"
-                @update:model-value="(v) => update({ verzugszins: parseFloat(v) || 0 })"
+                @update:model-value="(v) => update({ lateInterest: parseFloat(v) || 0 })"
               />
             </td>
           </tr>
@@ -221,7 +221,7 @@
 
       <p class="text-[7pt] text-gray-400 mt-6">
         {{ t('Legal basis') }}: {{ countryDefaults.legalBasis }} · {{ t('Interest rate') }}:
-        {{ (countryDefaults.verzugszinsRate * 100).toFixed(1) }}% p.a.
+        {{ (countryDefaults.interestRate * 100).toFixed(1) }}% p.a.
       </p>
     </section>
   </PageTemplate>
@@ -233,7 +233,7 @@ import { useI18n } from 'vue-i18n';
 import type { Document, DocumentPatch, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import { useMoney } from '@/composables/useMoney';
-import { getMahnungDefaults } from '@/data/mahnung-defaults';
+import { getReminderDefaults } from '@/data/reminder-defaults';
 import PageTemplate from '../PageTemplate.vue';
 import DClientPicker from '../DClientPicker.vue';
 import DInvoicePicker from '../DInvoicePicker.vue';
@@ -253,14 +253,16 @@ const props = defineProps<{
 const recipient = computed(() => props.doc.recipient);
 const meta = computed(() => props.doc.meta);
 const relatedInvoiceNumber = computed(() => props.doc.relatedInvoice ?? '');
-const isResolved = computed(() => store.isMahnungResolved(props.doc));
-const mahnungStufe = computed(() => props.doc.stufe ?? 1);
-const offenerBetrag = computed(() => props.doc.offenerBetrag ?? 0);
-const mahngebuehr = computed(() => props.doc.mahngebuehr ?? 0);
-const verzugszins = computed(() => props.doc.verzugszins ?? 0);
-const countryDefaults = computed(() => getMahnungDefaults(recipient.value.country || 'Schweiz'));
+const isResolved = computed(() => store.isReminderResolved(props.doc));
+const currentLevel = computed(() => props.doc.reminderLevel ?? 1);
+const outstandingAmount = computed(() => props.doc.outstandingAmount ?? 0);
+const reminderFee = computed(() => props.doc.reminderFee ?? 0);
+const lateInterest = computed(() => props.doc.lateInterest ?? 0);
+const countryDefaults = computed(() => getReminderDefaults(recipient.value.country || 'Schweiz'));
 
-const total = computed(() => sumAmounts(offenerBetrag.value, mahngebuehr.value, verzugszins.value));
+const total = computed(() =>
+  sumAmounts(outstandingAmount.value, reminderFee.value, lateInterest.value),
+);
 
 function update(changes: DocumentPatch) {
   if (!props.doc.number) return;
@@ -271,10 +273,10 @@ function markInvoicePaid() {
   if (relatedInvoiceNumber.value) store.setStatus(relatedInvoiceNumber.value, 'paid');
 }
 
-function updateStufe(value: string) {
-  const stufe = Math.max(1, Math.min(3, parseInt(value) || 1));
-  const fee = countryDefaults.value.mahngebuehr[stufe - 1] ?? 0;
-  update({ stufe, mahngebuehr: fee });
+function updateLevel(value: string) {
+  const reminderLevel = Math.max(1, Math.min(3, parseInt(value) || 1));
+  const fee = countryDefaults.value.reminderFee[reminderLevel - 1] ?? 0;
+  update({ reminderLevel, reminderFee: fee });
 }
 
 function formatAmount(n: number): string {

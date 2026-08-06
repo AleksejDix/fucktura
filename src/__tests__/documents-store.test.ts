@@ -58,26 +58,26 @@ describe('useDocumentsStore', () => {
       store.documents = [
         makeDoc({ number: 'R-1', type: 'invoice' }),
         makeDoc({ number: 'R-2', type: 'invoice' }),
-        makeDoc({ number: 'O-1', type: 'offerte' }),
+        makeDoc({ number: 'O-1', type: 'quote' }),
         makeDoc({
           number: 'M-1',
-          type: 'mahnung',
-          offenerBetrag: 0,
-          mahngebuehr: 0,
-          verzugszins: 0,
+          type: 'reminder',
+          outstandingAmount: 0,
+          reminderFee: 0,
+          lateInterest: 0,
         }),
       ];
 
       expect(store.grouped.invoice).toHaveLength(2);
-      expect(store.grouped.offerte).toHaveLength(1);
-      expect(store.grouped.mahnung).toHaveLength(1);
+      expect(store.grouped.quote).toHaveLength(1);
+      expect(store.grouped.reminder).toHaveLength(1);
     });
 
     it('returns empty arrays when no documents', () => {
       const store = useDocumentsStore();
       expect(store.grouped.invoice).toHaveLength(0);
-      expect(store.grouped.offerte).toHaveLength(0);
-      expect(store.grouped.mahnung).toHaveLength(0);
+      expect(store.grouped.quote).toHaveLength(0);
+      expect(store.grouped.reminder).toHaveLength(0);
     });
   });
 
@@ -285,7 +285,7 @@ describe('useDocumentsStore', () => {
     it('returns false for accepted offers past validUntil', () => {
       const store = useDocumentsStore();
       const doc = makeDoc({
-        type: 'offerte',
+        type: 'quote',
         status: 'accepted',
         meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday },
       });
@@ -295,7 +295,7 @@ describe('useDocumentsStore', () => {
     it('returns false for rejected offers past validUntil', () => {
       const store = useDocumentsStore();
       const doc = makeDoc({
-        type: 'offerte',
+        type: 'quote',
         status: 'rejected',
         meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday },
       });
@@ -305,17 +305,17 @@ describe('useDocumentsStore', () => {
     it('returns true for sent offer past validUntil', () => {
       const store = useDocumentsStore();
       const doc = makeDoc({
-        type: 'offerte',
+        type: 'quote',
         status: 'sent',
         meta: { date: yesterday, contactPerson: '', customerNumber: '', validUntil: yesterday },
       });
       expect(store.isOverdue(doc)).toBe(true);
     });
 
-    it('returns false for mahnung with no overdueSince', () => {
+    it('returns false for reminder with no overdueSince', () => {
       const store = useDocumentsStore();
       const doc = makeDoc({
-        type: 'mahnung',
+        type: 'reminder',
         status: 'draft',
         meta: { date: yesterday, contactPerson: '', customerNumber: '' },
       });
@@ -332,9 +332,9 @@ describe('useDocumentsStore', () => {
       expect(store.isOverdue(doc)).toBe(false);
     });
 
-    it('returns false for quittung (no due concept)', () => {
+    it('returns false for receipt (no due concept)', () => {
       const store = useDocumentsStore();
-      const doc = makeDoc({ type: 'quittung', status: 'paid' });
+      const doc = makeDoc({ type: 'receipt', status: 'paid' });
       expect(store.isOverdue(doc)).toBe(false);
     });
   });
@@ -367,7 +367,7 @@ describe('useDocumentsStore', () => {
         }),
         makeDoc({
           number: 'O-1',
-          type: 'offerte',
+          type: 'quote',
           status: 'draft',
           senderKey: 'gs',
           meta: {
@@ -377,7 +377,7 @@ describe('useDocumentsStore', () => {
             validUntil: tomorrow,
           },
         }),
-        makeDoc({ number: 'Q-1', type: 'quittung', status: 'paid', senderKey: 'dix' }),
+        makeDoc({ number: 'Q-1', type: 'receipt', status: 'paid', senderKey: 'dix' }),
       ];
     }
 
@@ -412,7 +412,7 @@ describe('useDocumentsStore', () => {
     it('type view returns docs of that type', () => {
       const store = useDocumentsStore();
       seed(store);
-      store.setView('type:offerte');
+      store.setView('type:quote');
       expect(store.filteredDocuments.map((d) => d.number)).toEqual(['O-1']);
     });
 

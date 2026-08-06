@@ -59,11 +59,11 @@ const version = __APP_VERSION__;
 const doc = computed(() => store.activeDocument);
 const total = computed(() => {
   if (!doc.value) return 0;
-  if (doc.value.type === 'mahnung') {
+  if (doc.value.type === 'reminder') {
     return sumAmounts(
-      doc.value.offenerBetrag ?? 0,
-      doc.value.mahngebuehr ?? 0,
-      doc.value.verzugszins ?? 0,
+      doc.value.outstandingAmount ?? 0,
+      doc.value.reminderFee ?? 0,
+      doc.value.lateInterest ?? 0,
     );
   }
   return sumLineItems(doc.value.lineItems ?? []);

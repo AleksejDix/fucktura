@@ -174,7 +174,7 @@ const netTotalDinero = computed(() => sumLineItems(allItems.value));
 const netTotal = computed(() => vatBreakdown.value.reduce((s, g) => s + g.net, 0));
 
 const exemptLabel = computed(() =>
-  props.doc.type === 'offerte' ? 'Quote amount (tax exempt)' : 'Amount (tax exempt)',
+  props.doc.type === 'quote' ? 'Quote amount (tax exempt)' : 'Amount (tax exempt)',
 );
 
 function format(n: number): string {

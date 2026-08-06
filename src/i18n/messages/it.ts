@@ -4,10 +4,10 @@ export default {
   Page: 'Pagina',
 
   // Sidebar
-  Offerten: 'Preventivi',
-  Rechnungen: 'Fatture',
-  Mahnungen: 'Solleciti',
-  'New Offerte': 'Nuovo preventivo',
+  Quotes: 'Preventivi',
+  Invoices: 'Fatture',
+  Reminders: 'Solleciti',
+  'New quote': 'Nuovo preventivo',
   'Convert to invoice': 'Convertire in fattura',
   'All documents': 'Tutti i documenti',
   Delete: 'Elimina',

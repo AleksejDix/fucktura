@@ -2,7 +2,7 @@ import type { Document, DocumentStatus, ViewId } from '@/fs/types';
 
 /**
  * Pure predicates behind the mail-style smart views in the sidebar.
- * Anything that needs store state (sender resolution, mahnung settlement)
+ * Anything that needs store state (sender resolution, reminder settlement)
  * is injected via ViewContext so this module stays free of refs.
  */
 
@@ -15,17 +15,17 @@ export function recipientLabel(doc: Document): string {
   return doc.recipient.company || doc.recipient.name || '';
 }
 
-export function isOverdue(doc: Document, isMahnungResolved: (d: Document) => boolean): boolean {
+export function isOverdue(doc: Document, isReminderResolved: (d: Document) => boolean): boolean {
   if (doc.type === 'invoice' && doc.status === 'paid') return false;
-  if (doc.type === 'mahnung' && isMahnungResolved(doc)) return false;
-  if (doc.type === 'offerte' && (doc.status === 'accepted' || doc.status === 'rejected'))
+  if (doc.type === 'reminder' && isReminderResolved(doc)) return false;
+  if (doc.type === 'quote' && (doc.status === 'accepted' || doc.status === 'rejected'))
     return false;
   const due =
     doc.type === 'invoice'
       ? doc.meta.dueDate
-      : doc.type === 'offerte'
+      : doc.type === 'quote'
         ? doc.meta.validUntil
-        : doc.type === 'mahnung'
+        : doc.type === 'reminder'
           ? doc.meta.overdueSince
           : null;
   if (!due) return false;
@@ -50,9 +50,9 @@ export function viewMatches(doc: Document, view: ViewId, ctx: ViewContext): bool
 /** Status pills that make sense for the current view. */
 export function statusPillsForView(view: ViewId): DocumentStatus[] {
   if (view === 'drafts' || view === 'overdue' || view === 'unpaid') return [];
-  if (view === 'type:offerte') return ['draft', 'sent', 'accepted', 'rejected'];
+  if (view === 'type:quote') return ['draft', 'sent', 'accepted', 'rejected'];
   if (view === 'type:invoice') return ['draft', 'sent', 'paid'];
-  if (view === 'type:mahnung') return ['draft', 'sent'];
-  if (view === 'type:quittung') return [];
+  if (view === 'type:reminder') return ['draft', 'sent'];
+  if (view === 'type:receipt') return [];
   return ['draft', 'sent', 'paid', 'accepted', 'rejected'];
 }

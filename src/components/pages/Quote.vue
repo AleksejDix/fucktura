@@ -235,7 +235,7 @@ function update(changes: DocumentPatch) {
     "Your contact": "Uw contactpersoon",
     "Customer number": "Klantnummer",
     "Greeting": "Geachte {name}",
-    "Quote intro": "Bedankt voor uw aanvraag. Graag bieden wij u de volgende offerte aan:",
+    "Quote intro": "Bedankt voor uw aanvraag. Graag bieden wij u de volgende quote aan:",
     "Pos": "Pos.",
     "Description": "Omschrijving",
     "Quantity": "Aantal",
@@ -243,7 +243,7 @@ function update(changes: DocumentPatch) {
     "Price in CHF": "Prijs in CHF",
     "Product code": "Productcode",
     "Quote amount (tax exempt)": "Offertebedrag (vrijgesteld van BTW)",
-    "Quote valid note": "Deze offerte is geldig tot {date}.",
+    "Quote valid note": "Deze quote is geldig tot {date}.",
     "Quote closing": "Wij zien uw reactie met belangstelling tegemoet.",
     "Kind regards": "Met vriendelijke groet",
     "Add line item": "Positie toevoegen"

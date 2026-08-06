@@ -1,16 +1,21 @@
 import type { DocumentType } from '@/fs/types';
 
 export const DOC_TYPE_DOT_CLASS: Record<DocumentType, string> = {
-  offerte: 'bg-amber-500',
+  quote: 'bg-amber-500',
   invoice: 'bg-emerald-500',
-  mahnung: 'bg-red-500',
-  quittung: 'bg-blue-500',
+  reminder: 'bg-red-500',
+  receipt: 'bg-blue-500',
 };
 
 export function defaultUnitForType(type: DocumentType): string {
-  return type === 'quittung' ? 'Pauschal' : 'h';
+  return type === 'receipt' ? 'Pauschal' : 'h';
 }
 
+/**
+ * Document-number prefixes keep the original German initials (Rechnung,
+ * Offerte, Mahnung, Quittung) so numbering stays continuous with documents
+ * already issued.
+ */
 export function numberPrefix(type: DocumentType): string {
-  return type === 'invoice' ? 'R' : type === 'offerte' ? 'O' : type === 'mahnung' ? 'M' : 'Q';
+  return type === 'invoice' ? 'R' : type === 'quote' ? 'O' : type === 'reminder' ? 'M' : 'Q';
 }

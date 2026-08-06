@@ -171,7 +171,7 @@ function onKeydown(e: KeyboardEvent) {
   } else if (!e.shiftKey && e.key === '[') {
     e.preventDefault();
     store.previousDocument();
-  } else if (e.shiftKey && k === 'i' && isOfferte.value && store.activeDocument) {
+  } else if (e.shiftKey && k === 'i' && isQuote.value && store.activeDocument) {
     e.preventDefault();
     store.convertToInvoice(store.activeDocument.number);
   }
@@ -187,7 +187,7 @@ onUnmounted(() => {
 });
 
 const hasActiveDoc = computed(() => !!store.activeDocument);
-const isOfferte = computed(() => store.activeDocument?.type === 'offerte');
+const isQuote = computed(() => store.activeDocument?.type === 'quote');
 const activeDoc = computed(() => store.activeDocument);
 const activeType = computed(() => activeDoc.value?.type);
 const activeStatus = computed(() => activeDoc.value?.status);
@@ -208,7 +208,7 @@ function emailBody(): string {
 
   const bodies: Record<string, Record<string, (d: typeof doc) => string>> = {
     de: {
-      offerte: (d) => {
+      quote: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Guten Tag ${name}
 
@@ -238,9 +238,9 @@ Freundliche Grüsse
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      mahnung: (d) => {
+      reminder: (d) => {
         const total = formatChf(
-          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+          sumAmounts(d.outstandingAmount ?? 0, d.reminderFee ?? 0, d.lateInterest ?? 0),
         );
         return `Guten Tag ${name}
 
@@ -256,7 +256,7 @@ Freundliche Grüsse
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      quittung: (d) => {
+      receipt: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Guten Tag ${name}
 
@@ -272,7 +272,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
     },
     en: {
-      offerte: (d) => {
+      quote: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Dear ${name}
 
@@ -302,9 +302,9 @@ Kind regards
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      mahnung: (d) => {
+      reminder: (d) => {
         const total = formatChf(
-          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+          sumAmounts(d.outstandingAmount ?? 0, d.reminderFee ?? 0, d.lateInterest ?? 0),
         );
         return `Dear ${name}
 
@@ -320,7 +320,7 @@ Kind regards
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      quittung: (d) => {
+      receipt: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Dear ${name}
 
@@ -336,7 +336,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
     },
     es: {
-      offerte: (d) => {
+      quote: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Estimado/a ${name}
 
@@ -366,9 +366,9 @@ Atentamente
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      mahnung: (d) => {
+      reminder: (d) => {
         const total = formatChf(
-          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+          sumAmounts(d.outstandingAmount ?? 0, d.reminderFee ?? 0, d.lateInterest ?? 0),
         );
         return `Estimado/a ${name}
 
@@ -384,7 +384,7 @@ Atentamente
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      quittung: (d) => {
+      receipt: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Estimado/a ${name}
 
@@ -400,11 +400,11 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
     },
     nl: {
-      offerte: (d) => {
+      quote: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Geachte ${name}
 
-Hierbij ontvangt u onze offerte ${d.number} van ${fmtDate(d.meta.date)}.
+Hierbij ontvangt u onze quote ${d.number} van ${fmtDate(d.meta.date)}.
 
 Offertebedrag: ${currency} ${total}
 Geldig tot: ${fmtDate(d.meta.validUntil)}
@@ -430,9 +430,9 @@ Met vriendelijke groet
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      mahnung: (d) => {
+      reminder: (d) => {
         const total = formatChf(
-          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+          sumAmounts(d.outstandingAmount ?? 0, d.reminderFee ?? 0, d.lateInterest ?? 0),
         );
         return `Geachte ${name}
 
@@ -448,7 +448,7 @@ Met vriendelijke groet
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      quittung: (d) => {
+      receipt: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Geachte ${name}
 
@@ -464,7 +464,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
     },
     ru: {
-      offerte: (d) => {
+      quote: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Здравствуйте, ${name}
 
@@ -494,9 +494,9 @@ ${d.subtitle ? `Тема: ${d.subtitle}\n\n` : ''}При возникновен�
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      mahnung: (d) => {
+      reminder: (d) => {
         const total = formatChf(
-          sumAmounts(d.offenerBetrag ?? 0, d.mahngebuehr ?? 0, d.verzugszins ?? 0),
+          sumAmounts(d.outstandingAmount ?? 0, d.reminderFee ?? 0, d.lateInterest ?? 0),
         );
         return `Здравствуйте, ${name}
 
@@ -512,7 +512,7 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
 ${sender.contact || sender.company}
 ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
       },
-      quittung: (d) => {
+      receipt: (d) => {
         const total = formatChf(sumLineItems(d.lineItems ?? []));
         return `Здравствуйте, ${name}
 
@@ -548,9 +548,9 @@ function sendEmail() {
   const typeLabel =
     doc.type === 'invoice'
       ? t('Invoice')
-      : doc.type === 'offerte'
+      : doc.type === 'quote'
         ? t('Quote')
-        : doc.type === 'quittung'
+        : doc.type === 'receipt'
           ? t('Receipt')
           : t('Reminder');
   const subject = doc.subtitle
@@ -568,7 +568,7 @@ function statusItems(): MenuItem[] {
   const s = activeStatus.value;
   const items: MenuItem[] = [];
 
-  if (activeType.value === 'offerte') {
+  if (activeType.value === 'quote') {
     for (const status of ['draft', 'sent', 'accepted', 'rejected'] as const) {
       items.push({
         label: t(status),
@@ -584,7 +584,7 @@ function statusItems(): MenuItem[] {
         checked: s === status,
       });
     }
-  } else if (activeType.value === 'mahnung') {
+  } else if (activeType.value === 'reminder') {
     for (const status of ['draft', 'sent'] as const) {
       items.push({
         label: t(status),
@@ -596,7 +596,7 @@ function statusItems(): MenuItem[] {
     // its own — so the menu item drives the invoice, not the reminder.
     const related = activeDoc.value?.relatedInvoice;
     if (related) {
-      const resolved = store.isMahnungResolved(activeDoc.value!);
+      const resolved = store.isReminderResolved(activeDoc.value!);
       items.push({ separator: true });
       items.push({
         label: t('settled'),
@@ -645,14 +645,16 @@ const menus = computed<Menu[]>(() => [
           ]
         : []),
       { separator: true },
-      { label: t('New Offerte'), shortcut: '⌘N', action: () => store.createOfferte() },
+      { label: t('New quote'), shortcut: '⌘N', action: () => store.createQuote() },
       { label: t('New invoice'), action: () => store.createInvoice() },
       {
         label: t('New reminder'),
         action: () =>
-          store.createMahnung(activeType.value === 'invoice' ? activeDoc.value?.number : undefined),
+          store.createReminder(
+            activeType.value === 'invoice' ? activeDoc.value?.number : undefined,
+          ),
       },
-      { label: t('New receipt'), action: () => store.createQuittung() },
+      { label: t('New receipt'), action: () => store.createReceipt() },
       { separator: true },
       { label: t('Print / PDF'), shortcut: '⌘P', action: () => emit('generate-pdf') },
       {
@@ -718,10 +720,10 @@ const menus = computed<Menu[]>(() => [
         label: t('Convert to invoice'),
         shortcut: '⌘⇧I',
         action: () => store.convertToInvoice(store.activeDocument!.number),
-        disabled: !isOfferte.value,
+        disabled: !isQuote.value,
         hidden: !hasActiveDoc.value,
       },
-      { separator: true, hidden: !isOfferte.value || !hasActiveDoc.value },
+      { separator: true, hidden: !isQuote.value || !hasActiveDoc.value },
       {
         label: t('Delete'),
         shortcut: '⌘⌫',

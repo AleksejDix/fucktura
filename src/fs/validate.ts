@@ -6,7 +6,7 @@ const isStr = (v: unknown): v is string => typeof v === 'string';
 const isNum = (v: unknown): v is number => typeof v === 'number' && !isNaN(v);
 const isArr = Array.isArray;
 
-const DOC_TYPES = ['invoice', 'offerte', 'mahnung', 'quittung'];
+const DOC_TYPES = ['invoice', 'quote', 'reminder', 'receipt'];
 
 function isAccount(v: unknown): boolean {
   return isObj(v) && isStr(v.iban) && isStr(v.bank) && isStr(v.bic);

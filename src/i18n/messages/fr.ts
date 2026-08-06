@@ -4,10 +4,10 @@ export default {
   Page: 'Page',
 
   // Sidebar
-  Offerten: 'Devis',
-  Rechnungen: 'Factures',
-  Mahnungen: 'Rappels',
-  'New Offerte': 'Nouveau devis',
+  Quotes: 'Devis',
+  Invoices: 'Factures',
+  Reminders: 'Rappels',
+  'New quote': 'Nouveau devis',
   'Convert to invoice': 'Convertir en facture',
   'All documents': 'Tous les documents',
   Delete: 'Supprimer',
