@@ -117,11 +117,20 @@ export interface Document {
   updatedAt: string;
 }
 
+/** A data file (or entry) that could not be loaded and is not shown in the app. */
+export interface FileProblem {
+  /** Path relative to the data folder, e.g. 'documents/R-123.json' */
+  file: string;
+  reason: 'unparseable' | 'invalid';
+}
+
 export interface RepoSnapshot {
   senders: Sender[];
   clients: Client[];
   positions: Position[];
   documents: Document[];
+  /** Files skipped during load — must be surfaced to the user, never dropped silently. */
+  problems: FileProblem[];
 }
 
 /** Shallow patch for a document; nested meta fields merge into existing meta. */
