@@ -27,6 +27,16 @@
 
     <div class="flex items-center gap-3 shrink-0">
       <button
+        v-if="store.loadProblems.length > 0"
+        type="button"
+        @click="store.loadProblemsDismissed = false"
+        class="flex items-center gap-1 text-amber-700 hover:text-amber-900"
+        :title="$t('Unreadable files', { count: store.loadProblems.length })"
+      >
+        <span>⚠️</span>
+        <span class="font-mono">{{ store.loadProblems.length }}</span>
+      </button>
+      <button
         v-if="updateReady"
         @click="applyUpdate"
         class="text-[11px] px-2 py-0.5 bg-red-600 text-white hover:bg-red-700 transition-colors"

@@ -135,6 +135,16 @@ export default {
   'Tax note hint': 'Se imprime debajo del importe total, p. ej. una nota de exención de IVA.',
   auto: 'auto',
 
+  'Not saved': 'No guardado',
+
+  // Load problems
+  'Unreadable files': '{count} archivo(s) no se pudieron leer y no se muestran',
+  'Unreadable files hint':
+    'Corrija el archivo en su carpeta de datos; la app se recarga cuando la ventana recupera el foco.',
+  'Invalid JSON': 'JSON no válido',
+  'Unexpected shape': 'Estructura inesperada',
+  Dismiss: 'Descartar',
+
   // Error boundary
   'Something went wrong': 'Algo salió mal',
   Retry: 'Reintentar',

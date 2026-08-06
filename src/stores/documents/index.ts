@@ -4,6 +4,7 @@ import type {
   Document,
   DocumentPatch,
   DocumentStatus,
+  FileProblem,
   Position,
   Sender,
   ViewId,
@@ -44,6 +45,9 @@ export const useDocumentsStore = defineStore('documents', () => {
   const quickSearch = ref('');
   const loading = ref(true);
   const activeDocumentNumber = ref<string | null>(null);
+  /** Files skipped during load; shown as a banner until dismissed. */
+  const loadProblems = ref<FileProblem[]>([]);
+  const loadProblemsDismissed = ref(false);
 
   // --- Lookups ---
 
@@ -155,6 +159,11 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   async function load() {
     const snap = await repo.loadAll();
+    const signature = (p: FileProblem[]) => p.map((x) => `${x.file}:${x.reason}`).join('|');
+    if (signature(snap.problems) !== signature(loadProblems.value)) {
+      loadProblemsDismissed.value = false;
+    }
+    loadProblems.value = snap.problems;
     senders.value = [...snap.senders].sort((a, b) => a.key.localeCompare(b.key));
     clients.value = [...snap.clients].sort((a, b) =>
       a.customerNumber.localeCompare(b.customerNumber),
@@ -206,10 +215,35 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   // --- Document persistence ---
 
+  /**
+   * Numbers double as filenames and generateNumber has second resolution,
+   * so two quick creations (double-click, duplicate twice) could collide
+   * and overwrite the same file. Claims run synchronously against loaded
+   * documents plus in-flight writes, bumping the numeric tail until free.
+   */
+  const pendingNumbers = new Set<string>();
+
+  function claimNumber(desired: string): string {
+    const taken = (n: string) =>
+      pendingNumbers.has(n) || documents.value.some((d) => d.number === n);
+    let candidate = desired;
+    while (taken(candidate)) {
+      const m = candidate.match(/^(.*)-(\d+)$/);
+      candidate = m ? `${m[1]}-${Number(m[2]) + 1}` : `${candidate}-2`;
+    }
+    pendingNumbers.add(candidate);
+    return candidate;
+  }
+
   async function addDocument(doc: Omit<Document, 'createdAt' | 'updatedAt'>) {
+    const number = claimNumber(doc.number);
     const now = new Date().toISOString();
-    const full: Document = { ...doc, createdAt: now, updatedAt: now };
-    await repo.writeDocument(full);
+    const full: Document = { ...doc, number, createdAt: now, updatedAt: now };
+    try {
+      await repo.writeDocument(full);
+    } finally {
+      pendingNumbers.delete(number);
+    }
     documents.value = [full, ...documents.value];
     setActive(full.number);
     return full.number;
@@ -221,12 +255,38 @@ export const useDocumentsStore = defineStore('documents', () => {
     if (activeDocumentNumber.value === number) setActive(null);
   }
 
-  async function writeDoc(doc: Document) {
-    await repo.writeDocument(doc);
-    const idx = documents.value.findIndex((d) => d.number === doc.number);
-    if (idx >= 0) documents.value.splice(idx, 1, doc);
+  /** Pending disk write per document number, so writes never interleave. */
+  const writeQueues = new Map<string, Promise<void>>();
+
+  function enqueueWrite(number: string, fn: () => Promise<void>): Promise<void> {
+    const tail = writeQueues.get(number) ?? Promise.resolve();
+    const run = tail.catch(() => {}).then(fn);
+    const settled = run.catch(() => {});
+    writeQueues.set(number, settled);
+    settled.then(() => {
+      if (writeQueues.get(number) === settled) writeQueues.delete(number);
+    });
+    return run;
   }
 
+  /**
+   * Applies to memory first, then persists. Memory-first means a second
+   * edit in the same tick reads the first edit's result instead of the
+   * pre-edit document (lost update); the per-document queue keeps the
+   * disk writes in the same order. On write failure memory is ahead of
+   * disk; the save indicator reports it and the focus reload resyncs.
+   */
+  async function writeDoc(doc: Document) {
+    const idx = documents.value.findIndex((d) => d.number === doc.number);
+    if (idx >= 0) documents.value.splice(idx, 1, doc);
+    await enqueueWrite(doc.number, () => repo.writeDocument(doc));
+  }
+
+  /**
+   * Merges a shallow patch (meta merges one level deeper). Passing a key
+   * explicitly set to undefined clears that field: the spread keeps the
+   * key, and JSON serialization drops it from the file.
+   */
   async function updateDocument(docNumber: string, patch: DocumentPatch) {
     const doc = documents.value.find((d) => d.number === docNumber);
     if (!doc) return;
@@ -404,6 +464,8 @@ export const useDocumentsStore = defineStore('documents', () => {
     isReminderResolved,
     activeSender,
     loading,
+    loadProblems,
+    loadProblemsDismissed,
     activeDocumentNumber,
     activeDocument,
     filteredDocuments,

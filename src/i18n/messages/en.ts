@@ -134,6 +134,16 @@ export default {
   'Tax note hint': 'Printed below the invoice total, e.g. a small-business VAT exemption note.',
   auto: 'auto',
 
+  'Not saved': 'Not saved',
+
+  // Load problems
+  'Unreadable files': '{count} file(s) could not be read and are not shown',
+  'Unreadable files hint':
+    'Fix the file in your data folder; the app reloads when the window regains focus.',
+  'Invalid JSON': 'Invalid JSON',
+  'Unexpected shape': 'Unexpected shape',
+  Dismiss: 'Dismiss',
+
   // Error boundary
   'Something went wrong': 'Something went wrong',
   Retry: 'Retry',

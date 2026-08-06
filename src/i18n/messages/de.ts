@@ -135,6 +135,16 @@ export default {
     'Wird unter dem Rechnungsbetrag gedruckt, z. B. Kleinunternehmer-Hinweis nach § 19 UStG.',
   auto: 'auto',
 
+  'Not saved': 'Nicht gespeichert',
+
+  // Load problems
+  'Unreadable files': '{count} Datei(en) konnten nicht gelesen werden und werden nicht angezeigt',
+  'Unreadable files hint':
+    'Korrigieren Sie die Datei im Datenordner; die App lädt neu, sobald das Fenster wieder den Fokus erhält.',
+  'Invalid JSON': 'Ungültiges JSON',
+  'Unexpected shape': 'Unerwartete Struktur',
+  Dismiss: 'Ausblenden',
+
   // Error boundary
   'Something went wrong': 'Etwas ist schiefgelaufen',
   Retry: 'Erneut versuchen',
