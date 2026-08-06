@@ -221,12 +221,38 @@ export const useDocumentsStore = defineStore('documents', () => {
     if (activeDocumentNumber.value === number) setActive(null);
   }
 
-  async function writeDoc(doc: Document) {
-    await repo.writeDocument(doc);
-    const idx = documents.value.findIndex((d) => d.number === doc.number);
-    if (idx >= 0) documents.value.splice(idx, 1, doc);
+  /** Pending disk write per document number, so writes never interleave. */
+  const writeQueues = new Map<string, Promise<void>>();
+
+  function enqueueWrite(number: string, fn: () => Promise<void>): Promise<void> {
+    const tail = writeQueues.get(number) ?? Promise.resolve();
+    const run = tail.catch(() => {}).then(fn);
+    const settled = run.catch(() => {});
+    writeQueues.set(number, settled);
+    settled.then(() => {
+      if (writeQueues.get(number) === settled) writeQueues.delete(number);
+    });
+    return run;
   }
 
+  /**
+   * Applies to memory first, then persists. Memory-first means a second
+   * edit in the same tick reads the first edit's result instead of the
+   * pre-edit document (lost update); the per-document queue keeps the
+   * disk writes in the same order. On write failure memory is ahead of
+   * disk; the save indicator reports it and the focus reload resyncs.
+   */
+  async function writeDoc(doc: Document) {
+    const idx = documents.value.findIndex((d) => d.number === doc.number);
+    if (idx >= 0) documents.value.splice(idx, 1, doc);
+    await enqueueWrite(doc.number, () => repo.writeDocument(doc));
+  }
+
+  /**
+   * Merges a shallow patch (meta merges one level deeper). Passing a key
+   * explicitly set to undefined clears that field: the spread keeps the
+   * key, and JSON serialization drops it from the file.
+   */
   async function updateDocument(docNumber: string, patch: DocumentPatch) {
     const doc = documents.value.find((d) => d.number === docNumber);
     if (!doc) return;
