@@ -244,13 +244,13 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
         );
         return `Guten Tag ${name}
 
-Leider haben wir für die Rechnung ${d.number} vom ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} noch keinen Zahlungseingang feststellen können.
+Gerne erlauben wir uns, Sie an die noch offene Rechnung ${d.relatedInvoice ?? d.number} vom ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} zu erinnern. Gemäss unseren Unterlagen ist bisher kein Zahlungseingang erfolgt.
 
-Offener Betrag: ${currency} ${total}
+Offener Betrag inkl. Mahngebühr und Verzugszins: ${currency} ${total}
 Fällig seit: ${fmtDate(d.meta.overdueSince)}
 Zahlbar bis: ${fmtDate(d.meta.dueDate)}
 
-Wir bitten Sie, den ausstehenden Betrag innert der genannten Frist zu überweisen.
+Die Mahnung mit allen Details und Zahlungsinformationen finden Sie im Anhang. Wir bitten Sie, den ausstehenden Betrag innert der genannten Frist zu überweisen. Sollte sich Ihre Zahlung mit dieser Nachricht gekreuzt haben, betrachten Sie diese Erinnerung bitte als gegenstandslos.
 
 Freundliche Grüsse
 ${sender.contact || sender.company}
@@ -308,13 +308,13 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
         );
         return `Dear ${name}
 
-We have not yet received payment for invoice ${d.number} dated ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
+May we kindly remind you of the outstanding invoice ${d.relatedInvoice ?? d.number} dated ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}. According to our records we have not yet received payment.
 
-Outstanding amount: ${currency} ${total}
+Outstanding amount incl. reminder fee and default interest: ${currency} ${total}
 Overdue since: ${fmtDate(d.meta.overdueSince)}
 Due date: ${fmtDate(d.meta.dueDate)}
 
-We kindly ask you to settle the outstanding amount within the stated deadline.
+Please find the reminder with all details and payment information attached. We kindly ask you to settle the outstanding amount within the stated deadline. Should your payment have crossed this message, please disregard this reminder.
 
 Kind regards
 ${sender.contact || sender.company}
@@ -372,13 +372,13 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
         );
         return `Estimado/a ${name}
 
-Lamentablemente no hemos recibido el pago de la factura ${d.number} del ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
+Nos permitimos recordarle la factura pendiente ${d.relatedInvoice ?? d.number} del ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}. Según nuestros registros, aún no hemos recibido el pago.
 
-Importe pendiente: ${currency} ${total}
+Importe pendiente incl. gastos de recordatorio e intereses de demora: ${currency} ${total}
 Vencido desde: ${fmtDate(d.meta.overdueSince)}
 Fecha límite de pago: ${fmtDate(d.meta.dueDate)}
 
-Le rogamos que realice la transferencia dentro del plazo indicado.
+Adjunto encontrará el recordatorio con todos los detalles y la información de pago. Le rogamos que abone el importe pendiente dentro del plazo indicado. Si su pago se ha cruzado con este mensaje, ignore este recordatorio.
 
 Atentamente
 ${sender.contact || sender.company}
@@ -436,13 +436,13 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
         );
         return `Geachte ${name}
 
-Helaas hebben wij voor factuur ${d.number} van ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)} nog geen betaling ontvangen.
+Graag herinneren wij u aan de nog openstaande factuur ${d.relatedInvoice ?? d.number} van ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}. Volgens onze administratie hebben wij nog geen betaling ontvangen.
 
-Openstaand bedrag: ${currency} ${total}
+Openstaand bedrag incl. aanmaningskosten en vertragingsrente: ${currency} ${total}
 Vervallen sinds: ${fmtDate(d.meta.overdueSince)}
 Betaalbaar tot: ${fmtDate(d.meta.dueDate)}
 
-Wij verzoeken u het openstaande bedrag binnen de genoemde termijn over te maken.
+In de bijlage vindt u de aanmaning met alle details en betalingsinformatie. Wij verzoeken u het openstaande bedrag binnen de genoemde termijn over te maken. Mocht uw betaling deze e-mail hebben gekruist, beschouw deze herinnering dan als niet verzonden.
 
 Met vriendelijke groet
 ${sender.contact || sender.company}
@@ -500,13 +500,13 @@ ${sender.company}${sender.email ? `\n${sender.email}` : ''}`;
         );
         return `Здравствуйте, ${name}
 
-К сожалению, мы ещё не получили оплату по счёту ${d.number} от ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}.
+Позволим себе напомнить о неоплаченном счёте ${d.relatedInvoice ?? d.number} от ${fmtDate(d.meta.invoiceDate) || fmtDate(d.meta.date)}. По нашим данным, оплата ещё не поступила.
 
-Сумма задолженности: ${currency} ${total}
+Сумма задолженности с учётом сбора за напоминание и процентов за просрочку: ${currency} ${total}
 Просрочено с: ${fmtDate(d.meta.overdueSince)}
 Срок оплаты: ${fmtDate(d.meta.dueDate)}
 
-Просим произвести оплату в указанный срок.
+Напоминание со всеми деталями и платёжной информацией во вложении. Просим произвести оплату в указанный срок. Если ваш платёж уже отправлен и разминулся с этим письмом, просто проигнорируйте это напоминание.
 
 С уважением
 ${sender.contact || sender.company}
@@ -553,9 +553,15 @@ function sendEmail() {
         : doc.type === 'receipt'
           ? t('Receipt')
           : t('Reminder');
-  const subject = doc.subtitle
-    ? `${typeLabel} ${doc.number} – ${doc.subtitle}`
-    : `${typeLabel} ${doc.number}`;
+  // A reminder's subtitle already reads "1. Mahnung zur Rechnung R-…",
+  // so prefixing "Mahnung M-…" would state the type twice and lead with
+  // the internal reminder number instead of the invoice being dunned.
+  const subject =
+    doc.type === 'reminder' && doc.subtitle
+      ? doc.subtitle
+      : doc.subtitle
+        ? `${typeLabel} ${doc.number} – ${doc.subtitle}`
+        : `${typeLabel} ${doc.number}`;
   const body = emailBody();
   window.open(
     `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
