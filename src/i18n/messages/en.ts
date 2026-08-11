@@ -179,4 +179,51 @@ export default {
 
   // Service worker
   'Update available · Reload': 'Update available · Reload',
+
+  // Outgoing emails (see src/emails/index.ts for the parameters)
+  'Email subject label': `Subject`,
+  'Quote email': `Dear {name}
+
+Please find attached our quote {number} dated {date}.
+
+Quote amount: {currency} {total}
+Valid until: {validUntil}
+
+{subjectBlock}Please do not hesitate to contact us if you have any questions.
+
+Kind regards
+{signature}`,
+  'Invoice email': `Dear {name}
+
+Please find attached our invoice {number} dated {date}.
+
+Invoice amount: {currency} {total}
+Due date: {dueDate}
+
+{subjectBlock}Please do not hesitate to contact us if you have any questions.
+
+Kind regards
+{signature}`,
+  'Reminder email': `Dear {name}
+
+May we kindly remind you of the outstanding invoice {invoiceRef} dated {invoiceDate}. According to our records we have not yet received payment.
+
+Outstanding amount incl. reminder fee and default interest: {currency} {total}
+Overdue since: {overdueSince}
+Due date: {dueDate}
+
+Please find the reminder with all details and payment information attached. We kindly ask you to settle the outstanding amount within the stated deadline. Should your payment have crossed this message, please disregard this reminder.
+
+Kind regards
+{signature}`,
+  'Receipt email': `Dear {name}
+
+Please find attached our receipt {number} dated {date}.
+
+Amount: {currency} {total} (already paid)
+
+{subjectBlock}Please do not hesitate to contact us if you have any questions.
+
+Kind regards
+{signature}`,
 };

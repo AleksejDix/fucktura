@@ -1,64 +1,64 @@
 import { formatDateForLocale } from '@/composables/useDate';
 import { useMoney } from '@/composables/useMoney';
 import type { Document, DocumentType } from '@/fs/types';
-import { de } from './de';
-import { en } from './en';
-import { es } from './es';
-import { nl } from './nl';
-import { ru } from './ru';
+import { i18n } from '@/i18n';
 
 /**
- * Outgoing email texts, one module per language. Everything derived
- * (recipient name, currency, formatted total, dates, signature) is
- * computed here once so the language files stay pure text.
+ * Outgoing email texts. The letters themselves live in the i18n catalogs
+ * (src/i18n/messages/*, "Outgoing emails" section) as single multiline
+ * messages; this module computes the interpolation parameters and picks
+ * the right message for the document type and locale.
+ *
+ * Parameters available to the messages:
+ *   {name}         recipient display name (person, falling back to company)
+ *   {number}       the document's own number
+ *   {date}         issue date, formatted for the locale
+ *   {dueDate}      payment deadline
+ *   {validUntil}   quote validity date
+ *   {invoiceRef}   number of the invoice a reminder duns
+ *   {invoiceDate}  issue date of the dunned invoice
+ *   {overdueSince} original due date of the dunned invoice
+ *   {currency}     CHF for Swiss sender IBANs, EUR otherwise
+ *   {total}        formatted amount (reminders include fee and interest)
+ *   {subjectBlock} localized "Subject: …" line incl. trailing blank line, or empty
+ *   {signature}    contact person, company, email
  */
 
-export interface EmailContext {
-  doc: Document;
-  /** Recipient display name (person, falling back to company). */
-  name: string;
-  /** CHF for Swiss sender IBANs, EUR otherwise. */
-  currency: string;
-  /** Formatted amount for the document type (reminders include fee and interest). */
-  total: string;
-  /** Formats an ISO date in the email's locale. */
-  date: (iso: string | undefined | null) => string;
-  /** Number of the invoice a reminder duns (falls back to the document's own number). */
-  invoiceRef: string;
-  /** Issue date of the dunned invoice, for reminders. */
-  invoiceDate: string;
-  /** Sender block: contact person, company, email. */
-  signature: string;
-}
-
-export type EmailTemplates = Record<DocumentType, (ctx: EmailContext) => string>;
-
-const TEMPLATES: Record<string, EmailTemplates> = { de, en, es, nl, ru };
+const EMAIL_KEYS: Record<DocumentType, string> = {
+  quote: 'Quote email',
+  invoice: 'Invoice email',
+  reminder: 'Reminder email',
+  receipt: 'Receipt email',
+};
 
 const { sumLineItems, sumAmounts, formatChf } = useMoney();
 
 export function emailBody(doc: Document, locale: string): string {
   const sender = doc.sender;
   const date = (iso: string | undefined | null) => formatDateForLocale(iso, locale);
+  const tr = (key: string, named: Record<string, unknown> = {}) =>
+    i18n.global.t(key, named, { locale });
   const total =
     doc.type === 'reminder'
       ? formatChf(
           sumAmounts(doc.outstandingAmount ?? 0, doc.reminderFee ?? 0, doc.lateInterest ?? 0),
         )
       : formatChf(sumLineItems(doc.lineItems ?? []));
-  const ctx: EmailContext = {
-    doc,
+  const subjectBlock = doc.subtitle ? `${tr('Email subject label')}: ${doc.subtitle}\n\n` : '';
+  return tr(EMAIL_KEYS[doc.type] ?? EMAIL_KEYS.invoice, {
     name: doc.recipient.name || doc.recipient.company,
-    currency: sender.accounts?.[0]?.iban?.startsWith('CH') ? 'CHF' : 'EUR',
-    total,
-    date,
+    number: doc.number,
+    date: date(doc.meta.date),
+    dueDate: date(doc.meta.dueDate),
+    validUntil: date(doc.meta.validUntil),
     invoiceRef: doc.relatedInvoice ?? doc.number,
     invoiceDate: date(doc.meta.invoiceDate) || date(doc.meta.date),
+    overdueSince: date(doc.meta.overdueSince),
+    currency: sender.accounts?.[0]?.iban?.startsWith('CH') ? 'CHF' : 'EUR',
+    total,
+    subjectBlock,
     signature: `${sender.contact || sender.company}\n${sender.company}${sender.email ? `\n${sender.email}` : ''}`,
-  };
-  const templates = TEMPLATES[locale] ?? TEMPLATES.de;
-  const template = templates[doc.type] ?? templates.invoice;
-  return template(ctx);
+  });
 }
 
 /**

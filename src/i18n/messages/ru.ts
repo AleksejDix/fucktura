@@ -179,4 +179,51 @@ export default {
   'Delete position confirm': 'Удалить позицию {name}?',
   // Service worker
   'Update available · Reload': 'Доступно обновление · Перезагрузить',
+
+  // Outgoing emails (see src/emails/index.ts for the parameters)
+  'Email subject label': `Тема`,
+  'Quote email': `Здравствуйте, {name}
+
+В приложении наше коммерческое предложение {number} от {date}.
+
+Сумма предложения: {currency} {total}
+Действительно до: {validUntil}
+
+{subjectBlock}При возникновении вопросов обращайтесь к нам.
+
+С уважением
+{signature}`,
+  'Invoice email': `Здравствуйте, {name}
+
+В приложении наш счёт {number} от {date}.
+
+Сумма счёта: {currency} {total}
+Срок оплаты: {dueDate}
+
+{subjectBlock}При возникновении вопросов обращайтесь к нам.
+
+С уважением
+{signature}`,
+  'Reminder email': `Здравствуйте, {name}
+
+Позволим себе напомнить о неоплаченном счёте {invoiceRef} от {invoiceDate}. По нашим данным, оплата ещё не поступила.
+
+Сумма задолженности с учётом сбора за напоминание и процентов за просрочку: {currency} {total}
+Просрочено с: {overdueSince}
+Срок оплаты: {dueDate}
+
+Напоминание со всеми деталями и платёжной информацией во вложении. Просим произвести оплату в указанный срок. Если ваш платёж уже отправлен и разминулся с этим письмом, просто проигнорируйте это напоминание.
+
+С уважением
+{signature}`,
+  'Receipt email': `Здравствуйте, {name}
+
+В приложении квитанция {number} от {date}.
+
+Сумма: {currency} {total} (уже оплачено)
+
+{subjectBlock}При возникновении вопросов обращайтесь к нам.
+
+С уважением
+{signature}`,
 };

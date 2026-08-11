@@ -181,4 +181,51 @@ export default {
   'Delete position confirm': 'Position {name} löschen?',
   // Service worker
   'Update available · Reload': 'Update verfügbar · Neu laden',
+
+  // Outgoing emails (see src/emails/index.ts for the parameters)
+  'Email subject label': `Betreff`,
+  'Quote email': `Guten Tag {name}
+
+Anbei erhalten Sie unsere Offerte {number} vom {date}.
+
+Offertbetrag: {currency} {total}
+Gültig bis: {validUntil}
+
+{subjectBlock}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
+
+Freundliche Grüsse
+{signature}`,
+  'Invoice email': `Guten Tag {name}
+
+Anbei erhalten Sie unsere Rechnung {number} vom {date}.
+
+Rechnungsbetrag: {currency} {total}
+Zahlbar bis: {dueDate}
+
+{subjectBlock}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
+
+Freundliche Grüsse
+{signature}`,
+  'Reminder email': `Guten Tag {name}
+
+Gerne erlauben wir uns, Sie an die noch offene Rechnung {invoiceRef} vom {invoiceDate} zu erinnern. Gemäss unseren Unterlagen ist bisher kein Zahlungseingang erfolgt.
+
+Offener Betrag inkl. Mahngebühr und Verzugszins: {currency} {total}
+Fällig seit: {overdueSince}
+Zahlbar bis: {dueDate}
+
+Die Mahnung mit allen Details und Zahlungsinformationen finden Sie im Anhang. Wir bitten Sie, den ausstehenden Betrag innert der genannten Frist zu überweisen. Sollte sich Ihre Zahlung mit dieser Nachricht gekreuzt haben, betrachten Sie diese Erinnerung bitte als gegenstandslos.
+
+Freundliche Grüsse
+{signature}`,
+  'Receipt email': `Guten Tag {name}
+
+Anbei erhalten Sie die Quittung {number} vom {date}.
+
+Betrag: {currency} {total} (bereits bezahlt)
+
+{subjectBlock}Bei Fragen stehen wir Ihnen gerne zur Verfügung.
+
+Freundliche Grüsse
+{signature}`,
 };

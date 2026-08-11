@@ -180,4 +180,51 @@ export default {
   'Delete position confirm': 'Positie {name} verwijderen?',
   // Service worker
   'Update available · Reload': 'Update beschikbaar · Herladen',
+
+  // Outgoing emails (see src/emails/index.ts for the parameters)
+  'Email subject label': `Betreft`,
+  'Quote email': `Geachte {name}
+
+Hierbij ontvangt u onze offerte {number} van {date}.
+
+Offertebedrag: {currency} {total}
+Geldig tot: {validUntil}
+
+{subjectBlock}Mocht u vragen hebben, neem dan gerust contact met ons op.
+
+Met vriendelijke groet
+{signature}`,
+  'Invoice email': `Geachte {name}
+
+Hierbij ontvangt u onze factuur {number} van {date}.
+
+Factuurbedrag: {currency} {total}
+Betaalbaar tot: {dueDate}
+
+{subjectBlock}Mocht u vragen hebben, neem dan gerust contact met ons op.
+
+Met vriendelijke groet
+{signature}`,
+  'Reminder email': `Geachte {name}
+
+Graag herinneren wij u aan de nog openstaande factuur {invoiceRef} van {invoiceDate}. Volgens onze administratie hebben wij nog geen betaling ontvangen.
+
+Openstaand bedrag incl. aanmaningskosten en vertragingsrente: {currency} {total}
+Vervallen sinds: {overdueSince}
+Betaalbaar tot: {dueDate}
+
+In de bijlage vindt u de aanmaning met alle details en betalingsinformatie. Wij verzoeken u het openstaande bedrag binnen de genoemde termijn over te maken. Mocht uw betaling deze e-mail hebben gekruist, beschouw deze herinnering dan als niet verzonden.
+
+Met vriendelijke groet
+{signature}`,
+  'Receipt email': `Geachte {name}
+
+Hierbij ontvangt u onze kwitantie {number} van {date}.
+
+Bedrag: {currency} {total} (reeds betaald)
+
+{subjectBlock}Mocht u vragen hebben, neem dan gerust contact met ons op.
+
+Met vriendelijke groet
+{signature}`,
 };
