@@ -180,4 +180,51 @@ export default {
   'Delete position confirm': '¿Eliminar la posición {name}?',
   // Service worker
   'Update available · Reload': 'Actualización disponible · Recargar',
+
+  // Outgoing emails (see src/emails/index.ts for the parameters)
+  'Email subject label': `Asunto`,
+  'Quote email': `Estimado/a {name}
+
+Adjunto le enviamos nuestro presupuesto {number} del {date}.
+
+Importe: {currency} {total}
+Válido hasta: {validUntil}
+
+{subjectBlock}Quedamos a su disposición para cualquier consulta.
+
+Atentamente
+{signature}`,
+  'Invoice email': `Estimado/a {name}
+
+Adjunto le enviamos nuestra factura {number} del {date}.
+
+Importe: {currency} {total}
+Fecha de vencimiento: {dueDate}
+
+{subjectBlock}Quedamos a su disposición para cualquier consulta.
+
+Atentamente
+{signature}`,
+  'Reminder email': `Estimado/a {name}
+
+Nos permitimos recordarle la factura pendiente {invoiceRef} del {invoiceDate}. Según nuestros registros, aún no hemos recibido el pago.
+
+Importe pendiente incl. gastos de recordatorio e intereses de demora: {currency} {total}
+Vencido desde: {overdueSince}
+Fecha límite de pago: {dueDate}
+
+Adjunto encontrará el recordatorio con todos los detalles y la información de pago. Le rogamos que abone el importe pendiente dentro del plazo indicado. Si su pago se ha cruzado con este mensaje, ignore este recordatorio.
+
+Atentamente
+{signature}`,
+  'Receipt email': `Estimado/a {name}
+
+Adjunto le enviamos el recibo {number} del {date}.
+
+Importe: {currency} {total} (ya pagado)
+
+{subjectBlock}Quedamos a su disposición para cualquier consulta.
+
+Atentamente
+{signature}`,
 };

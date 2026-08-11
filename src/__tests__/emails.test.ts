@@ -102,8 +102,9 @@ describe('emailBody', () => {
     }
   });
 
-  it('falls back to German for unknown locales', () => {
-    expect(emailBody(doc({}), 'fr')).toContain('Anbei erhalten Sie unsere Rechnung');
+  it('falls back to English for locales without email messages', () => {
+    // fr/it are stub catalogs; vue-i18n falls back to en per fallbackLocale.
+    expect(emailBody(doc({}), 'fr')).toContain('Please find attached our invoice');
   });
 });
 
