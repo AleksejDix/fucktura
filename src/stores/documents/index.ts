@@ -29,6 +29,7 @@ import {
   recipientLabel,
   statusPillsForView as pillsForView,
 } from './views';
+import { numberClaims, writeQueue } from './persistence';
 
 export const useDocumentsStore = defineStore('documents', () => {
   const documents = ref<Document[]>([]);
@@ -216,34 +217,16 @@ export const useDocumentsStore = defineStore('documents', () => {
 
   // --- Document persistence ---
 
-  /**
-   * Numbers double as filenames and generateNumber has second resolution,
-   * so two quick creations (double-click, duplicate twice) could collide
-   * and overwrite the same file. Claims run synchronously against loaded
-   * documents plus in-flight writes, bumping the numeric tail until free.
-   */
-  const pendingNumbers = new Set<string>();
-
-  function claimNumber(desired: string): string {
-    const taken = (n: string) =>
-      pendingNumbers.has(n) || documents.value.some((d) => d.number === n);
-    let candidate = desired;
-    while (taken(candidate)) {
-      const m = candidate.match(/^(.*)-(\d+)$/);
-      candidate = m ? `${m[1]}-${Number(m[2]) + 1}` : `${candidate}-2`;
-    }
-    pendingNumbers.add(candidate);
-    return candidate;
-  }
+  const numbers = numberClaims((n) => documents.value.some((d) => d.number === n));
 
   async function addDocument(doc: Omit<Document, 'createdAt' | 'updatedAt'>) {
-    const number = claimNumber(doc.number);
+    const number = numbers.claim(doc.number);
     const now = new Date().toISOString();
     const full: Document = { ...doc, number, createdAt: now, updatedAt: now };
     try {
       await repo.writeDocument(full);
     } finally {
-      pendingNumbers.delete(number);
+      numbers.release(number);
     }
     documents.value = [full, ...documents.value];
     setActive(full.number);
@@ -256,19 +239,7 @@ export const useDocumentsStore = defineStore('documents', () => {
     if (activeDocumentNumber.value === number) setActive(null);
   }
 
-  /** Pending disk write per document number, so writes never interleave. */
-  const writeQueues = new Map<string, Promise<void>>();
-
-  function enqueueWrite(number: string, fn: () => Promise<void>): Promise<void> {
-    const tail = writeQueues.get(number) ?? Promise.resolve();
-    const run = tail.catch(() => {}).then(fn);
-    const settled = run.catch(() => {});
-    writeQueues.set(number, settled);
-    settled.then(() => {
-      if (writeQueues.get(number) === settled) writeQueues.delete(number);
-    });
-    return run;
-  }
+  const queue = writeQueue();
 
   /**
    * Applies to memory first, then persists. Memory-first means a second
@@ -280,7 +251,7 @@ export const useDocumentsStore = defineStore('documents', () => {
   async function writeDoc(doc: Document) {
     const idx = documents.value.findIndex((d) => d.number === doc.number);
     if (idx >= 0) documents.value.splice(idx, 1, doc);
-    await enqueueWrite(doc.number, () => repo.writeDocument(doc));
+    await queue.enqueue(doc.number, () => repo.writeDocument(doc));
   }
 
   /**
