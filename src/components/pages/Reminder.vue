@@ -275,7 +275,7 @@ function markInvoicePaid() {
 
 function updateLevel(value: string) {
   const reminderLevel = Math.max(1, Math.min(3, parseInt(value) || 1));
-  const fee = countryDefaults.value.reminderFee[reminderLevel - 1] ?? 0;
+  const fee = countryDefaults.value.fees[reminderLevel - 1] ?? 0;
   update({ reminderLevel, reminderFee: fee });
 }
 
