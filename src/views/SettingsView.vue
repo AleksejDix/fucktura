@@ -1,25 +1,23 @@
 <template>
-  <div
-    class="w-[210mm] mx-auto py-8 px-[26mm] bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none my-4"
-  >
-    <div
-      v-if="folder.currentName"
-      class="flex items-center justify-between text-[9pt] text-gray-500 mb-6 pb-3 border-b border-gray-200"
-    >
-      <span>
-        {{ $t('Current folder') }}:
-        <span class="font-mono text-gray-900">📁 {{ folder.currentName }}</span>
-      </span>
-      <button
-        type="button"
-        @click="folder.openFolder()"
-        class="text-[9pt] text-gray-600 hover:text-black underline"
+  <DSheet :title="$t('Company settings')">
+    <template #top>
+      <div
+        v-if="folder.currentName"
+        class="flex items-center justify-between text-[9pt] text-gray-500 mb-6 pb-3 border-b border-gray-200"
       >
-        {{ $t('Change…') }}
-      </button>
-    </div>
-
-    <p class="text-[14pt] font-bold text-gray-900 mb-6">{{ $t('Company settings') }}</p>
+        <span>
+          {{ $t('Current folder') }}:
+          <span class="font-mono text-gray-900">📁 {{ folder.currentName }}</span>
+        </span>
+        <button
+          type="button"
+          @click="folder.openFolder()"
+          class="text-[9pt] text-gray-600 hover:text-black underline"
+        >
+          {{ $t('Change…') }}
+        </button>
+      </div>
+    </template>
 
     <div class="flex gap-2 mb-6">
       <button
@@ -47,54 +45,34 @@
       <section>
         <p class="text-[8pt] text-gray-900 mb-2">{{ $t('Company') }}</p>
         <div class="grid grid-cols-2 gap-2">
-          <input
+          <DField
             v-model="form.company"
-            @blur="save"
+            class="col-span-2"
             :placeholder="$t('Company name')"
-            class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
+            @save="save"
           />
-          <input
+          <DField
             v-model="form.street"
-            @blur="save"
+            class="col-span-2"
             :placeholder="$t('Street')"
-            class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
+            @save="save"
           />
-          <input
-            v-model="form.zip"
-            @blur="save"
-            :placeholder="$t('ZIP')"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono"
-          />
-          <input
-            v-model="form.city"
-            @blur="save"
-            :placeholder="$t('City')"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
-          />
-          <input
+          <DField v-model="form.zip" mono :placeholder="$t('ZIP')" @save="save" />
+          <DField v-model="form.city" :placeholder="$t('City')" @save="save" />
+          <DField
             v-model="form.country"
-            @blur="save"
+            class="col-span-2"
             :placeholder="$t('Country')"
-            class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
+            @save="save"
           />
-          <input
-            v-model="form.email"
-            @blur="save"
-            :placeholder="$t('Email')"
-            type="email"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
-          />
-          <input
-            v-model="form.website"
-            @blur="save"
-            :placeholder="$t('Website')"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
-          />
-          <input
+          <DField v-model="form.email" type="email" :placeholder="$t('Email')" @save="save" />
+          <DField v-model="form.website" :placeholder="$t('Website')" @save="save" />
+          <DField
             v-model="form.uid"
-            @blur="save"
+            class="col-span-2"
+            mono
             :placeholder="$t('UID')"
-            class="col-span-2 border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono"
+            @save="save"
           />
         </div>
       </section>
@@ -102,18 +80,12 @@
       <section>
         <p class="text-[8pt] text-gray-900 mb-2">{{ $t('Contact person') }}</p>
         <div class="grid grid-cols-2 gap-2">
-          <input
-            v-model="form.contact"
-            @blur="save"
-            :placeholder="$t('Name')"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
-          />
-          <input
+          <DField v-model="form.contact" :placeholder="$t('Name')" @save="save" />
+          <DField
             v-model="form.contactEmail"
-            @blur="save"
-            :placeholder="$t('Email')"
             type="email"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
+            :placeholder="$t('Email')"
+            @save="save"
           />
         </div>
       </section>
@@ -121,30 +93,22 @@
       <section>
         <p class="text-[8pt] text-gray-900 mb-2">{{ $t('Payment terms') }}</p>
         <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[8pt] text-gray-500 mb-0.5">{{
-              $t('Invoice due days')
-            }}</label>
-            <input
-              v-model.number="form.invoiceDueDays"
-              @blur="save"
-              type="number"
-              min="1"
-              class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono"
-            />
-          </div>
-          <div>
-            <label class="block text-[8pt] text-gray-500 mb-0.5">{{
-              $t('Quote valid days')
-            }}</label>
-            <input
-              v-model.number="form.quoteValidDays"
-              @blur="save"
-              type="number"
-              min="1"
-              class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono"
-            />
-          </div>
+          <DField
+            :model-value="form.invoiceDueDays"
+            :label="$t('Invoice due days')"
+            type="number"
+            min="1"
+            mono
+            @save="(v) => saveDays('invoiceDueDays', v)"
+          />
+          <DField
+            :model-value="form.quoteValidDays"
+            :label="$t('Quote valid days')"
+            type="number"
+            min="1"
+            mono
+            @save="(v) => saveDays('quoteValidDays', v)"
+          />
         </div>
       </section>
 
@@ -161,12 +125,11 @@
           <span class="text-gray-400 text-[8pt]">{{ $t('VAT registered hint') }}</span>
         </label>
         <div class="mt-2">
-          <label class="block text-[8pt] text-gray-500 mb-0.5">{{ $t('Tax note') }}</label>
-          <input
+          <DField
             v-model="form.taxNote"
-            @blur="save"
+            :label="$t('Tax note')"
             :placeholder="$t('Tax note hint')"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
+            @save="save"
           />
         </div>
       </section>
@@ -183,25 +146,10 @@
           </button>
         </div>
         <div v-for="(account, i) in form.accounts" :key="i" class="grid grid-cols-3 gap-2 mb-2">
-          <input
-            v-model="account.iban"
-            @blur="save"
-            placeholder="IBAN"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono"
-          />
-          <input
-            v-model="account.bank"
-            @blur="save"
-            :placeholder="$t('Bank')"
-            class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full"
-          />
+          <DField v-model="account.iban" mono placeholder="IBAN" @save="save" />
+          <DField v-model="account.bank" :placeholder="$t('Bank')" @save="save" />
           <div class="flex items-center gap-2">
-            <input
-              v-model="account.bic"
-              @blur="save"
-              placeholder="BIC"
-              class="border-b border-gray-200 py-1.5 text-[9pt] text-gray-900 placeholder-gray-300 focus:outline-none focus:border-gray-900 bg-transparent w-full font-mono flex-1"
-            />
+            <DField v-model="account.bic" mono placeholder="BIC" class="flex-1" @save="save" />
             <button
               v-if="form.accounts.length > 1"
               type="button"
@@ -225,7 +173,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </DSheet>
 </template>
 
 <script setup lang="ts">
@@ -236,6 +184,8 @@ import { useI18n } from 'vue-i18n';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
 import { useConfirmStore } from '@/stores/confirm';
+import DSheet from '@/components/DSheet.vue';
+import DField from '@/components/DField.vue';
 
 const documentsStore = useDocumentsStore();
 const folder = useFolderStore();
@@ -289,6 +239,12 @@ function addAccount() {
 
 function removeAccount(i: number) {
   form.value?.accounts.splice(i, 1);
+  save();
+}
+
+function saveDays(field: 'invoiceDueDays' | 'quoteValidDays', value: string) {
+  if (!form.value) return;
+  form.value[field] = parseInt(value, 10) || 14;
   save();
 }
 

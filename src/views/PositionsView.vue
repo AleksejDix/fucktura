@@ -1,71 +1,53 @@
 <template>
-  <div
-    class="w-[210mm] mx-auto py-8 px-[26mm] bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] print:shadow-none my-4"
-  >
-    <p class="text-[14pt] font-bold text-gray-900 mb-6">{{ $t('Positions') }}</p>
-
+  <DSheet :title="$t('Positions')">
     <div class="space-y-2">
       <div
         v-for="(pos, i) in positions"
         :key="pos.id"
         class="grid grid-cols-[1fr_120px_50px_60px_80px_24px] gap-2 items-end text-[9pt]"
       >
-        <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
-            $t('Description')
-          }}</label>
-          <input
-            v-model="pos.description"
-            @blur="save"
-            class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 focus:outline-none focus:border-gray-900"
-          />
-        </div>
-        <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
-            $t('Product code')
-          }}</label>
-          <input
-            v-model="pos.code"
-            @blur="save"
-            class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 font-mono focus:outline-none focus:border-gray-900"
-          />
-        </div>
-        <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
-            $t('Unit')
-          }}</label>
-          <input
-            v-model="pos.unit"
-            @blur="save"
-            placeholder="h"
-            class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 text-center focus:outline-none focus:border-gray-900"
-          />
-        </div>
-        <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
-            $t('VAT %')
-          }}</label>
-          <input
-            :value="pos.defaultVatRate ?? ''"
-            :placeholder="$t('auto')"
-            @blur="updateVat(pos, ($event.target as HTMLInputElement).value)"
-            type="number"
-            step="0.1"
-            class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 font-mono text-right focus:outline-none focus:border-gray-900"
-          />
-        </div>
-        <div>
-          <label v-if="i === 0" class="block text-[8pt] text-gray-500 mb-0.5">{{
-            $t('Default price')
-          }}</label>
-          <input
-            :value="pos.defaultPrice"
-            @blur="updatePrice(pos, ($event.target as HTMLInputElement).value)"
-            type="number"
-            step="0.01"
-            class="w-full border border-gray-300 px-2 py-1.5 text-gray-900 font-mono text-right focus:outline-none focus:border-gray-900"
-          />
-        </div>
+        <DField
+          v-model="pos.description"
+          variant="box"
+          :label="i === 0 ? $t('Description') : undefined"
+          @save="save"
+        />
+        <DField
+          v-model="pos.code"
+          variant="box"
+          mono
+          :label="i === 0 ? $t('Product code') : undefined"
+          @save="save"
+        />
+        <DField
+          v-model="pos.unit"
+          variant="box"
+          align="center"
+          placeholder="h"
+          :label="i === 0 ? $t('Unit') : undefined"
+          @save="save"
+        />
+        <DField
+          :model-value="pos.defaultVatRate ?? ''"
+          variant="box"
+          mono
+          align="right"
+          type="number"
+          step="0.1"
+          :placeholder="$t('auto')"
+          :label="i === 0 ? $t('VAT %') : undefined"
+          @save="(v) => updateVat(pos, v)"
+        />
+        <DField
+          :model-value="pos.defaultPrice"
+          variant="box"
+          mono
+          align="right"
+          type="number"
+          step="0.01"
+          :label="i === 0 ? $t('Default price') : undefined"
+          @save="(v) => updatePrice(pos, v)"
+        />
         <button @click="deletePosition(pos.id)" class="text-gray-300 hover:text-red-500 pb-1.5">
           &times;
         </button>
@@ -78,7 +60,7 @@
     >
       + {{ $t('Add position') }}
     </button>
-  </div>
+  </DSheet>
 </template>
 
 <script setup lang="ts">
@@ -88,6 +70,8 @@ import { nanoid } from 'nanoid';
 import type { Position } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import { useConfirmStore } from '@/stores/confirm';
+import DSheet from '@/components/DSheet.vue';
+import DField from '@/components/DField.vue';
 
 const documentsStore = useDocumentsStore();
 const confirmStore = useConfirmStore();
