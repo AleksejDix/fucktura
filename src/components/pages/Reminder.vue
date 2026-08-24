@@ -232,6 +232,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { Document, DocumentPatch, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
+import { addDays } from '@/stores/documents/factories';
 import { useMoney } from '@/composables/useMoney';
 import { getReminderDefaults } from '@/data/reminder-defaults';
 import PageTemplate from '../PageTemplate.vue';
@@ -275,8 +276,11 @@ function markInvoicePaid() {
 
 function updateLevel(value: string) {
   const reminderLevel = Math.max(1, Math.min(3, parseInt(value) || 1));
-  const fee = countryDefaults.value.fees[reminderLevel - 1] ?? 0;
-  update({ reminderLevel, reminderFee: fee });
+  const md = countryDefaults.value;
+  const fee = md.fees[reminderLevel - 1] ?? 0;
+  const days = md.paymentDays[reminderLevel - 1] ?? 14;
+  const base = meta.value.date ? new Date(meta.value.date) : new Date();
+  update({ reminderLevel, reminderFee: fee, meta: { dueDate: addDays(base, days) } });
 }
 
 function formatAmount(n: number): string {

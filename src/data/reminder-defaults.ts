@@ -17,8 +17,8 @@ export interface ReminderDefaults {
   fees: [number, number, number];
   /** Annual default interest rate as decimal (e.g. 0.05 = 5%) */
   interestRate: number;
-  /** Payment deadline in days from reminder date */
-  paymentDays: number;
+  /** Payment deadline in days from reminder date, per escalation level [1st, 2nd, 3rd reminder] */
+  paymentDays: [number, number, number];
   /** Currency code */
   currency: string;
   /** Legal reference */
@@ -30,7 +30,7 @@ const defaults: Record<string, ReminderDefaults> = {
   Schweiz: {
     fees: [20, 40, 60],
     interestRate: 0.05,
-    paymentDays: 14,
+    paymentDays: [14, 7, 7],
     currency: 'CHF',
     legalBasis: 'OR Art. 104',
   },
@@ -38,7 +38,7 @@ const defaults: Record<string, ReminderDefaults> = {
   Deutschland: {
     fees: [5, 10, 20],
     interestRate: 0.05, // + base rate (~3.12%), effectively ~8.12%
-    paymentDays: 14,
+    paymentDays: [14, 7, 7],
     currency: 'EUR',
     legalBasis: 'BGB §286/§288',
   },
@@ -46,14 +46,14 @@ const defaults: Record<string, ReminderDefaults> = {
   Niederlande: {
     fees: [40, 40, 40],
     interestRate: 0.08,
-    paymentDays: 14,
+    paymentDays: [14, 7, 7],
     currency: 'EUR',
     legalBasis: 'WIK (Wet Incassokosten)',
   },
   Nederland: {
     fees: [40, 40, 40],
     interestRate: 0.08,
-    paymentDays: 14,
+    paymentDays: [14, 7, 7],
     currency: 'EUR',
     legalBasis: 'WIK (Wet Incassokosten)',
   },
@@ -61,14 +61,14 @@ const defaults: Record<string, ReminderDefaults> = {
   Spanien: {
     fees: [40, 40, 40],
     interestRate: 0.08,
-    paymentDays: 30,
+    paymentDays: [30, 7, 7],
     currency: 'EUR',
     legalBasis: 'Ley 3/2004',
   },
   España: {
     fees: [40, 40, 40],
     interestRate: 0.08,
-    paymentDays: 30,
+    paymentDays: [30, 7, 7],
     currency: 'EUR',
     legalBasis: 'Ley 3/2004',
   },
@@ -76,7 +76,7 @@ const defaults: Record<string, ReminderDefaults> = {
   Österreich: {
     fees: [20, 40, 60],
     interestRate: 0.0912,
-    paymentDays: 14,
+    paymentDays: [14, 7, 7],
     currency: 'EUR',
     legalBasis: 'UGB §456',
   },

@@ -6,7 +6,7 @@ describe('getReminderDefaults', () => {
     const d = getReminderDefaults('Schweiz');
     expect(d.currency).toBe('CHF');
     expect(d.interestRate).toBe(0.05);
-    expect(d.paymentDays).toBe(14);
+    expect(d.paymentDays).toEqual([14, 7, 7]);
     expect(d.legalBasis).toBe('OR Art. 104');
     expect(d.fees).toEqual([20, 40, 60]);
   });
@@ -33,7 +33,7 @@ describe('getReminderDefaults', () => {
 
   it('returns Spanish defaults for Spanien', () => {
     const d = getReminderDefaults('Spanien');
-    expect(d.paymentDays).toBe(30);
+    expect(d.paymentDays).toEqual([30, 7, 7]);
     expect(d.currency).toBe('EUR');
   });
 

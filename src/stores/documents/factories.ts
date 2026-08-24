@@ -171,7 +171,7 @@ export function buildReminder(s: Sender, invoice: Document | null): NewDocument 
       : { company: '', name: '', street: '', zip: '', city: '', country: '' },
     meta: {
       date: today.toISOString(),
-      dueDate: addDays(today, md.paymentDays),
+      dueDate: addDays(today, md.paymentDays[0]),
       invoiceDate: invoice?.meta.date ?? '',
       overdueSince: invoice?.meta.dueDate ?? '',
       contactPerson: s.contact ?? '',
