@@ -61,26 +61,7 @@
     <div class="flex items-center gap-2 px-3">
       <DModeToggle />
     </div>
-    <Teleport to="body">
-      <div
-        v-if="showAbout"
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30"
-        @click.self="showAbout = false"
-      >
-        <div class="bg-white w-[300px] p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] text-center">
-          <p class="text-[18pt] font-bold">Fucktura</p>
-          <p class="text-[9pt] text-gray-500 mt-1">v1.0.0</p>
-          <p class="text-[9pt] text-gray-600 mt-4">{{ t('About description') }}</p>
-          <p class="text-[8pt] text-gray-400 mt-4">Made by Aleksej Dix</p>
-          <button
-            @click="showAbout = false"
-            class="mt-4 px-4 py-1.5 text-[9pt] bg-black text-white hover:bg-gray-800"
-          >
-            OK
-          </button>
-        </div>
-      </div>
-    </Teleport>
+    <DAboutDialog :open="showAbout" @close="showAbout = false" />
   </nav>
 </template>
 
@@ -90,13 +71,15 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import DModeToggle from './DModeToggle.vue';
 import DLogo from './DLogo.vue';
+import DAboutDialog from './DAboutDialog.vue';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
 import { useModeStore } from '@/stores/mode';
 import { usePaletteStore } from '@/stores/palette';
 import { useConfirmStore } from '@/stores/confirm';
 import { useLetterNormStore } from '@/stores/letterNorm';
-import { emailBody, emailSubject } from '@/emails';
+import { useGlobalShortcuts } from '@/composables/useGlobalShortcuts';
+import { emailMailtoUrl } from '@/emails';
 
 interface MenuItem {
   label?: string;
@@ -146,42 +129,10 @@ function closeMenus(e: MouseEvent) {
   }
 }
 
-function onKeydown(e: KeyboardEvent) {
-  const mod = e.metaKey || e.ctrlKey;
-  if (!mod || e.altKey) return;
-  const k = e.key.toLowerCase();
-  if (!e.shiftKey && k === 'o') {
-    e.preventDefault();
-    folder.openFolder();
-  } else if (!e.shiftKey && k === 'k') {
-    e.preventDefault();
-    palette.toggle();
-  } else if (!e.shiftKey && k === 'd' && store.activeDocument) {
-    e.preventDefault();
-    store.duplicateDocument(store.activeDocument.number);
-  } else if (e.shiftKey && k === 'l' && store.activeDocument) {
-    e.preventDefault();
-    store.addLineItemToActive();
-  } else if (!e.shiftKey && e.key === ']') {
-    e.preventDefault();
-    store.nextDocument();
-  } else if (!e.shiftKey && e.key === '[') {
-    e.preventDefault();
-    store.previousDocument();
-  } else if (e.shiftKey && k === 'i' && isQuote.value && store.activeDocument) {
-    e.preventDefault();
-    store.convertToInvoice(store.activeDocument.number);
-  }
-}
+useGlobalShortcuts();
 
-onMounted(() => {
-  document.addEventListener('click', closeMenus);
-  document.addEventListener('keydown', onKeydown);
-});
-onUnmounted(() => {
-  document.removeEventListener('click', closeMenus);
-  document.removeEventListener('keydown', onKeydown);
-});
+onMounted(() => document.addEventListener('click', closeMenus));
+onUnmounted(() => document.removeEventListener('click', closeMenus));
 
 const hasActiveDoc = computed(() => !!store.activeDocument);
 const isQuote = computed(() => store.activeDocument?.type === 'quote');
@@ -203,8 +154,7 @@ function setLocale(lang: string) {
 function sendEmail() {
   const doc = activeDoc.value;
   if (!doc) return;
-  const client = activeClient.value;
-  const to = doc.recipient.email || client?.email || '';
+  const to = doc.recipient.email || activeClient.value?.email || '';
   const typeLabel =
     doc.type === 'invoice'
       ? t('Invoice')
@@ -213,11 +163,7 @@ function sendEmail() {
         : doc.type === 'receipt'
           ? t('Receipt')
           : t('Reminder');
-  const subject = emailSubject(doc, typeLabel);
-  const body = emailBody(doc, locale.value);
-  window.open(
-    `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-  );
+  window.open(emailMailtoUrl(doc, typeLabel, locale.value, to));
 }
 
 function statusItems(): MenuItem[] {

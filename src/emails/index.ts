@@ -71,3 +71,15 @@ export function emailSubject(doc: Document, typeLabel: string): string {
     ? `${typeLabel} ${doc.number} – ${doc.subtitle}`
     : `${typeLabel} ${doc.number}`;
 }
+
+/** mailto: URL that opens the mail client with the letter prefilled. */
+export function emailMailtoUrl(
+  doc: Document,
+  typeLabel: string,
+  locale: string,
+  to: string,
+): string {
+  const subject = emailSubject(doc, typeLabel);
+  const body = emailBody(doc, locale);
+  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
