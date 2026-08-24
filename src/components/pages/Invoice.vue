@@ -90,6 +90,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { Document, DocumentPatch, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
+import { paginateLineItems } from '@/lib/paginate';
 import PageTemplate from '../PageTemplate.vue';
 import DLetterhead from '../DLetterhead.vue';
 import DRecipientAddress from '../DRecipientAddress.vue';
@@ -111,47 +112,7 @@ const props = defineProps<{
 const recipient = computed(() => props.doc.recipient);
 const meta = computed(() => props.doc.meta);
 
-// Heuristic page split: page 1 has the letterhead+recipient+meta+intro
-// taking up about half the page, so it fits ~18 items. Continuation pages
-// use almost the full A4 — about ~28 items. The last page reserves space
-// for the totals + closing block (~6 row equivalents).
-const ITEMS_FIRST = 18;
-const ITEMS_CONT = 28;
-const LAST_PAGE_RESERVE = 6;
-
-interface PageSlice {
-  items: typeof props.doc.lineItems;
-  pageNum: number;
-  isFirst: boolean;
-  isLast: boolean;
-}
-
-const pages = computed<PageSlice[]>(() => {
-  const all = props.doc.lineItems ?? [];
-  if (all.length === 0) {
-    return [{ items: [], pageNum: 1, isFirst: true, isLast: true }];
-  }
-  const slices: PageSlice[] = [];
-  let i = 0;
-  let isFirst = true;
-  let pageNum = 1;
-  while (i < all.length) {
-    const max = isFirst ? ITEMS_FIRST : ITEMS_CONT;
-    const remaining = all.length - i;
-    const fitsAsLast = remaining <= max - LAST_PAGE_RESERVE;
-    if (fitsAsLast) {
-      slices.push({ items: all.slice(i), pageNum, isFirst, isLast: true });
-      return slices;
-    }
-    slices.push({ items: all.slice(i, i + max), pageNum, isFirst, isLast: false });
-    i += max;
-    isFirst = false;
-    pageNum += 1;
-  }
-  // Edge case: items fit exactly without triggering fitsAsLast
-  if (slices.length > 0) slices[slices.length - 1].isLast = true;
-  return slices;
-});
+const pages = computed(() => paginateLineItems(props.doc.lineItems ?? []));
 
 function update(changes: DocumentPatch) {
   if (!props.doc.number) return;
