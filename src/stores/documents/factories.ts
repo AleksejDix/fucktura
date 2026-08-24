@@ -36,6 +36,14 @@ export function addDays(date: Date, days: number): string {
   return result.toISOString();
 }
 
+/**
+ * Default begins the day AFTER the due date — on the due date itself the
+ * invoice can still be paid on time (OR Art. 102).
+ */
+export function overdueSinceDate(dueDate: string | undefined): string {
+  return dueDate ? addDays(new Date(dueDate), 1) : '';
+}
+
 export function senderSnapshot(s: Sender): SenderSnapshot {
   const { key: _, ...snap } = s;
   return snap;
@@ -173,7 +181,7 @@ export function buildReminder(s: Sender, invoice: Document | null): NewDocument 
       date: today.toISOString(),
       dueDate: addDays(today, md.paymentDays[0]),
       invoiceDate: invoice?.meta.date ?? '',
-      overdueSince: invoice?.meta.dueDate ?? '',
+      overdueSince: overdueSinceDate(invoice?.meta.dueDate),
       contactPerson: s.contact ?? '',
       customerNumber: invoice?.customerNumber ?? '',
     },
@@ -200,7 +208,7 @@ export function reminderLinkPatch(reminder: Document, invoice: Document): Docume
     meta: {
       customerNumber: invoice.customerNumber,
       invoiceDate: invoice.meta.date,
-      overdueSince: invoice.meta.dueDate ?? '',
+      overdueSince: overdueSinceDate(invoice.meta.dueDate),
     },
   };
 }
