@@ -15,26 +15,7 @@
         />. {{ t('Reminder') }}
       </DDocTitle>
 
-      <div class="mt-3 print:hidden">
-        <DInvoicePicker :doc-number="doc.number" :has-invoice="!!relatedInvoiceNumber" />
-        <div v-if="relatedInvoiceNumber" class="flex items-center gap-2 text-[9pt]">
-          <span class="text-gray-600">{{ t('reminder to invoice') }}</span>
-          <span class="font-mono font-medium">{{ relatedInvoiceNumber }}</span>
-          <span
-            class="px-2 py-0.5 rounded-sm text-[8pt] font-medium"
-            :class="isResolved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
-            >{{ isResolved ? t('settled') : t('Open') }}</span
-          >
-          <button
-            v-if="!isResolved"
-            type="button"
-            @click="markInvoicePaid"
-            class="text-[8pt] underline text-gray-500 hover:text-gray-900"
-          >
-            {{ t('Mark invoice paid') }}
-          </button>
-        </div>
-      </div>
+      <DReminderInvoiceLink :doc="doc" />
 
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
         <DMetaField :label="t('Date')">
@@ -159,7 +140,7 @@ import DLetterhead from '../DLetterhead.vue';
 import DRecipientAddress from '../DRecipientAddress.vue';
 import DDocTitle from '../DDocTitle.vue';
 import DMetaField from '../DMetaField.vue';
-import DInvoicePicker from '../DInvoicePicker.vue';
+import DReminderInvoiceLink from '../DReminderInvoiceLink.vue';
 import DInline from '../DInline.vue';
 import DDate from '../DDate.vue';
 
@@ -177,7 +158,6 @@ const props = defineProps<{
 const recipient = computed(() => props.doc.recipient);
 const meta = computed(() => props.doc.meta);
 const relatedInvoiceNumber = computed(() => props.doc.relatedInvoice ?? '');
-const isResolved = computed(() => store.isReminderResolved(props.doc));
 const currentLevel = computed(() => props.doc.reminderLevel ?? 1);
 const outstandingAmount = computed(() => props.doc.outstandingAmount ?? 0);
 const reminderFee = computed(() => props.doc.reminderFee ?? 0);
@@ -212,10 +192,6 @@ function update(changes: DocumentPatch) {
   store.updateDocument(props.doc.number, changes);
 }
 
-function markInvoicePaid() {
-  if (relatedInvoiceNumber.value) store.setStatus(relatedInvoiceNumber.value, 'paid');
-}
-
 function updateLevel(value: string) {
   const reminderLevel = Math.max(1, Math.min(3, parseInt(value) || 1));
   const md = countryDefaults.value;
@@ -248,9 +224,6 @@ function formatAmount(n: number): string {
     "Price in CHF": "Betrag in CHF",
     "Outstanding amount": "Offener Rechnungsbetrag",
     "reminder to invoice": "zur Rechnung",
-    "Open": "Offen",
-    "settled": "Erledigt",
-    "Mark invoice paid": "Rechnung als bezahlt markieren",
     "Reminder fee": "Mahngebühr",
     "Default interest": "Verzugszins",
     "Total amount due": "Fälliger Gesamtbetrag",
@@ -276,9 +249,6 @@ function formatAmount(n: number): string {
     "Price in CHF": "Amount in CHF",
     "Outstanding amount": "Outstanding amount",
     "reminder to invoice": "to invoice",
-    "Open": "Open",
-    "settled": "Settled",
-    "Mark invoice paid": "Mark invoice as paid",
     "Reminder fee": "Reminder fee",
     "Default interest": "Default interest",
     "Total amount due": "Total amount due",
@@ -304,9 +274,6 @@ function formatAmount(n: number): string {
     "Price in CHF": "Importe en CHF",
     "Outstanding amount": "Importe pendiente de la factura",
     "reminder to invoice": "a la factura",
-    "Open": "Pendiente",
-    "settled": "Saldado",
-    "Mark invoice paid": "Marcar factura como pagada",
     "Reminder fee": "Gastos de recordatorio",
     "Default interest": "Intereses de demora",
     "Total amount due": "Importe total adeudado",
@@ -332,9 +299,6 @@ function formatAmount(n: number): string {
     "Price in CHF": "Bedrag in CHF",
     "Outstanding amount": "Openstaand factuurbedrag",
     "reminder to invoice": "bij factuur",
-    "Open": "Openstaand",
-    "settled": "Afgehandeld",
-    "Mark invoice paid": "Factuur als betaald markeren",
     "Reminder fee": "Aanmaningskosten",
     "Default interest": "Wettelijke rente",
     "Total amount due": "Totaal verschuldigd bedrag",
@@ -360,9 +324,6 @@ function formatAmount(n: number): string {
     "Price in CHF": "Сумма в CHF",
     "Outstanding amount": "Сумма задолженности",
     "reminder to invoice": "к счёту",
-    "Open": "Открыто",
-    "settled": "Погашено",
-    "Mark invoice paid": "Отметить счёт оплаченным",
     "Reminder fee": "Сбор за напоминание",
     "Default interest": "Пени за просрочку",
     "Total amount due": "Итого к оплате",
