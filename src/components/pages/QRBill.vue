@@ -1,23 +1,7 @@
 <template>
   <PageTemplate :page-index="pageIndex">
     <template #header>
-      <header
-        class="absolute top-0 left-0 right-0 pl-[var(--norm-ml)] pr-[var(--norm-mr)] pt-[10mm] max-h-[var(--norm-header-h)]"
-      >
-        <div class="flex justify-end">
-          <div class="text-[9pt] text-right leading-relaxed">
-            <div class="font-bold">{{ sender.company }}</div>
-            <div>{{ sender.street }}</div>
-            <div>
-              <span class="font-mono">{{ sender.zip }}</span> {{ sender.city }},
-              {{ sender.country }}
-            </div>
-            <div>{{ sender.email }}</div>
-            <div>{{ sender.website }}</div>
-            <div class="text-gray-500 font-mono">{{ sender.uid }}</div>
-          </div>
-        </div>
-      </header>
+      <DLetterhead :sender="sender" />
     </template>
 
     <template #footer><span /></template>
@@ -44,6 +28,7 @@ import { toDecimal } from 'dinero.js';
 import type { Document, SenderSnapshot } from '@/fs/types';
 import { useMoney } from '@/composables/useMoney';
 import PageTemplate from '../PageTemplate.vue';
+import DLetterhead from '../DLetterhead.vue';
 
 const { t, locale } = useI18n({ useScope: 'local' });
 const { sumLineItems, sumAmounts, sumGross } = useMoney();

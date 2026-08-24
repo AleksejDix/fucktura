@@ -1,121 +1,36 @@
 <template>
   <PageTemplate :page-index="pageIndex">
     <template #header>
-      <header
-        class="absolute top-0 left-0 right-0 pt-[10mm] pl-[var(--norm-ml)] pr-[var(--norm-mr)] max-h-[var(--norm-header-h)]"
-      >
-        <div class="flex justify-end">
-          <div class="text-[9pt] text-right leading-relaxed">
-            <div class="font-bold">{{ sender.company }}</div>
-            <div>{{ sender.street }}</div>
-            <div>
-              <span class="font-mono">{{ sender.zip }}</span> {{ sender.city }},
-              {{ sender.country }}
-            </div>
-            <div>{{ sender.email }}</div>
-            <div>{{ sender.website }}</div>
-            <div class="text-gray-500 font-mono">{{ sender.uid }}</div>
-          </div>
-        </div>
-      </header>
+      <DLetterhead :sender="sender" />
     </template>
 
     <section>
-      <div class="pt-[var(--norm-addr-offset)]">
-        <div class="w-[var(--norm-addr-w)]">
-          <DClientPicker
-            :doc-number="doc.number"
-            :has-client="!!recipient.company || !!recipient.name"
-          />
-          <address
-            v-if="recipient.company || recipient.name"
-            class="not-italic text-[9pt] leading-relaxed"
-          >
-            <DInline
-              v-model="recipient.company"
-              tag="div"
-              @update:model-value="(v) => update({ 'recipient.company': v })"
-            />
-            <DInline
-              v-model="recipient.name"
-              tag="div"
-              @update:model-value="(v) => update({ 'recipient.name': v })"
-            />
-            <DInline
-              v-model="recipient.street"
-              tag="div"
-              @update:model-value="(v) => update({ 'recipient.street': v })"
-            />
-            <div>
-              <DInline
-                v-model="recipient.zip"
-                tag="span"
-                class="font-mono"
-                @update:model-value="(v) => update({ 'recipient.zip': v })"
-              />
-              {{ ' ' }}
-              <DInline
-                v-model="recipient.city"
-                tag="span"
-                @update:model-value="(v) => update({ 'recipient.city': v })"
-              />
-            </div>
-            <DInline
-              v-if="recipient.country"
-              v-model="recipient.country"
-              tag="div"
-              @update:model-value="(v) => update({ 'recipient.country': v })"
-            />
-            <DInline
-              v-if="recipient.uid"
-              v-model="recipient.uid"
-              tag="div"
-              class="text-gray-500 font-mono"
-              @update:model-value="(v) => update({ 'recipient.uid': v })"
-            />
-          </address>
-        </div>
-      </div>
+      <DRecipientAddress :doc="doc" />
 
-      <div class="pt-[12mm]">
-        <div class="flex justify-between items-baseline">
-          <h2 class="text-[14pt] font-bold">{{ t('Receipt') }}</h2>
-          <span class="text-[14pt] font-bold">{{ doc.number }}</span>
-        </div>
-        <DInline
-          v-model="doc.subtitle"
-          tag="p"
-          class="font-bold text-[9pt]"
-          @update:model-value="(v) => update({ subtitle: v })"
-        />
-      </div>
+      <DDocTitle :doc="doc" :title="t('Receipt')" />
 
       <div class="grid grid-cols-2 gap-x-8 text-[9pt] border-y border-gray-300 py-2 mt-3">
-        <div class="flex justify-between">
-          <span class="text-gray-600">{{ t('Date') }}:</span>
+        <DMetaField :label="t('Date')">
           <DDate :value="meta.date" @update="(v) => update({ meta: { date: v } })" />
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">{{ t('Your contact') }}:</span>
+        </DMetaField>
+        <DMetaField :label="t('Your contact')">
           <DInline
             v-model="meta.contactPerson"
             tag="span"
             @update:model-value="(v) => update({ meta: { contactPerson: v } })"
           />
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">{{ t('Payment method') }}:</span>
+        </DMetaField>
+        <DMetaField :label="t('Payment method')">
           <span class="font-bold">{{ t('Paid via Demo Booking') }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">{{ t('Customer number') }}:</span>
+        </DMetaField>
+        <DMetaField :label="t('Customer number')">
           <DInline
             v-model="meta.customerNumber"
             tag="span"
             class="font-mono"
             @update:model-value="(v) => update({ meta: { customerNumber: v } })"
           />
-        </div>
+        </DMetaField>
       </div>
 
       <div class="text-[9pt] leading-relaxed mt-3">
@@ -141,7 +56,10 @@ import { useI18n } from 'vue-i18n';
 import type { Document, DocumentPatch, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import PageTemplate from '../PageTemplate.vue';
-import DClientPicker from '../DClientPicker.vue';
+import DLetterhead from '../DLetterhead.vue';
+import DRecipientAddress from '../DRecipientAddress.vue';
+import DDocTitle from '../DDocTitle.vue';
+import DMetaField from '../DMetaField.vue';
 import DInline from '../DInline.vue';
 import DDate from '../DDate.vue';
 import DLineItemsTable from '../DLineItemsTable.vue';
