@@ -1,11 +1,9 @@
 import * as repo from '@/fs/repo';
 import type {
-  Client,
   Document,
   DocumentPatch,
   DocumentStatus,
   FileProblem,
-  Position,
   Sender,
   ViewId,
 } from '@/fs/types';
@@ -29,13 +27,13 @@ import {
   recipientLabel,
   statusPillsForView as pillsForView,
 } from './views';
+import { masterDataSlice } from './masterData';
 import { numberClaims, writeQueue } from './persistence';
 
 export const useDocumentsStore = defineStore('documents', () => {
   const documents = ref<Document[]>([]);
-  const clients = ref<Client[]>([]);
-  const senders = ref<Sender[]>([]);
-  const positions = ref<Position[]>([]);
+  const md = masterDataSlice();
+  const { senders, clients, positions, findClient } = md;
   /** Creation default: which sender a new doc should use. */
   const activeSenderKey = ref<string | null>(null);
   /** Mail-style smart view for the document list. */
@@ -67,11 +65,6 @@ export const useDocumentsStore = defineStore('documents', () => {
   function findSender(senderKey?: string): Sender | null {
     if (senderKey) return senders.value.find((s) => s.key === senderKey) ?? null;
     return activeSender.value;
-  }
-
-  function findClient(customerNumber?: string): Client | undefined {
-    if (!customerNumber) return undefined;
-    return clients.value.find((c) => c.customerNumber === customerNumber);
   }
 
   /** Resolves which sender owns a document; uses senderKey if set, else matches the snapshot. */
@@ -166,13 +159,7 @@ export const useDocumentsStore = defineStore('documents', () => {
       loadProblemsDismissed.value = false;
     }
     loadProblems.value = problems;
-    senders.value = [...snap.senders].sort((a, b) => a.key.localeCompare(b.key));
-    clients.value = [...snap.clients].sort((a, b) =>
-      a.customerNumber.localeCompare(b.customerNumber),
-    );
-    positions.value = [...snap.positions].sort((a, b) =>
-      a.description.localeCompare(b.description),
-    );
+    md.setFromSnapshot(snap);
     documents.value = [...snap.documents].sort((a, b) => {
       const da = new Date(a.meta.date).getTime();
       const db = new Date(b.meta.date).getTime();
@@ -381,43 +368,6 @@ export const useDocumentsStore = defineStore('documents', () => {
     });
   }
 
-  // --- Senders, clients, positions ---
-
-  async function saveSender(s: Sender) {
-    await repo.writeSender(s);
-    const idx = senders.value.findIndex((x) => x.key === s.key);
-    if (idx >= 0) senders.value.splice(idx, 1, s);
-    else {
-      senders.value.push(s);
-      senders.value.sort((a, b) => a.key.localeCompare(b.key));
-    }
-  }
-
-  async function removeSender(key: string) {
-    await repo.deleteSender(key);
-    senders.value = senders.value.filter((s) => s.key !== key);
-  }
-
-  async function saveClient(c: Client) {
-    await repo.writeClient(c);
-    const idx = clients.value.findIndex((x) => x.customerNumber === c.customerNumber);
-    if (idx >= 0) clients.value.splice(idx, 1, c);
-    else {
-      clients.value.push(c);
-      clients.value.sort((a, b) => a.customerNumber.localeCompare(b.customerNumber));
-    }
-  }
-
-  async function removeClient(customerNumber: string) {
-    await repo.deleteClient(customerNumber);
-    clients.value = clients.value.filter((c) => c.customerNumber !== customerNumber);
-  }
-
-  async function savePositions(list: Position[]) {
-    await repo.writePositions(list);
-    positions.value = [...list].sort((a, b) => a.description.localeCompare(b.description));
-  }
-
   return {
     documents,
     clients,
@@ -464,11 +414,11 @@ export const useDocumentsStore = defineStore('documents', () => {
     resetRecipient,
     nextDocument,
     previousDocument,
-    saveSender,
-    removeSender,
-    saveClient,
-    removeClient,
-    savePositions,
+    saveSender: md.saveSender,
+    removeSender: md.removeSender,
+    saveClient: md.saveClient,
+    removeClient: md.removeClient,
+    savePositions: md.savePositions,
     setNavigator,
   };
 });
