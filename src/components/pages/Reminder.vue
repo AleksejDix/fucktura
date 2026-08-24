@@ -158,7 +158,12 @@
 
       <div class="text-[9pt] leading-relaxed mt-3">
         <p>{{ t('Greeting', { name: recipient.name }) }}</p>
-        <p class="mt-2">{{ bodyText }}</p>
+        <DInline
+          :model-value="bodyText"
+          tag="p"
+          class="mt-2"
+          @update:model-value="(v) => update({ text: v })"
+        />
       </div>
 
       <table class="w-full text-[9pt] mt-3">
@@ -268,11 +273,12 @@ const total = computed(() =>
 );
 
 /**
- * Letter body: the wording escalates with the reminder level — the 2nd
- * and 3rd levels announce debt collection
+ * Letter body: a per-document override wins; otherwise the wording escalates
+ * with the reminder level — the 2nd and 3rd levels announce debt collection
  * (Betreibung) and carry the shorter payment deadline.
  */
 const bodyText = computed(() => {
+  if (props.doc.text) return props.doc.text;
   const key =
     currentLevel.value >= 3
       ? 'Reminder intro 3'

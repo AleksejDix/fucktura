@@ -107,6 +107,8 @@ export interface Document {
   lineItems?: LineItem[];
   /** Reminder escalation level (1st, 2nd, 3rd reminder). Reminders only. */
   reminderLevel?: number;
+  /** Letter body overriding the level-based default wording. Reminders only. */
+  text?: string;
   /** Outstanding invoice amount being dunned. Reminders only. */
   outstandingAmount?: number;
   /** Flat reminder fee added on top. Reminders only. */
