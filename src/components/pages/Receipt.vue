@@ -93,16 +93,9 @@ function update(changes: DocumentPatch) {
     "Customer number": "Buchungsnummer",
     "Greeting": "Guten Tag {name}",
     "Receipt intro": "Hiermit bestätigen wir den Erhalt folgender Zahlung:",
-    "Pos": "Pos.",
-    "Description": "Beschreibung",
-    "Quantity": "Menge",
-    "Unit price": "Einzelpreis",
-    "Price in": "Betrag in",
-    "Amount (tax exempt)": "Gesamtbetrag (von Steuer befreit)",
     "Tax note": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmerregelung).",
     "Thank you": "Vielen Dank für Ihren Aufenthalt!",
-    "Kind regards": "Freundliche Grüße",
-    "Add line item": "Position hinzufügen"
+    "Kind regards": "Freundliche Grüße"
   },
   "en": {
     "Receipt": "Receipt",
@@ -113,16 +106,9 @@ function update(changes: DocumentPatch) {
     "Customer number": "Booking number",
     "Greeting": "Dear {name}",
     "Receipt intro": "We hereby confirm receipt of the following payment:",
-    "Pos": "Pos.",
-    "Description": "Description",
-    "Quantity": "Quantity",
-    "Unit price": "Unit price",
-    "Price in": "Amount in",
-    "Amount (tax exempt)": "Total amount (tax exempt)",
     "Tax note": "No VAT charged pursuant to § 19 UStG (small business regulation).",
     "Thank you": "Thank you for your stay!",
-    "Kind regards": "Kind regards",
-    "Add line item": "Add line item"
+    "Kind regards": "Kind regards"
   },
   "ru": {
     "Receipt": "Квитанция",
@@ -133,16 +119,9 @@ function update(changes: DocumentPatch) {
     "Customer number": "Номер бронирования",
     "Greeting": "Здравствуйте, {name}",
     "Receipt intro": "Настоящим подтверждаем получение следующего платежа:",
-    "Pos": "Поз.",
-    "Description": "Описание",
-    "Quantity": "Количество",
-    "Unit price": "Цена за единицу",
-    "Price in": "Сумма в",
-    "Amount (tax exempt)": "Итого (без НДС)",
     "Tax note": "НДС не взимается в соответствии с § 19 UStG (режим малого предпринимательства).",
     "Thank you": "Спасибо за ваше пребывание!",
-    "Kind regards": "С уважением",
-    "Add line item": "Добавить позицию"
+    "Kind regards": "С уважением"
   }
 }
 </i18n>

@@ -94,17 +94,9 @@ function update(changes: DocumentPatch) {
     "Customer number": "Kundennummer",
     "Greeting": "Guten Tag {name}",
     "Quote intro": "Vielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen folgende Offerte:",
-    "Pos": "Pos.",
-    "Description": "Beschreibung",
-    "Quantity": "Menge",
-    "Unit price": "Einzelpreis",
-    "Price in CHF": "Preis in CHF",
-    "Product code": "Produktcode",
-    "Quote amount (tax exempt)": "Offertbetrag (von Steuer befreit)",
     "Quote valid note": "Diese Offerte ist gültig bis {date}.",
     "Quote closing": "Wir freuen uns auf Ihre Rückmeldung.",
-    "Kind regards": "Freundliche Grüsse",
-    "Add line item": "Position hinzufügen"
+    "Kind regards": "Freundliche Grüsse"
   },
   "en": {
     "Quote": "Quote",
@@ -114,17 +106,9 @@ function update(changes: DocumentPatch) {
     "Customer number": "Customer number",
     "Greeting": "Dear {name}",
     "Quote intro": "Thank you for your inquiry. We are pleased to offer you the following:",
-    "Pos": "Pos.",
-    "Description": "Description",
-    "Quantity": "Quantity",
-    "Unit price": "Unit price",
-    "Price in CHF": "Price in CHF",
-    "Product code": "Product code",
-    "Quote amount (tax exempt)": "Quote amount (tax exempt)",
     "Quote valid note": "This quote is valid until {date}.",
     "Quote closing": "We look forward to hearing from you.",
-    "Kind regards": "Kind regards",
-    "Add line item": "Add line item"
+    "Kind regards": "Kind regards"
   },
   "es": {
     "Quote": "Presupuesto",
@@ -134,17 +118,9 @@ function update(changes: DocumentPatch) {
     "Customer number": "Número de cliente",
     "Greeting": "Estimado/a {name}",
     "Quote intro": "Gracias por su consulta. Nos complace presentarle el siguiente presupuesto:",
-    "Pos": "Pos.",
-    "Description": "Descripción",
-    "Quantity": "Cantidad",
-    "Unit price": "Precio unitario",
-    "Price in CHF": "Precio en CHF",
-    "Product code": "Código de producto",
-    "Quote amount (tax exempt)": "Importe del presupuesto (exento de impuestos)",
     "Quote valid note": "Este presupuesto es válido hasta el {date}.",
     "Quote closing": "Esperamos su respuesta.",
-    "Kind regards": "Atentamente",
-    "Add line item": "Añadir posición"
+    "Kind regards": "Atentamente"
   },
   "nl": {
     "Quote": "Offerte",
@@ -154,17 +130,9 @@ function update(changes: DocumentPatch) {
     "Customer number": "Klantnummer",
     "Greeting": "Geachte {name}",
     "Quote intro": "Bedankt voor uw aanvraag. Graag bieden wij u de volgende quote aan:",
-    "Pos": "Pos.",
-    "Description": "Omschrijving",
-    "Quantity": "Aantal",
-    "Unit price": "Eenheidsprijs",
-    "Price in CHF": "Prijs in CHF",
-    "Product code": "Productcode",
-    "Quote amount (tax exempt)": "Offertebedrag (vrijgesteld van BTW)",
     "Quote valid note": "Deze quote is geldig tot {date}.",
     "Quote closing": "Wij zien uw reactie met belangstelling tegemoet.",
-    "Kind regards": "Met vriendelijke groet",
-    "Add line item": "Positie toevoegen"
+    "Kind regards": "Met vriendelijke groet"
   },
   "ru": {
     "Quote": "Коммерческое предложение",
@@ -174,17 +142,9 @@ function update(changes: DocumentPatch) {
     "Customer number": "Номер клиента",
     "Greeting": "Здравствуйте, {name}",
     "Quote intro": "Благодарим за ваш запрос. Рады предложить вам следующее:",
-    "Pos": "Поз.",
-    "Description": "Описание",
-    "Quantity": "Количество",
-    "Unit price": "Цена за единицу",
-    "Price in CHF": "Цена в CHF",
-    "Product code": "Код продукта",
-    "Quote amount (tax exempt)": "Сумма предложения (без НДС)",
     "Quote valid note": "Данное предложение действительно до {date}.",
     "Quote closing": "Ждём вашего ответа.",
-    "Kind regards": "С уважением",
-    "Add line item": "Добавить позицию"
+    "Kind regards": "С уважением"
   }
 }
 </i18n>
