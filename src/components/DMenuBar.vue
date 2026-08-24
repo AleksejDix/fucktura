@@ -2,59 +2,15 @@
   <nav
     class="h-8 bg-white border-b border-gray-200 flex items-stretch text-[13px] z-50 select-none"
   >
-    <div
+    <DMenu
       v-for="menu in menus"
       :key="menu.label"
-      class="relative"
-      @mouseenter="openMenu && (openMenu = menu.label)"
-    >
-      <button
-        @click="toggleMenu(menu.label)"
-        class="h-full px-4 flex items-center transition-colors"
-        :class="[
-          menu.label === 'Fucktura' ? 'w-[11rem] border-r border-gray-200' : '',
-          menu.bold ? 'font-bold' : '',
-          openMenu === menu.label ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-100',
-        ]"
-      >
-        <DLogo v-if="menu.label === 'Fucktura'" />
-        <template v-else>{{ menu.label }}</template>
-      </button>
-
-      <div
-        v-if="openMenu === menu.label"
-        class="absolute top-full left-0 min-w-[220px] bg-white shadow-xl border border-gray-200 py-1 z-50"
-      >
-        <template v-for="(item, i) in menu.items" :key="i">
-          <div v-if="item.separator" class="border-t border-gray-200 my-1" />
-          <button
-            v-else-if="!item.hidden"
-            @click.stop="runAction(item)"
-            :disabled="item.disabled"
-            class="w-full flex items-center justify-between px-3 py-1.5 text-left text-[13px] transition-colors"
-            :class="[
-              item.disabled
-                ? 'text-gray-300 cursor-default'
-                : item.destructive
-                  ? 'text-red-500 hover:bg-gray-100'
-                  : 'text-gray-800 hover:bg-black hover:text-white',
-              item.strikethrough ? 'line-through decoration-gray-400' : '',
-            ]"
-          >
-            <span class="flex items-center gap-2">
-              <span class="w-4 text-center">{{ item.checked ? '✓' : '' }}</span>
-              {{ item.label }}
-            </span>
-            <span
-              v-if="item.shortcut"
-              class="text-[11px] ml-4"
-              :class="item.disabled ? 'text-gray-300' : 'text-gray-400'"
-              >{{ item.shortcut }}</span
-            >
-          </button>
-        </template>
-      </div>
-    </div>
+      :menu="menu"
+      :open="openMenu === menu.label"
+      @toggle="toggleMenu(menu.label)"
+      @hover="openMenu && (openMenu = menu.label)"
+      @run="runAction"
+    />
 
     <div class="flex-1" />
 
@@ -70,7 +26,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import DModeToggle from './DModeToggle.vue';
-import DLogo from './DLogo.vue';
+import DMenu, { type Menu, type MenuItem } from './DMenu.vue';
 import DAboutDialog from './DAboutDialog.vue';
 import { useDocumentsStore } from '@/stores/documents';
 import { useFolderStore } from '@/stores/folder';
@@ -80,24 +36,6 @@ import { useConfirmStore } from '@/stores/confirm';
 import { useLetterNormStore } from '@/stores/letterNorm';
 import { useGlobalShortcuts } from '@/composables/useGlobalShortcuts';
 import { emailMailtoUrl } from '@/emails';
-
-interface MenuItem {
-  label?: string;
-  shortcut?: string;
-  action?: () => void | Promise<void>;
-  disabled?: boolean;
-  hidden?: boolean;
-  destructive?: boolean;
-  separator?: boolean;
-  checked?: boolean;
-  strikethrough?: boolean;
-}
-
-interface Menu {
-  label: string;
-  bold?: boolean;
-  items: MenuItem[];
-}
 
 const { t, locale } = useI18n();
 const store = useDocumentsStore();
@@ -217,6 +155,7 @@ const menus = computed<Menu[]>(() => [
   {
     label: 'Fucktura',
     bold: true,
+    brand: true,
     items: [
       {
         label: t('About Fucktura'),
