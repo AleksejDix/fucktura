@@ -158,7 +158,7 @@
 
       <div class="text-[9pt] leading-relaxed mt-3">
         <p>{{ t('Greeting', { name: recipient.name }) }}</p>
-        <p class="mt-2">{{ t('Reminder intro') }}</p>
+        <p class="mt-2">{{ bodyText }}</p>
       </div>
 
       <table class="w-full text-[9pt] mt-3">
@@ -234,6 +234,7 @@ import type { Document, DocumentPatch, Sender } from '@/fs/types';
 import { useDocumentsStore } from '@/stores/documents';
 import { addDays } from '@/stores/documents/factories';
 import { useMoney } from '@/composables/useMoney';
+import { useDate } from '@/composables/useDate';
 import { getReminderDefaults } from '@/data/reminder-defaults';
 import PageTemplate from '../PageTemplate.vue';
 import DClientPicker from '../DClientPicker.vue';
@@ -244,6 +245,7 @@ import DDate from '../DDate.vue';
 const { t } = useI18n({ useScope: 'local' });
 const store = useDocumentsStore();
 const { sumAmounts, formatChf } = useMoney();
+const { formatDate } = useDate();
 
 const props = defineProps<{
   pageIndex?: number;
@@ -264,6 +266,24 @@ const countryDefaults = computed(() => getReminderDefaults(recipient.value.count
 const total = computed(() =>
   sumAmounts(outstandingAmount.value, reminderFee.value, lateInterest.value),
 );
+
+/**
+ * Letter body: the wording escalates with the reminder level — the 2nd
+ * and 3rd levels announce debt collection
+ * (Betreibung) and carry the shorter payment deadline.
+ */
+const bodyText = computed(() => {
+  const key =
+    currentLevel.value >= 3
+      ? 'Reminder intro 3'
+      : currentLevel.value === 2
+        ? 'Reminder intro 2'
+        : 'Reminder intro';
+  return t(key, {
+    days: countryDefaults.value.paymentDays[currentLevel.value - 1] ?? 14,
+    dueDate: formatDate(meta.value.dueDate),
+  });
+});
 
 function update(changes: DocumentPatch) {
   if (!props.doc.number) return;
@@ -300,6 +320,8 @@ function formatAmount(n: number): string {
     "Customer number": "Kundennummer",
     "Greeting": "Guten Tag {name}",
     "Reminder intro": "Gemäss unseren Unterlagen ist die oben genannte Rechnung noch offen. Wir bitten Sie, den ausstehenden Betrag innert der angegebenen Frist zu überweisen.",
+    "Reminder intro 2": "Trotz unserer ersten Mahnung haben wir bis heute keinen Zahlungseingang feststellen können. Wir bitten Sie, den offenen Betrag innerhalb von {days} Tagen, spätestens bis zum {dueDate}, zu begleichen. Sollte die Zahlung nicht innerhalb dieser Frist bei uns eintreffen, werden wir ohne weitere Ankündigung die Betreibung einleiten.",
+    "Reminder intro 3": "Trotz zweimaliger Mahnung ist der offene Betrag bis heute nicht beglichen. Dies ist unsere letzte Mahnung: Sollte die Zahlung nicht innerhalb von {days} Tagen, spätestens bis zum {dueDate}, bei uns eintreffen, leiten wir ohne weitere Ankündigung die Betreibung ein.",
     "Description": "Beschreibung",
     "Price in CHF": "Betrag in CHF",
     "Outstanding amount": "Offener Rechnungsbetrag",
@@ -326,6 +348,8 @@ function formatAmount(n: number): string {
     "Customer number": "Customer number",
     "Greeting": "Dear {name}",
     "Reminder intro": "According to our records, the above invoice is still outstanding. Please transfer the outstanding amount within the specified period.",
+    "Reminder intro 2": "Despite our first reminder, we have not yet received your payment. Please settle the outstanding amount within {days} days, by {dueDate} at the latest. Should payment not reach us within this period, we will initiate debt collection proceedings without further notice.",
+    "Reminder intro 3": "Despite two reminders, the outstanding amount remains unpaid. This is our final reminder: should payment not reach us within {days} days, by {dueDate} at the latest, we will initiate debt collection proceedings without further notice.",
     "Description": "Description",
     "Price in CHF": "Amount in CHF",
     "Outstanding amount": "Outstanding amount",
@@ -352,6 +376,8 @@ function formatAmount(n: number): string {
     "Customer number": "Número de cliente",
     "Greeting": "Estimado/a {name}",
     "Reminder intro": "Según nuestros registros, la factura mencionada sigue pendiente de pago. Le rogamos que transfiera el importe adeudado dentro del plazo indicado.",
+    "Reminder intro 2": "A pesar de nuestro primer recordatorio, hasta la fecha no hemos recibido su pago. Le rogamos que abone el importe pendiente en un plazo de {days} días, a más tardar el {dueDate}. Si el pago no nos llega dentro de este plazo, iniciaremos el procedimiento de cobro por vía ejecutiva sin previo aviso.",
+    "Reminder intro 3": "A pesar de dos recordatorios, el importe pendiente sigue sin abonarse. Este es nuestro último recordatorio: si el pago no nos llega en un plazo de {days} días, a más tardar el {dueDate}, iniciaremos el procedimiento de cobro por vía ejecutiva sin previo aviso.",
     "Description": "Descripción",
     "Price in CHF": "Importe en CHF",
     "Outstanding amount": "Importe pendiente de la factura",
@@ -378,6 +404,8 @@ function formatAmount(n: number): string {
     "Customer number": "Klantnummer",
     "Greeting": "Geachte {name}",
     "Reminder intro": "Volgens onze administratie is bovengenoemde factuur nog niet voldaan. Wij verzoeken u het openstaande bedrag binnen de aangegeven termijn over te maken.",
+    "Reminder intro 2": "Ondanks onze eerste aanmaning hebben wij tot op heden geen betaling ontvangen. Wij verzoeken u het openstaande bedrag binnen {days} dagen, uiterlijk op {dueDate}, te voldoen. Indien de betaling niet binnen deze termijn bij ons binnenkomt, starten wij zonder nadere aankondiging een incassoprocedure.",
+    "Reminder intro 3": "Ondanks twee aanmaningen is het openstaande bedrag tot op heden niet voldaan. Dit is onze laatste aanmaning: indien de betaling niet binnen {days} dagen, uiterlijk op {dueDate}, bij ons binnenkomt, starten wij zonder nadere aankondiging een incassoprocedure.",
     "Description": "Omschrijving",
     "Price in CHF": "Bedrag in CHF",
     "Outstanding amount": "Openstaand factuurbedrag",
@@ -404,6 +432,8 @@ function formatAmount(n: number): string {
     "Customer number": "Номер клиента",
     "Greeting": "Здравствуйте, {name}",
     "Reminder intro": "Согласно нашим данным, указанный выше счёт до сих пор не оплачен. Просим произвести оплату в указанный срок.",
+    "Reminder intro 2": "Несмотря на наше первое напоминание, оплата до настоящего времени не поступила. Просим погасить задолженность в течение {days} дней, не позднее {dueDate}. Если оплата не поступит в указанный срок, мы без дополнительного уведомления начнём процедуру принудительного взыскания.",
+    "Reminder intro 3": "Несмотря на два напоминания, задолженность до настоящего времени не погашена. Это последнее напоминание: если оплата не поступит в течение {days} дней, не позднее {dueDate}, мы без дополнительного уведомления начнём процедуру принудительного взыскания.",
     "Description": "Описание",
     "Price in CHF": "Сумма в CHF",
     "Outstanding amount": "Сумма задолженности",
